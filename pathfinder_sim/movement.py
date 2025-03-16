@@ -60,7 +60,9 @@ class Map:
         end_node = grid.node(end[0], end[1])
         finder = AStarFinder(diagonal_movement=False)
         path, runs = finder.find_path(start_node, end_node, grid)
-        return path
+        # Convert each GridNode in the path to a tuple (x, y)
+        tuple_path = [(node.x, node.y) for node in path] if path else []
+        return tuple_path
 
 class MovementAction:
     """

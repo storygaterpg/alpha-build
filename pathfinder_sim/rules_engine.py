@@ -5,7 +5,7 @@ rules_engine.py
 This module implements the core rules engine for our simulation.
 It includes:
   - Dice: A class for dice rolls with standard dice notation.
-  - CombatResolver, SpellResolver, SkillResolver: Simplified resolvers.
+  - CombatResolver, SpellResolver, SkillResolver: Simplified resolvers for processing actions.
   - RulesEngine: Integrates these resolvers.
 """
 
@@ -13,6 +13,9 @@ from typing import List, Dict, Any
 import math
 
 class Dice:
+    """
+    A simple Dice class for rolling dice with notations like '1d20+5'.
+    """
     def __init__(self, seed: int = None):
         import random
         self.rng = random.Random(seed)
@@ -153,7 +156,7 @@ class SkillResolver:
 
     def resolve_skill_check(self, skill_action) -> Dict[str, Any]:
         roll = self.dice.roll_d20()
-        total = roll + 2
+        total = roll + 2  # Simplified bonus
         result = {
             "action": "skill_check",
             "character_name": skill_action.actor.name,

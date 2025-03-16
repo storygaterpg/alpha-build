@@ -1,6 +1,6 @@
 """
-engine.py
----------
+main.py
+-------
 
 This is the main simulation engine for our Pathfinder 1st Edition game.
 It integrates:
@@ -11,8 +11,8 @@ It integrates:
   - Rules Engine: From rules_engine.py.
   - Character: From character.py.
 
-This engine ties all components together and demonstrates a sample turn, including movement,
-spell targeting, action resolution, and condition updates.
+This engine ties all components together and demonstrates a sample turn,
+including movement, spell targeting, action resolution, and condition updates.
 """
 
 from movement import Map, MovementAction
@@ -22,11 +22,11 @@ from character import Character
 from turn_manager import TurnManager, ActionType, AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction
 from rules_engine import Dice, RulesEngine, rules_engine
 
-# Global game map for use by movement and turn actions.
+# Global game map for use by movement actions.
 game_map = None
 
 def main():
-    # Initialize dice and rules engine.
+    # Initialize dice and global rules engine.
     dice = Dice(seed=42)
     global rules_engine
     rules_engine = RulesEngine(dice)
@@ -34,7 +34,7 @@ def main():
     # Create a 10x10 map.
     global game_map
     game_map = Map(10, 10)
-    # Set terrain: Column 3, rows 3-5 as difficult; cell (5,5) as impassable.
+    # Set terrain: column 3, rows 3-5 as difficult; cell (5,5) as impassable.
     for y in range(3, 6):
         game_map.set_terrain(3, y, "difficult")
     game_map.set_terrain(5, 5, "impassable")
@@ -54,12 +54,12 @@ def main():
     print(alice)
     print(bob)
     
-    # Create a TurnManager.
-    turn_manager = TurnManager(rules_engine)
+    # Create a TurnManager, now passing the global game_map.
+    turn_manager = TurnManager(rules_engine, game_map)
     current_turn = turn_manager.new_turn()
     
-    # Create actions based on Pathfinder action economy:
-    # Option B: One standard action (attack) and one move action.
+    # Create actions:
+    # Option B: One standard action (attack) and one move action for Alice.
     attack = AttackAction(actor=alice, defender=bob, weapon_bonus=2,
                           weapon=None, is_touch_attack=False, target_flat_footed=True,
                           action_type=ActionType.STANDARD)
@@ -82,7 +82,7 @@ def main():
     for res in results:
         print("Action Result:", res)
     
-    # Demonstrate movement.
+    # Demonstrate additional movement.
     movement_action = MovementAction(game_map, alice.position, (9, 9))
     path = movement_action.execute()
     print("Calculated Movement Path for Alice:", path)
