@@ -10,8 +10,8 @@ It provides:
 Terrain Types:
   - "normal": cost 1
   - "difficult": cost 2
-  - "impassable": cost 9999 (effectively blocking movement)
-
+  - "impassable": cost 0 (cells with 0 are considered unwalkable)
+  
 The Map class stores its grid as a NumPy array for efficiency.
 """
 
@@ -23,7 +23,7 @@ from pathfinding.finder.a_star import AStarFinder
 # Terrain movement cost constants.
 NORMAL_COST = 1
 DIFFICULT_COST = 2
-IMPASSABLE_COST = 9999
+IMPASSABLE_COST = 0  # Changed to 0 so that impassable cells are not walkable
 
 class Map:
     """
