@@ -4,7 +4,8 @@ character.py
 
 This module defines the Character class for our Pathfinder simulation.
 It manages attributes such as position, dexterity, equipment bonuses, known spells, and active conditions.
-Additionally, it provides methods to compute defense statistics (AC, flat-footed AC, touch AC) as required by combat resolution.
+Additionally, it provides methods to compute defense statistics (full AC, flat-footed AC, touch AC)
+as required by combat resolution.
 """
 
 from typing import List, Dict, Any

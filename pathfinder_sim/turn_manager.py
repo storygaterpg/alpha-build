@@ -10,17 +10,11 @@ It enforces that each character, per turn, may choose one of the following combi
 
 Additionally, each character may take 1 Swift action and unlimited Free actions.
 A JSON parser is provided to process external action orders.
-
-Classes:
-  - ActionType: Enumeration for action types.
-  - GameAction and its subclasses.
-  - Turn: Represents a single turn and tracks per-character actions.
-  - TurnManager: Manages turn sequencing, action ID assignment, and JSON parsing.
 """
 
 import json
 from enum import Enum
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Tuple
 from character import Character
 from rules_engine import rules_engine  # Global rules engine instance
 
@@ -37,6 +31,8 @@ class GameAction:
         self.action_type = action_type
         self.action_id: int = 0
         self.parameters = parameters if parameters is not None else {}
+        self.rules_engine = None  # This will be injected before execution
+        self.game_map = None      # This will be injected for move actions
 
     def execute(self) -> Dict[str, Any]:
         raise NotImplementedError("Subclasses must implement execute()")
@@ -53,8 +49,7 @@ class AttackAction(GameAction):
         self.target_flat_footed = target_flat_footed
 
     def execute(self) -> Dict[str, Any]:
-        from rules_engine import rules_engine
-        return rules_engine.combat_resolver.resolve_attack(self)
+        return self.rules_engine.combat_resolver.resolve_attack(self)
 
 class SpellAction(GameAction):
     def __init__(self, actor: Character, target: Character, spell_name: str,
@@ -64,10 +59,9 @@ class SpellAction(GameAction):
         self.spell_name = spell_name
 
     def execute(self) -> Dict[str, Any]:
-        from rules_engine import rules_engine
         if self.spell_name.lower() not in [spell.lower() for spell in self.actor.spells]:
             raise ValueError(f"{self.actor.name} does not know '{self.spell_name}'.")
-        return rules_engine.spell_resolver.resolve_spell(self)
+        return self.rules_engine.spell_resolver.resolve_spell(self)
 
 class SkillCheckAction(GameAction):
     def __init__(self, actor: Character, skill_name: str, dc: int,
@@ -77,8 +71,7 @@ class SkillCheckAction(GameAction):
         self.dc = dc
 
     def execute(self) -> Dict[str, Any]:
-        from rules_engine import rules_engine
-        return rules_engine.skill_resolver.resolve_skill_check(self)
+        return self.rules_engine.skill_resolver.resolve_skill_check(self)
 
 class MoveAction(GameAction):
     def __init__(self, actor: Character, target: Tuple[int, int],
@@ -88,8 +81,8 @@ class MoveAction(GameAction):
 
     def execute(self) -> Dict[str, Any]:
         from movement import MovementAction
-        from pathfinder_sim.main import game_map
-        movement_action = MovementAction(game_map, self.actor.position, self.target)
+        # Use the injected game_map reference
+        movement_action = MovementAction(self.game_map, self.actor.position, self.target)
         path = movement_action.execute()
         if path:
             self.actor.position = path[-1]
@@ -111,8 +104,8 @@ class FullRoundAction(GameAction):
         if self.parameters.get("type") == "charge":
             target = self.parameters.get("target")
             from movement import MovementAction
-            from pathfinder_sim.main import game_map
-            movement_action = MovementAction(game_map, self.actor.position, target)
+            # Use injected game_map
+            movement_action = MovementAction(self.game_map, self.actor.position, target)
             path = movement_action.execute()
             if not path:
                 return {"action": "full_round", "result": "failed", "justification": "No clear path for charge."}
@@ -121,7 +114,8 @@ class FullRoundAction(GameAction):
             temp_attack = AttackAction(actor=self.actor, defender=self.parameters.get("defender"),
                                        weapon_bonus=0, weapon=self.parameters.get("weapon"),
                                        action_type=ActionType.FULL_ROUND)
-            attack_result = rules_engine.combat_resolver.resolve_attack(temp_attack)
+            temp_attack.rules_engine = self.rules_engine
+            attack_result = self.rules_engine.combat_resolver.resolve_attack(temp_attack)
             return {
                 "action": "full_round",
                 "type": "charge",
@@ -136,7 +130,7 @@ class FullRoundAction(GameAction):
 class Turn:
     def __init__(self, turn_number: int):
         self.turn_number = turn_number
-        # Per character, record actions: "standard", "move" (list), "swift", "full_round", "free" (list).
+        # For each character, record actions: "standard", "move" (list), "swift", "full_round", "free" (list).
         self.character_actions: Dict[str, Dict[str, Any]] = {}
 
     def add_action(self, action: GameAction) -> None:
@@ -192,8 +186,9 @@ class Turn:
         return actions
 
 class TurnManager:
-    def __init__(self, rules_engine):
+    def __init__(self, rules_engine, game_map):
         self.rules_engine = rules_engine
+        self.game_map = game_map
         self.current_turn = 1
         self.action_id_counter = 1
 
@@ -210,6 +205,10 @@ class TurnManager:
         results = []
         for action in turn.get_all_actions():
             self.assign_action_id(action)
+            # Inject rules_engine and game_map into actions.
+            action.rules_engine = self.rules_engine
+            if action.action_type in [ActionType.MOVE, ActionType.FULL_ROUND]:
+                action.game_map = self.game_map
             result = action.execute()
             result["turn_number"] = turn.turn_number
             result["action_id"] = action.action_id
