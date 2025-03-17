@@ -266,3 +266,34 @@ class TurnManager:
                 raise ValueError(f"Unsupported action type: {action_type_str}")
             turn.add_action(action)
         return turn
+    
+    def check_opportunity_attacks(self, move_action: MoveAction) -> List[Any]:
+        """
+        Check if the move action provokes opportunity attacks.
+        Uses each enemy's threatened squares (as defined by get_threatened_squares()).
+        If the starting square is within an enemy's threatened squares and the final square is not,
+        that enemy gets an opportunity attack.
+        """
+        opp_results = []
+        # Retrieve starting position; if not explicitly stored, assume the actor's position before the move.
+        start_pos = move_action.parameters.get("start_position")
+        if start_pos is None:
+            # For simplicity, if start_position wasn't stored, we assume the actor started at a previous known value.
+            # In a full system, we would store the starting position before movement.
+            start_pos = move_action.actor.position
+        end_pos = move_action.actor.position
+        for other in self.characters.values():
+            if other.name == move_action.actor.name:
+                continue
+            threatened = other.get_threatened_squares()
+            if start_pos in threatened and end_pos not in threatened:
+                # Trigger an opportunity attack from this enemy.
+                opp_attack = AttackAction(actor=other, defender=move_action.actor, weapon_bonus=0,
+                                          weapon=None, is_touch_attack=False, target_flat_footed=False,
+                                          action_type="free")
+                opp_attack.rules_engine = self.rules_engine
+                result = opp_attack.execute()
+                result["justification"] = f"Opportunity attack by {other.name} due to leaving threatened square."
+                result["triggered_by"] = move_action.actor.name
+                opp_results.append(result)
+        return opp_results

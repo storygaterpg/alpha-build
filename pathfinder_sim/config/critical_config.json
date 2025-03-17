@@ -1,0 +1,20 @@
+{
+    "default": {
+      "threat_range": 19,
+      "critical_multiplier": 2,
+      "confirmation_modifier": 0
+    },
+    "overrides": {
+      "longsword": {
+        "threat_range": 19,
+        "critical_multiplier": 2,
+        "confirmation_modifier": 1
+      },
+      "rapier": {
+        "threat_range": 18,
+        "critical_multiplier": 2,
+        "confirmation_modifier": 0
+      }
+    }
+  }
+  

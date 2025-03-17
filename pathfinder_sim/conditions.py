@@ -2,36 +2,32 @@
 conditions.py
 --------------
 
-This module implements the conditions framework for our Pathfinder simulation.
-Each condition is defined as a subclass of the base Condition class. Each condition
-has a name, duration (in rounds), and a detailed description that covers both its explicit
-mechanical effects and its implicit (self‑explanatory) effects.
-
-Currently implemented conditions include:
-  - BlindedCondition
-  - ConfusedCondition
-  - ProneCondition
-  - ShakenCondition
-  - StunnedCondition
-
-Additional conditions can be added following this pattern.
+This module implements the conditions framework for our Pathfinder simulation using a data-driven approach.
+Condition definitions are loaded from an external JSON configuration file, allowing for flexibility and easy adjustments.
 """
 
 from abc import ABC, abstractmethod
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Dict, Any
+import json
+import os
 
-if TYPE_CHECKING:
-    from character import Character  # Forward reference for type checking
+# Global variable to cache the conditions configuration.
+_CONDITIONS_CONFIG = None
+
+def load_conditions_config() -> Dict[str, Any]:
+    """
+    Loads condition definitions from 'config/conditions_config.json' and caches the result.
+    """
+    global _CONDITIONS_CONFIG
+    if _CONDITIONS_CONFIG is None:
+        config_path = os.path.join(os.path.dirname(__file__), "config", "conditions_config.json")
+        with open(config_path, "r") as f:
+            _CONDITIONS_CONFIG = json.load(f)
+    return _CONDITIONS_CONFIG
 
 class Condition(ABC):
     """
-    Base class for conditions affecting a character.
-    
-    Each condition has:
-      - a name,
-      - a duration (in rounds),
-      - a detailed description covering both explicit and implicit effects,
-      - and a method get_modifiers() that returns any numeric modifiers (e.g., to AC).
+    Abstract base class for conditions affecting a character.
     """
     def __init__(self, name: str, duration: int, description: str) -> None:
         self.name = name
@@ -40,10 +36,6 @@ class Condition(ABC):
 
     @abstractmethod
     def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        """
-        Return a dictionary of numeric modifiers imposed by this condition.
-        For conditions primarily affecting non-numeric aspects, return {}.
-        """
         pass
 
     def tick(self) -> None:
@@ -56,62 +48,33 @@ class Condition(ABC):
 
     def get_status(self) -> Dict[str, Any]:
         """
-        Return a summary of the condition, including its name, remaining duration,
-        and its detailed description.
+        Return a summary of the condition, including its name, remaining duration, and description.
         """
         return {"name": self.name, "duration": self.duration, "description": self.description}
 
-class BlindedCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Blinded: The creature cannot see, loses its Dexterity bonus to AC and dodge bonuses, "
-            "and takes an additional -2 penalty to AC. It cannot perceive visual cues, impairing its situational awareness."
-        )
-        super().__init__("Blinded", duration, description)
+class DataCondition(Condition):
+    """
+    A condition defined by data from the configuration file.
+    """
+    def __init__(self, name: str, duration: int, description: str, modifiers: Dict[str, int]):
+        super().__init__(name, duration, description)
+        self.modifiers = modifiers
 
     def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {"ac": - character.get_modifier('DEX') - 2}
+        return self.modifiers
 
-class ConfusedCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Confused: The creature's actions become erratic and unpredictable. It must roll on a confusion table "
-            "each round to determine its behavior. No direct numeric modifiers, but its behavior is chaotic."
-        )
-        super().__init__("Confused", duration, description)
-
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {}
-
-class ProneCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Prone: The creature is lying on the ground, cannot move normally, must crawl to move, "
-            "and requires a move action to stand up. It suffers a -4 penalty to AC against melee attacks."
-        )
-        super().__init__("Prone", duration, description)
-
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {"ac": -4}
-
-class ShakenCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Shaken: The creature is unnerved, taking a -2 penalty on attack rolls, saving throws, "
-            "skill checks, and ability checks. AC is not directly affected."
-        )
-        super().__init__("Shaken", duration, description)
-
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {}
-
-class StunnedCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Stunned: The creature is so disoriented that it can take no actions except free actions, "
-            "and it suffers a -2 penalty to AC. It is completely incapacitated during this time."
-        )
-        super().__init__("Stunned", duration, description)
-
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {"ac": -2}
+def create_condition(name: str, duration: int = None) -> DataCondition:
+    """
+    Factory function to create a condition instance by looking up its definition in the configuration.
+    If duration is not provided, uses the default_duration from the config.
+    """
+    config = load_conditions_config()
+    key = name.lower()
+    if key not in config:
+        raise ValueError(f"Condition '{name}' is not defined in the configuration.")
+    condition_data = config[key]
+    default_duration = condition_data.get("default_duration", 1)
+    final_duration = duration if duration is not None else default_duration
+    description = condition_data.get("description", f"{name} condition.")
+    modifiers = condition_data.get("modifiers", {})
+    return DataCondition(name, final_duration, description, modifiers)

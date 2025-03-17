@@ -1,0 +1,9 @@
+{
+    "attack": "Attack by {attacker_name} on {defender_name}: Roll={natural_roll}, Bonus={effective_bonus}, Total={total_attack}, Defense={effective_defense}, Hit={hit}{critical_info}",
+    "spell": "Spell '{spell_name}' cast by {caster_name} on {target_name}: Damage={damage}",
+    "move": "Movement by {actor_name}: From {start_position} to {end_position}, Path: {path}",
+    "bull_rush": "Bull Rush by {actor_name} on {defender_name}: PushDistance={push_distance}, New Position={new_position}",
+    "grapple": "Grapple by {actor_name} on {target_name}: Result={result}",
+    "default": "Action executed: {action}"
+  }
+  

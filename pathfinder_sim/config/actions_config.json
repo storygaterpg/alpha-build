@@ -1,0 +1,27 @@
+{
+    "attack": {
+      "resource_cost": 0,
+      "allowed_modifiers": ["BAB", "ability", "weapon", "penalty"],
+      "logging_template": "Attack by {attacker_name} on {defender_name}: Roll={natural_roll}, EffectiveBonus={effective_bonus}, TotalAttack={total_attack}, Defense={effective_defense}, Hit={hit}{critical_str}"
+    },
+    "spell": {
+      "resource_cost": {"spell_slots": 1},
+      "logging_template": "Spell '{spell_name}' cast by {caster_name} on {target_name}: Damage={damage}"
+    },
+    "move": {
+      "resource_cost": 0,
+      "logging_template": "Movement by {actor_name}: Start={start_position}, End={end_position}, Path={path}"
+    },
+    "bull_rush": {
+      "resource_cost": 0,
+      "logging_template": "Bull Rush by {actor_name} on {defender_name}: PushDistance={push_distance}, NewPosition={new_position}"
+    },
+    "grapple": {
+      "resource_cost": 0,
+      "logging_template": "Grapple attempt by {actor_name} on {target_name}: Result={result}"
+    },
+    "default": {
+      "logging_template": "Action executed: {action}"
+    }
+  }
+  

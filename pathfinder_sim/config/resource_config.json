@@ -1,0 +1,13 @@
+{
+    "spell_slots": {
+      "default_max": 3,
+      "regen_rate": 1,
+      "description": "Spell slots available for casting spells each day."
+    },
+    "daily_ability": {
+      "default_max": 1,
+      "regen_rate": 0,
+      "description": "A powerful ability that can be used once per day."
+    }
+  }
+  

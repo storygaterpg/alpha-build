@@ -1,0 +1,12 @@
+{
+    "bull_rush": {
+      "description": "Bull Rush: The attacker attempts to push the target back.",
+      "push_distance_default": 1,
+      "formula": "attacker_CMB = BAB + STR mod; target_CMD = AC + 10; success if roll + attacker_CMB >= target_CMD"
+    },
+    "grapple": {
+      "description": "Grapple: The attacker attempts to grapple the target.",
+      "formula": "attacker_CMB = BAB + STR mod; target_CMD = AC + 10; success if roll + attacker_CMB >= target_CMD"
+    }
+  }
+  

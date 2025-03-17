@@ -5,12 +5,14 @@ rules_engine.py
 This module implements the core rules engine for our simulation.
 It includes:
   - Dice: A class for dice rolls with standard dice notation.
-  - CombatResolver, SpellResolver, SkillResolver: Simplified resolvers for processing actions.
+  - CombatResolver, SpellResolver, SkillResolver: Resolvers for processing actions.
   - RulesEngine: Integrates these resolvers.
 """
 
 from typing import List, Dict, Any
 import math
+import json
+import os
 
 class Dice:
     """
@@ -39,6 +41,70 @@ class Dice:
     
     def roll_d20(self) -> int:
         return self.rng.randint(1, 20)
+
+# Global variable to cache bonus configuration.
+_BONUS_CONFIG = None
+
+def load_bonus_config() -> Dict[str, Any]:
+    global _BONUS_CONFIG
+    if _BONUS_CONFIG is None:
+        config_path = os.path.join(os.path.dirname(__file__), "config", "bonus_config.json")
+        with open(config_path, "r") as f:
+            _BONUS_CONFIG = json.load(f)
+    return _BONUS_CONFIG
+
+def stack_bonuses(bonus_list: List[tuple]) -> int:
+    config = load_bonus_config()
+    bonus_rules = config.get("bonus_types", {})
+    
+    stacking_total = 0
+    non_stacking = {}
+    
+    for value, btype in bonus_list:
+        btype_lower = btype.lower()
+        rule = bonus_rules.get(btype_lower, {"stacks": False})
+        if rule["stacks"]:
+            stacking_total += value
+        else:
+            if btype_lower in non_stacking:
+                if value >= 0 and non_stacking[btype_lower] < value:
+                    non_stacking[btype_lower] = value
+                elif value < 0 and non_stacking[btype_lower] > value:
+                    non_stacking[btype_lower] = value
+            else:
+                non_stacking[btype_lower] = value
+    return stacking_total + sum(non_stacking.values())
+
+# --- New: Critical Config Loader ---
+_CRITICAL_CONFIG = None
+
+def load_critical_config() -> Dict[str, Any]:
+    """
+    Loads the critical hit configuration from the 'config/critical_config.json' file.
+    Caches the result for efficiency.
+    """
+    global _CRITICAL_CONFIG
+    if _CRITICAL_CONFIG is None:
+        config_path = os.path.join(os.path.dirname(__file__), "config", "critical_config.json")
+        with open(config_path, "r") as f:
+            _CRITICAL_CONFIG = json.load(f)
+    return _CRITICAL_CONFIG
+
+def get_critical_parameters(weapon: Any) -> Dict[str, Any]:
+    """
+    Retrieves critical hit parameters for the given weapon.
+    If the weapon has a type/name that appears in the config overrides,
+    return those values; otherwise, return the default critical parameters.
+    """
+    crit_config = load_critical_config()
+    overrides = crit_config.get("overrides", {})
+    # If the weapon defines a 'name', check for an override.
+    if weapon is not None and hasattr(weapon, "name"):
+        wname = weapon.name.lower()
+        if wname in overrides:
+            return overrides[wname]
+    # Otherwise, return default.
+    return crit_config.get("default", {"threat_range": 19, "critical_multiplier": 2, "confirmation_modifier": 0})
 
 class CombatResolver:
     def __init__(self, dice):
@@ -74,7 +140,16 @@ class CombatResolver:
         bab = getattr(attack_action.actor, "BAB", 0)
         weapon_bonus = attack_action.weapon_bonus if attack_action.weapon is not None else 0
         check_penalty = attack_action.weapon.check_penalty if attack_action.weapon is not None else 0
-        total_attack = natural_roll + bab + ability_mod + weapon_bonus - check_penalty
+        
+        bonus_list = [
+            (bab, "BAB"),
+            (ability_mod, "ability"),
+            (weapon_bonus, "weapon"),
+            (-check_penalty, "penalty")
+        ]
+        effective_bonus = stack_bonuses(bonus_list)
+        total_attack = natural_roll + effective_bonus
+
         effective_defense = self.compute_effective_defense(attack_action.defender,
                                                            attack_action.is_touch_attack,
                                                            attack_action.target_flat_footed)
@@ -84,10 +159,7 @@ class CombatResolver:
             "attacker_name": attack_action.actor.name,
             "defender_name": attack_action.defender.name,
             "natural_roll": natural_roll,
-            "BAB": bab,
-            "ability_mod": ability_mod,
-            "weapon_bonus": weapon_bonus,
-            "check_penalty": check_penalty,
+            "effective_bonus": effective_bonus,
             "total_attack": total_attack,
             "effective_defense": effective_defense,
             "hit": hit,
@@ -102,11 +174,16 @@ class CombatResolver:
                 return result
         if hit:
             critical_confirmed = False
+            # Retrieve critical parameters from configuration.
+            crit_params = get_critical_parameters(attack_action.weapon)
+            threat_range = crit_params.get("threat_range", 19)
+            crit_multiplier = crit_params.get("critical_multiplier", 2)
+            confirm_modifier = crit_params.get("confirmation_modifier", 0)
             if attack_action.weapon and not attack_action.is_touch_attack:
-                threat_range = attack_action.weapon.threat_range
                 if natural_roll >= threat_range:
                     confirm_roll = self.dice.roll_d20()
-                    confirm_total = confirm_roll + bab + ability_mod + weapon_bonus - check_penalty
+                    # Apply confirmation modifier from configuration.
+                    confirm_total = confirm_roll + effective_bonus + confirm_modifier
                     if confirm_total >= effective_defense:
                         critical_confirmed = True
                     result["critical_confirm_roll"] = confirm_roll
@@ -115,8 +192,8 @@ class CombatResolver:
             if attack_action.weapon:
                 base_damage = self.dice.roll(attack_action.weapon.damage_dice)
                 if critical_confirmed:
-                    total_damage = (base_damage * attack_action.weapon.critical_multiplier) + ability_mod
-                    result["critical_multiplier"] = attack_action.weapon.critical_multiplier
+                    total_damage = (base_damage * crit_multiplier) + ability_mod
+                    result["critical_multiplier"] = crit_multiplier
                 else:
                     total_damage = base_damage + ability_mod
             else:
@@ -156,7 +233,7 @@ class SkillResolver:
 
     def resolve_skill_check(self, skill_action) -> Dict[str, Any]:
         roll = self.dice.roll_d20()
-        total = roll + 2  # Simplified bonus
+        total = roll + 2  # Simplified bonus.
         result = {
             "action": "skill_check",
             "character_name": skill_action.actor.name,

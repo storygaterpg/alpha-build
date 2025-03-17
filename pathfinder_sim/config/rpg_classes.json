@@ -1,0 +1,91 @@
+{
+    "barbarian": {
+      "hit_die": 12,
+      "base_attack_bonus_progression": "full",
+      "good_saves": ["fortitude"],
+      "class_skills": ["Climb", "Intimidate", "Survival"],
+      "description": "A fierce warrior who relies on rage and brute strength.",
+      "special_abilities": ["Rage", "Damage Reduction"]
+    },
+    "bard": {
+      "hit_die": 8,
+      "base_attack_bonus_progression": "average",
+      "good_saves": ["reflex", "will"],
+      "class_skills": ["Diplomacy", "Perform", "Stealth"],
+      "description": "A versatile character blending music, magic, and social skills.",
+      "special_abilities": ["Bardic Music", "Inspire Courage"]
+    },
+    "cleric": {
+      "hit_die": 8,
+      "base_attack_bonus_progression": "average",
+      "good_saves": ["fortitude", "will"],
+      "class_skills": ["Heal", "Knowledge (religion)", "Diplomacy"],
+      "description": "A divine spellcaster dedicated to a deity, capable of healing and smiting foes.",
+      "special_abilities": ["Turn Undead", "Divine Spellcasting"]
+    },
+    "druid": {
+      "hit_die": 8,
+      "base_attack_bonus_progression": "average",
+      "good_saves": ["fortitude", "will"],
+      "class_skills": ["Survival", "Knowledge (nature)", "Perception"],
+      "description": "A nature priest who can cast spells and transform into animals.",
+      "special_abilities": ["Wild Shape", "Nature Spellcasting"]
+    },
+    "fighter": {
+      "hit_die": 10,
+      "base_attack_bonus_progression": "full",
+      "good_saves": ["fortitude"],
+      "class_skills": ["Intimidate", "Ride", "Survival"],
+      "description": "A master of martial combat with a wide array of weapons and armor.",
+      "special_abilities": ["Bonus Feats", "Armor Training"]
+    },
+    "monk": {
+      "hit_die": 8,
+      "base_attack_bonus_progression": "full",
+      "good_saves": ["reflex"],
+      "class_skills": ["Acrobatics", "Perception", "Stealth"],
+      "description": "A disciplined martial artist with a focus on unarmed combat and speed.",
+      "special_abilities": ["Flurry of Blows", "Evasion"]
+    },
+    "paladin": {
+      "hit_die": 10,
+      "base_attack_bonus_progression": "full",
+      "good_saves": ["will", "fortitude"],
+      "class_skills": ["Diplomacy", "Heal", "Sense Motive"],
+      "description": "A holy knight dedicated to righteousness, with strong defensive and offensive capabilities.",
+      "special_abilities": ["Lay on Hands", "Divine Grace"]
+    },
+    "ranger": {
+      "hit_die": 10,
+      "base_attack_bonus_progression": "full",
+      "good_saves": ["reflex", "fortitude"],
+      "class_skills": ["Survival", "Stealth", "Perception"],
+      "description": "A wilderness expert skilled in tracking, hunting, and ranged combat.",
+      "special_abilities": ["Favored Enemy", "Combat Style"]
+    },
+    "rogue": {
+      "hit_die": 8,
+      "base_attack_bonus_progression": "average",
+      "good_saves": ["reflex"],
+      "class_skills": ["Stealth", "Disable Device", "Bluff"],
+      "description": "A cunning character specializing in stealth, traps, and sneak attacks.",
+      "special_abilities": ["Sneak Attack", "Evasion"]
+    },
+    "sorcerer": {
+      "hit_die": 6,
+      "base_attack_bonus_progression": "poor",
+      "good_saves": ["reflex", "will"],
+      "class_skills": ["Spellcraft", "Knowledge (arcana)", "Bluff"],
+      "description": "An innate spellcaster with a limited but powerful selection of spells.",
+      "special_abilities": ["Bloodline Powers", "Spontaneous Spellcasting"]
+    },
+    "wizard": {
+      "hit_die": 6,
+      "base_attack_bonus_progression": "poor",
+      "good_saves": ["will"],
+      "class_skills": ["Spellcraft", "Knowledge (arcana)", "Perception"],
+      "description": "A learned spellcaster with a broad and versatile array of spells, prepared each day.",
+      "special_abilities": ["Arcane Bond", "Spellbook"]
+    }
+  }
+  

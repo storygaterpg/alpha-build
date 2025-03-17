@@ -1,0 +1,107 @@
+{
+    "blinded": {
+      "description": "Blinded: The creature cannot see, loses its Dexterity bonus to AC and all dodge bonuses, and takes an additional -2 penalty to AC. Implicitly, the creature cannot perceive visual cues, making it extremely vulnerable in combat and unable to perform tasks that require sight.",
+      "default_duration": 2,
+      "modifiers": {
+        "ac": -2
+      }
+    },
+    "charmed": {
+      "description": "Charmed: The creature regards the charmer as a trusted ally and is influenced to act in their interest. Implicitly, its independent judgment is compromised and it may not act in its own best interest.",
+      "default_duration": 2,
+      "modifiers": {}
+    },
+    "confused": {
+      "description": "Confused: The creature's actions become erratic and unpredictable, requiring it to roll on a confusion table each round. Implicitly, its behavior may harm allies, itself, or fail to respond properly to threats.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "dazed": {
+      "description": "Dazed: The creature is disoriented and can take only a single move or standard action per round. Implicitly, its reaction time is severely reduced, limiting its combat effectiveness.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "deafened": {
+      "description": "Deafened: The creature cannot hear, suffering a -4 penalty on Perception checks that rely on sound. Implicitly, it misses critical auditory cues in its environment, reducing situational awareness.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "dying": {
+      "description": "Dying: The creature's hit points are below 0, causing it to lose 1 hit point per round until stabilized. It is unconscious and helpless, and its critical state requires immediate aid to prevent death.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "fatigued": {
+      "description": "Fatigued: The creature is exhausted, taking a -2 penalty on Strength and Dexterity-based checks and unable to run or charge. Implicitly, its physical performance is severely diminished and it struggles to perform even basic actions.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "flatfooted": {
+      "description": "Flat-footed: The creature is caught off-guard, losing its Dexterity bonus to AC and any dodge bonuses until it acts. Implicitly, it is highly vulnerable to attacks during the first round of combat.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "frightened": {
+      "description": "Frightened: The creature is overwhelmed by fear, suffering a -2 penalty on attack rolls, saving throws, and skill checks. Implicitly, it may be compelled to flee from the source of its fear or act irrationally.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "grappled": {
+      "description": "Grappled: The creature is restrained by an opponent, suffering a -4 penalty on Dexterity-based checks and unable to move freely. Implicitly, it is at a disadvantage in combat and unable to reposition.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "immobilized": {
+      "description": "Immobilized: The creature is completely unable to move from its current position. Implicitly, it cannot reposition or escape, making it vulnerable to attacks.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "paralyzed": {
+      "description": "Paralyzed: The creature is frozen in place, unable to move or take any actions except free actions, and loses its Dexterity bonus to AC. Implicitly, it is rendered helpless and extremely vulnerable.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "petrified": {
+      "description": "Petrified: The creature is turned to stone, becoming immobile and inanimate. Implicitly, it is removed from combat and can neither act nor be affected by most conditions.",
+      "default_duration": 0,
+      "modifiers": {}
+    },
+    "sickened": {
+      "description": "Sickened: The creature is overcome by nausea, taking a -2 penalty on most ability and skill checks. Implicitly, its overall performance is impaired, making it less effective in combat and other tasks.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "staggered": {
+      "description": "Staggered: The creature is so unsteady that it can take only a single move or standard action per round. Implicitly, its combat efficiency and ability to respond to threats are greatly reduced.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "stunned": {
+      "description": "Stunned: The creature is so disoriented that it can take no actions except free actions, and suffers a -2 penalty to AC. Implicitly, it is completely incapacitated and extremely vulnerable until it recovers.",
+      "default_duration": 1,
+      "modifiers": {
+        "ac": -2
+      }
+    },
+    "unconscious": {
+      "description": "Unconscious: The creature is knocked out, losing its Dexterity bonus to AC and considered helpless. Implicitly, it cannot defend itself and is highly vulnerable to further attacks.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "enfeebled": {
+      "description": "Enfeebled: The creature's Strength is temporarily reduced, impairing its melee attacks and damage. Implicitly, its overall combat effectiveness is diminished. (Note: This condition may require a specific reduction value when applied.)",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "dazzled": {
+      "description": "Dazzled: The creature is affected by bright light, suffering a -1 penalty on attack rolls and Perception checks that rely on sight. Implicitly, its vision is impaired, reducing its accuracy in targeting enemies.",
+      "default_duration": 1,
+      "modifiers": {}
+    },
+    "entangled": {
+      "description": "Entangled: The creature is caught in a restraining substance (such as webs or vines), suffering penalties on attack rolls and Dexterity-based checks. Implicitly, its movement is significantly restricted, limiting its ability to maneuver in combat.",
+      "default_duration": 1,
+      "modifiers": {}
+    }
+  }
+  

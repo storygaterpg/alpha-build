@@ -1,0 +1,20 @@
+{
+    "barbarian": {
+      "levels": {
+        "1": {"BAB": 1, "Fort": 2, "Ref": 0, "Will": 0, "skill_points": 4, "hit_points": 12},
+        "2": {"BAB": 2, "Fort": 3, "Ref": 0, "Will": 0, "skill_points": 4, "hit_points": 12},
+        "3": {"BAB": 3, "Fort": 3, "Ref": 1, "Will": 1, "skill_points": 4, "hit_points": 12}
+        // Continue for levels 4-20...
+      }
+    },
+    "bard": {
+      "levels": {
+        "1": {"BAB": 0, "Fort": 0, "Ref": 2, "Will": 2, "skill_points": 6, "hit_points": 8},
+        "2": {"BAB": 1, "Fort": 0, "Ref": 3, "Will": 3, "skill_points": 6, "hit_points": 8},
+        "3": {"BAB": 2, "Fort": 1, "Ref": 3, "Will": 3, "skill_points": 6, "hit_points": 8}
+        // Continue for levels 4-20...
+      }
+    }
+    // Similarly for cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard.
+  }
+  
