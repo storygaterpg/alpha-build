@@ -52,3 +52,101 @@ class AttackAction(GameAction):
         # Format log message using our logger helper.
         result["log"] = format_log("attack", log_data)
         return result
+
+class SpellAction(GameAction):
+    def __init__(self, actor: Character, target: Character, spell_name: str,
+                 action_type: str = "spell"):
+        super().__init__(actor, action_type)
+        self.target = target
+        self.spell_name = spell_name
+
+    def execute(self) -> Dict[str, Any]:
+        if self.spell_name.lower() not in [spell.lower() for spell in self.actor.spells]:
+            raise ValueError(f"{self.actor.name} does not know '{self.spell_name}'.")
+        result = self.rules_engine.spell_resolver.resolve_spell(self)
+        log_data = {
+            "spell_name": result.get("spell_name", ""),
+            "caster_name": result.get("caster_name", ""),
+            "target_name": result.get("target_name", ""),
+            "damage": result.get("damage", "")
+        }
+        result["log"] = format_log("spell", log_data)
+        return result
+
+class SkillCheckAction(GameAction):
+    def __init__(self, actor: Character, skill_name: str, dc: int,
+                 action_type: str = "skill_check"):
+        super().__init__(actor, action_type)
+        self.skill_name = skill_name
+        self.dc = dc
+
+    def execute(self) -> Dict[str, Any]:
+        result = self.rules_engine.skill_resolver.resolve_skill_check(self)
+        # Simple logging for skill checks.
+        result["log"] = f"Skill check by {result.get('character_name')} on {result.get('skill_name')}: Roll={result.get('roll')}, Total={result.get('total')}, DC={result.get('dc')}."
+        return result
+
+class MoveAction(GameAction):
+    def __init__(self, actor: Character, target: Tuple[int, int],
+                 action_type: str = "move"):
+        super().__init__(actor, action_type, parameters={"target": target})
+        self.target = target
+
+    def execute(self) -> Dict[str, Any]:
+        from movement import MovementAction
+        movement_action = MovementAction(self.game_map, self.actor.position, self.target)
+        # Record starting position.
+        start_pos = self.actor.position
+        path = movement_action.execute()
+        if path:
+            self.actor.position = path[-1]
+        result = {
+            "action": "move",
+            "actor": self.actor.name,
+            "path": path,
+            "final_position": self.actor.position,
+            "justification": "Movement action executed.",
+            "start_position": start_pos,
+            "end_position": self.actor.position
+        }
+        result["log"] = format_log("move", {
+            "actor_name": self.actor.name,
+            "start_position": start_pos,
+            "end_position": self.actor.position,
+            "path": path
+        })
+        return result
+
+class FullRoundAction(GameAction):
+    def __init__(self, actor: Character, parameters: Dict[str, Any],
+                 action_type: str = "full_round"):
+        super().__init__(actor, action_type, parameters)
+
+    def execute(self) -> Dict[str, Any]:
+        if self.parameters.get("type") == "charge":
+            target = self.parameters.get("target")
+            from movement import MovementAction
+            movement_action = MovementAction(self.game_map, self.actor.position, target)
+            path = movement_action.execute()
+            if not path:
+                return {"action": "full_round", "result": "failed", "justification": "No clear path for charge."}
+            self.actor.position = target
+            from rules_engine import rules_engine
+            temp_attack = AttackAction(actor=self.actor, defender=self.parameters.get("defender"),
+                                       weapon_bonus=0, weapon=self.parameters.get("weapon"),
+                                       action_type="full_round")
+            temp_attack.rules_engine = self.rules_engine
+            attack_result = self.rules_engine.combat_resolver.resolve_attack(temp_attack)
+            result = {
+                "action": "full_round",
+                "type": "charge",
+                "path": path,
+                "final_position": self.actor.position,
+                "attack_result": attack_result,
+                "justification": "Charge executed as a full-round action."
+            }
+            # For simplicity, log directly.
+            result["log"] = f"Full-round charge by {self.actor.name} to {target}. Attack result: {attack_result}."
+            return result
+        else:
+            return {"action": "full_round", "result": "unknown", "justification": "Full-round action type not implemented."}

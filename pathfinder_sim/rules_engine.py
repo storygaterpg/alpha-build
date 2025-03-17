@@ -7,6 +7,9 @@ It includes:
   - Dice: A class for dice rolls with standard dice notation.
   - CombatResolver, SpellResolver, SkillResolver: Resolvers for processing actions.
   - RulesEngine: Integrates these resolvers.
+  
+Note: Critical hit parameters are now read from the weapons configuration file 
+(config/weapons_config.json) rather than from a separate critical_config.
 """
 
 from typing import List, Dict, Any
@@ -42,7 +45,9 @@ class Dice:
     def roll_d20(self) -> int:
         return self.rng.randint(1, 20)
 
-# Global variable to cache bonus configuration.
+# --------------------------
+# Bonus Configuration (remains unchanged)
+# --------------------------
 _BONUS_CONFIG = None
 
 def load_bonus_config() -> Dict[str, Any]:
@@ -75,37 +80,38 @@ def stack_bonuses(bonus_list: List[tuple]) -> int:
                 non_stacking[btype_lower] = value
     return stacking_total + sum(non_stacking.values())
 
-# --- New: Critical Config Loader ---
-_CRITICAL_CONFIG = None
+# --------------------------
+# New: Weapons Configuration Loader
+# --------------------------
+_WEAPONS_CONFIG = None
 
-def load_critical_config() -> Dict[str, Any]:
+def load_weapons_config() -> Dict[str, Any]:
     """
-    Loads the critical hit configuration from the 'config/critical_config.json' file.
-    Caches the result for efficiency.
+    Loads the weapons configuration from 'config/weapons_config.json'.
+    Caches the configuration for efficiency.
     """
-    global _CRITICAL_CONFIG
-    if _CRITICAL_CONFIG is None:
-        config_path = os.path.join(os.path.dirname(__file__), "config", "critical_config.json")
+    global _WEAPONS_CONFIG
+    if _WEAPONS_CONFIG is None:
+        config_path = os.path.join(os.path.dirname(__file__), "config", "weapons_config.json")
         with open(config_path, "r") as f:
-            _CRITICAL_CONFIG = json.load(f)
-    return _CRITICAL_CONFIG
+            _WEAPONS_CONFIG = json.load(f)
+    return _WEAPONS_CONFIG
 
-def get_critical_parameters(weapon: Any) -> Dict[str, Any]:
+def get_weapon_critical_parameters(weapon: Any) -> Dict[str, Any]:
     """
-    Retrieves critical hit parameters for the given weapon.
-    If the weapon has a type/name that appears in the config overrides,
-    return those values; otherwise, return the default critical parameters.
+    Retrieves the critical parameters for a given weapon by looking it up in the weapons configuration.
+    If the weapon is not found, returns default values.
     """
-    crit_config = load_critical_config()
-    overrides = crit_config.get("overrides", {})
-    # If the weapon defines a 'name', check for an override.
     if weapon is not None and hasattr(weapon, "name"):
         wname = weapon.name.lower()
-        if wname in overrides:
-            return overrides[wname]
-    # Otherwise, return default.
-    return crit_config.get("default", {"threat_range": 19, "critical_multiplier": 2, "confirmation_modifier": 0})
+        weapons_config = load_weapons_config()
+        if wname in weapons_config:
+            return weapons_config[wname].get("critical", {"threat_range": 19, "multiplier": 2})
+    return {"threat_range": 19, "multiplier": 2}
 
+# --------------------------
+# CombatResolver and Other Resolvers
+# --------------------------
 class CombatResolver:
     def __init__(self, dice):
         self.dice = dice
@@ -174,16 +180,13 @@ class CombatResolver:
                 return result
         if hit:
             critical_confirmed = False
-            # Retrieve critical parameters from configuration.
-            crit_params = get_critical_parameters(attack_action.weapon)
-            threat_range = crit_params.get("threat_range", 19)
-            crit_multiplier = crit_params.get("critical_multiplier", 2)
-            confirm_modifier = crit_params.get("confirmation_modifier", 0)
             if attack_action.weapon and not attack_action.is_touch_attack:
+                crit_params = get_weapon_critical_parameters(attack_action.weapon)
+                threat_range = crit_params.get("threat_range", 19)
+                crit_multiplier = crit_params.get("multiplier", 2)
                 if natural_roll >= threat_range:
                     confirm_roll = self.dice.roll_d20()
-                    # Apply confirmation modifier from configuration.
-                    confirm_total = confirm_roll + effective_bonus + confirm_modifier
+                    confirm_total = confirm_roll + effective_bonus
                     if confirm_total >= effective_defense:
                         critical_confirmed = True
                     result["critical_confirm_roll"] = confirm_roll

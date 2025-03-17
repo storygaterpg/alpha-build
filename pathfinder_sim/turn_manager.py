@@ -3,13 +3,8 @@ turn_manager.py
 ---------------
 
 This module implements our advanced turn management and action economy system for the Pathfinder simulation.
-It enforces that each character, per turn, may choose one of the following combinations for standard and move actions:
-  - Option A: 2 Move actions (no standard action),
-  - Option B: 1 Standard action and 1 Move action,
-  - Option C: 1 Full-round action (substituting for both standard and move actions).
-
-Additionally, each character may take 1 Swift action and unlimited Free actions.
-A JSON parser is provided to process external action orders.
+It handles action sequencing, turn numbering, and parsing JSON orders into actions.
+All core action classes are now imported from actions.py.
 """
 
 import json
@@ -17,6 +12,7 @@ from enum import Enum
 from typing import List, Dict, Any, Tuple
 from character import Character
 from rules_engine import rules_engine  # Global rules engine instance
+from actions import AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction, GameAction
 
 class ActionType(Enum):
     STANDARD = "standard"
@@ -25,115 +21,13 @@ class ActionType(Enum):
     FREE = "free"
     FULL_ROUND = "full_round"
 
-class GameAction:
-    def __init__(self, actor: Character, action_type: ActionType, parameters: Dict[str, Any] = None):
-        self.actor = actor
-        self.action_type = action_type
-        self.action_id: int = 0
-        self.parameters = parameters if parameters is not None else {}
-        self.rules_engine = None  # This will be injected before execution
-        self.game_map = None      # This will be injected for move actions
-
-    def execute(self) -> Dict[str, Any]:
-        raise NotImplementedError("Subclasses must implement execute()")
-
-class AttackAction(GameAction):
-    def __init__(self, actor: Character, defender: Character, weapon_bonus: int = 0,
-                 weapon: Any = None, is_touch_attack: bool = False, target_flat_footed: bool = False,
-                 action_type: ActionType = ActionType.STANDARD):
-        super().__init__(actor, action_type)
-        self.defender = defender
-        self.weapon_bonus = weapon_bonus
-        self.weapon = weapon
-        self.is_touch_attack = is_touch_attack
-        self.target_flat_footed = target_flat_footed
-
-    def execute(self) -> Dict[str, Any]:
-        return self.rules_engine.combat_resolver.resolve_attack(self)
-
-class SpellAction(GameAction):
-    def __init__(self, actor: Character, target: Character, spell_name: str,
-                 action_type: ActionType = ActionType.STANDARD):
-        super().__init__(actor, action_type)
-        self.target = target
-        self.spell_name = spell_name
-
-    def execute(self) -> Dict[str, Any]:
-        if self.spell_name.lower() not in [spell.lower() for spell in self.actor.spells]:
-            raise ValueError(f"{self.actor.name} does not know '{self.spell_name}'.")
-        return self.rules_engine.spell_resolver.resolve_spell(self)
-
-class SkillCheckAction(GameAction):
-    def __init__(self, actor: Character, skill_name: str, dc: int,
-                 action_type: ActionType = ActionType.STANDARD):
-        super().__init__(actor, action_type)
-        self.skill_name = skill_name
-        self.dc = dc
-
-    def execute(self) -> Dict[str, Any]:
-        return self.rules_engine.skill_resolver.resolve_skill_check(self)
-
-class MoveAction(GameAction):
-    def __init__(self, actor: Character, target: Tuple[int, int],
-                 action_type: ActionType = ActionType.MOVE):
-        super().__init__(actor, action_type, parameters={"target": target})
-        self.target = target
-
-    def execute(self) -> Dict[str, Any]:
-        from movement import MovementAction
-        # Use the injected game_map reference
-        movement_action = MovementAction(self.game_map, self.actor.position, self.target)
-        path = movement_action.execute()
-        if path:
-            self.actor.position = path[-1]
-        result = {
-            "action": "move",
-            "actor": self.actor.name,
-            "path": path,
-            "final_position": self.actor.position,
-            "justification": "Movement action executed."
-        }
-        return result
-
-class FullRoundAction(GameAction):
-    def __init__(self, actor: Character, parameters: Dict[str, Any],
-                 action_type: ActionType = ActionType.FULL_ROUND):
-        super().__init__(actor, action_type, parameters)
-
-    def execute(self) -> Dict[str, Any]:
-        if self.parameters.get("type") == "charge":
-            target = self.parameters.get("target")
-            from movement import MovementAction
-            # Use injected game_map
-            movement_action = MovementAction(self.game_map, self.actor.position, target)
-            path = movement_action.execute()
-            if not path:
-                return {"action": "full_round", "result": "failed", "justification": "No clear path for charge."}
-            self.actor.position = target
-            from rules_engine import rules_engine
-            temp_attack = AttackAction(actor=self.actor, defender=self.parameters.get("defender"),
-                                       weapon_bonus=0, weapon=self.parameters.get("weapon"),
-                                       action_type=ActionType.FULL_ROUND)
-            temp_attack.rules_engine = self.rules_engine
-            attack_result = self.rules_engine.combat_resolver.resolve_attack(temp_attack)
-            return {
-                "action": "full_round",
-                "type": "charge",
-                "path": path,
-                "final_position": self.actor.position,
-                "attack_result": attack_result,
-                "justification": "Charge executed as a full-round action."
-            }
-        else:
-            return {"action": "full_round", "result": "unknown", "justification": "Full-round action type not implemented."}
-
 class Turn:
     def __init__(self, turn_number: int):
         self.turn_number = turn_number
         # For each character, record actions: "standard", "move" (list), "swift", "full_round", "free" (list).
         self.character_actions: Dict[str, Dict[str, Any]] = {}
 
-    def add_action(self, action: GameAction) -> None:
+    def add_action(self, action) -> None:
         actor_name = action.actor.name
         if actor_name not in self.character_actions:
             self.character_actions[actor_name] = {
@@ -171,7 +65,7 @@ class Turn:
         else:
             raise Exception(f"Unsupported action type: {action.action_type}")
 
-    def get_all_actions(self) -> List[GameAction]:
+    def get_all_actions(self) -> List:
         actions = []
         for rec in self.character_actions.values():
             if rec["full_round"]:
@@ -197,7 +91,7 @@ class TurnManager:
         self.current_turn += 1
         return turn
 
-    def assign_action_id(self, action: GameAction) -> None:
+    def assign_action_id(self, action) -> None:
         action.action_id = self.action_id_counter
         self.action_id_counter += 1
 
@@ -205,7 +99,6 @@ class TurnManager:
         results = []
         for action in turn.get_all_actions():
             self.assign_action_id(action)
-            # Inject rules_engine and game_map into actions.
             action.rules_engine = self.rules_engine
             if action.action_type in [ActionType.MOVE, ActionType.FULL_ROUND]:
                 action.game_map = self.game_map
@@ -241,59 +134,28 @@ class TurnManager:
                                           weapon=params.get("weapon"),
                                           is_touch_attack=params.get("is_touch_attack", False),
                                           target_flat_footed=params.get("target_flat_footed", False),
-                                          action_type=ActionType.STANDARD)
+                                          action_type="standard")
                 elif "skill_name" in params:
                     action = SkillCheckAction(actor=actor,
                                               skill_name=params.get("skill_name"),
                                               dc=params.get("dc", 15),
-                                              action_type=ActionType.STANDARD)
+                                              action_type="standard")
                 else:
                     raise ValueError("Standard action must be an attack or a skill check.")
             elif action_type == ActionType.MOVE:
                 target = tuple(params.get("target"))
-                action = MoveAction(actor=actor, target=target, action_type=ActionType.MOVE)
+                action = MoveAction(actor=actor, target=target, action_type="move")
             elif action_type == ActionType.SWIFT:
                 action = SkillCheckAction(actor=actor,
                                           skill_name=params.get("skill_name"),
                                           dc=params.get("dc", 15),
-                                          action_type=ActionType.SWIFT)
+                                          action_type="swift")
             elif action_type == ActionType.FULL_ROUND:
-                action = FullRoundAction(actor=actor, parameters=params, action_type=ActionType.FULL_ROUND)
+                action = FullRoundAction(actor=actor, parameters=params, action_type="full_round")
             elif action_type == ActionType.FREE:
-                action = GameAction(actor=actor, action_type=ActionType.FREE, parameters=params)
+                action = GameAction(actor=actor, action_type="free", parameters=params)
                 action.execute = lambda: {"action": "free", "actor": actor.name, "justification": "Free action executed."}
             else:
                 raise ValueError(f"Unsupported action type: {action_type_str}")
             turn.add_action(action)
         return turn
-    
-    def check_opportunity_attacks(self, move_action: MoveAction) -> List[Any]:
-        """
-        Check if the move action provokes opportunity attacks.
-        Uses each enemy's threatened squares (as defined by get_threatened_squares()).
-        If the starting square is within an enemy's threatened squares and the final square is not,
-        that enemy gets an opportunity attack.
-        """
-        opp_results = []
-        # Retrieve starting position; if not explicitly stored, assume the actor's position before the move.
-        start_pos = move_action.parameters.get("start_position")
-        if start_pos is None:
-            # For simplicity, if start_position wasn't stored, we assume the actor started at a previous known value.
-            # In a full system, we would store the starting position before movement.
-            start_pos = move_action.actor.position
-        end_pos = move_action.actor.position
-        for other in self.characters.values():
-            if other.name == move_action.actor.name:
-                continue
-            threatened = other.get_threatened_squares()
-            if start_pos in threatened and end_pos not in threatened:
-                # Trigger an opportunity attack from this enemy.
-                opp_attack = AttackAction(actor=other, defender=move_action.actor, weapon_bonus=0,
-                                          weapon=None, is_touch_attack=False, target_flat_footed=False,
-                                          action_type="free")
-                opp_attack.rules_engine = self.rules_engine
-                result = opp_attack.execute()
-                result["justification"] = f"Opportunity attack by {other.name} due to leaving threatened square."
-                result["triggered_by"] = move_action.actor.name
-                opp_results.append(result)
-        return opp_results
