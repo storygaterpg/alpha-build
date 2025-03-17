@@ -1,27 +1,50 @@
 {
-    "attack": {
-      "resource_cost": 0,
-      "allowed_modifiers": ["BAB", "ability", "weapon", "penalty"],
-      "logging_template": "Attack by {attacker_name} on {defender_name}: Roll={natural_roll}, EffectiveBonus={effective_bonus}, TotalAttack={total_attack}, Defense={effective_defense}, Hit={hit}{critical_str}"
-    },
-    "spell": {
-      "resource_cost": {"spell_slots": 1},
-      "logging_template": "Spell '{spell_name}' cast by {caster_name} on {target_name}: Damage={damage}"
-    },
-    "move": {
-      "resource_cost": 0,
-      "logging_template": "Movement by {actor_name}: Start={start_position}, End={end_position}, Path={path}"
-    },
-    "bull_rush": {
-      "resource_cost": 0,
-      "logging_template": "Bull Rush by {actor_name} on {defender_name}: PushDistance={push_distance}, NewPosition={new_position}"
-    },
-    "grapple": {
-      "resource_cost": 0,
-      "logging_template": "Grapple attempt by {actor_name} on {target_name}: Result={result}"
-    },
-    "default": {
-      "logging_template": "Action executed: {action}"
-    }
+  "attack": {
+    "resource_cost": 0,
+    "allowed_modifiers": ["BAB", "ability", "weapon", "penalty"],
+    "logging_template": "Attack by {attacker_name} on {defender_name}: Roll={natural_roll}, Bonus={effective_bonus}, Total={total_attack}, Defense={effective_defense}, Hit={hit}{critical_info}",
+    "description": "A standard attack action that calculates an outcome based on a d20 roll combined with modifiers from BAB, ability scores, and weapon properties. Explicitly determines if the attack meets or exceeds the target's defense. Implicitly, this action may result in a critical hit, which is confirmed by an additional roll."
+  },
+  "spell": {
+    "resource_cost": {"spell_slots": 1},
+    "allowed_modifiers": [],
+    "logging_template": "Spell '{spell_name}' cast by {caster_name} on {target_name}: Damage={damage}",
+    "description": "A spellcasting action that consumes one spell slot and produces magical effects (typically damage). Explicitly, it rolls dice to determine damage. Implicitly, the spell requires preparation and concentration."
+  },
+  "move": {
+    "resource_cost": 0,
+    "allowed_modifiers": [],
+    "logging_template": "Movement by {actor_name}: From {start_position} to {end_position}, Path: {path}",
+    "description": "A movement action that updates a character's position on the battlefield. Explicitly, it computes a path from the starting square to the target square. Implicitly, moving may provoke opportunity attacks and can be affected by terrain."
+  },
+  "skill_check": {
+    "resource_cost": 0,
+    "allowed_modifiers": [],
+    "logging_template": "Skill check by {character_name} on {skill_name}: Roll={roll}, Total={total}, DC={dc}",
+    "description": "A skill check action that attempts to overcome an obstacle or perform a specialized task. Explicitly, it involves a d20 roll plus any bonuses compared against a difficulty class (DC). Implicitly, it reflects the character’s competence in that skill."
+  },
+  "swift": {
+    "resource_cost": 0,
+    "allowed_modifiers": [],
+    "logging_template": "Swift action by {actor_name} on {skill_name}: Roll={roll}, Total={total}, DC={dc}",
+    "description": "A swift action is a minor, additional action that can be taken within a turn without affecting the main action economy. Explicitly, it may involve a quick skill check or reaction. Implicitly, it represents a minimal-impact effort used to gain a tactical edge."
+  },
+  "free": {
+    "resource_cost": 0,
+    "allowed_modifiers": [],
+    "logging_template": "Free action by {actor_name}: Justification={justification}",
+    "description": "A free action does not consume any major portion of the action economy. Explicitly, it is logged for transparency. Implicitly, it represents incidental actions that have little impact on the character's turn."
+  },
+  "full_round": {
+    "resource_cost": 0,
+    "allowed_modifiers": [],
+    "logging_template": "Full-round action by {actor_name}: Outcome={outcome}",
+    "description": "A full-round action substitutes for both a standard and move action in a turn. Explicitly, it is used for actions that require extended effort, such as a full attack. Implicitly, it prevents the character from taking other major actions during that turn."
+  },
+  "default": {
+    "resource_cost": 0,
+    "allowed_modifiers": [],
+    "logging_template": "Action executed: {action}",
+    "description": "A default template for actions that do not have a specific configuration. Serves as a fallback logging format."
   }
-  
+}
