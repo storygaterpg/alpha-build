@@ -1,20 +1,290 @@
 {
-    "barbarian": {
-      "levels": {
-        "1": {"BAB": 1, "Fort": 2, "Ref": 0, "Will": 0, "skill_points": 4, "hit_points": 12},
-        "2": {"BAB": 2, "Fort": 3, "Ref": 0, "Will": 0, "skill_points": 4, "hit_points": 12},
-        "3": {"BAB": 3, "Fort": 3, "Ref": 1, "Will": 1, "skill_points": 4, "hit_points": 12}
-        // Continue for levels 4-20...
-      }
-    },
-    "bard": {
-      "levels": {
-        "1": {"BAB": 0, "Fort": 0, "Ref": 2, "Will": 2, "skill_points": 6, "hit_points": 8},
-        "2": {"BAB": 1, "Fort": 0, "Ref": 3, "Will": 3, "skill_points": 6, "hit_points": 8},
-        "3": {"BAB": 2, "Fort": 1, "Ref": 3, "Will": 3, "skill_points": 6, "hit_points": 8}
-        // Continue for levels 4-20...
+  "barbarian": {
+    "levels": {
+      "1": {
+        "BAB": 1,
+        "Fort": 2,
+        "Ref": 0,
+        "Will": 0,
+        "skill_points": 4,
+        "hit_points": 12,
+        "special_abilities": ["Rage"]
+      },
+      "2": {
+        "BAB": 2,
+        "Fort": 3,
+        "Ref": 0,
+        "Will": 0,
+        "skill_points": 4,
+        "hit_points": 12,
+        "special_abilities": ["Trap Sense +1"]
       }
     }
-    // Similarly for cleric, druid, fighter, monk, paladin, ranger, rogue, sorcerer, wizard.
+  },
+  "bard": {
+    "levels": {
+      "1": {
+        "BAB": 0,
+        "Fort": 0,
+        "Ref": 2,
+        "Will": 2,
+        "skill_points": 6,
+        "hit_points": 8,
+        "special_abilities": ["Bardic Music", "Inspire Courage 1d6"],
+        "spell_slots": {
+          "0": 2,
+          "1": 1
+        }
+      },
+      "2": {
+        "BAB": 1,
+        "Fort": 0,
+        "Ref": 3,
+        "Will": 3,
+        "skill_points": 6,
+        "hit_points": 8,
+        "special_abilities": [],
+        "spell_slots": {
+          "0": 3,
+          "1": 1
+        }
+      }
+    }
+  },
+  "cleric": {
+    "levels": {
+      "1": {
+        "BAB": 0,
+        "Fort": 2,
+        "Ref": 0,
+        "Will": 2,
+        "skill_points": 6,
+        "hit_points": 8,
+        "special_abilities": ["Turn Undead 1/day"],
+        "spell_slots": {
+          "0": 3,
+          "1": 1
+        }
+      },
+      "2": {
+        "BAB": 1,
+        "Fort": 3,
+        "Ref": 0,
+        "Will": 3,
+        "skill_points": 6,
+        "hit_points": 8,
+        "special_abilities": [],
+        "spell_slots": {
+          "0": 4,
+          "1": 2
+        }
+      }
+    }
+  },
+  "druid": {
+    "levels": {
+      "1": {
+        "BAB": 0,
+        "Fort": 2,
+        "Ref": 0,
+        "Will": 2,
+        "skill_points": 8,
+        "hit_points": 8,
+        "special_abilities": ["Wild Shape", "Nature Spellcasting"],
+        "spell_slots": {
+          "0": 2,
+          "1": 1
+        }
+      },
+      "2": {
+        "BAB": 1,
+        "Fort": 3,
+        "Ref": 0,
+        "Will": 3,
+        "skill_points": 8,
+        "hit_points": 8,
+        "special_abilities": [],
+        "spell_slots": {
+          "0": 3,
+          "1": 2
+        }
+      }
+    }
+  },
+  "fighter": {
+    "levels": {
+      "1": {
+        "BAB": 1,
+        "Fort": 2,
+        "Ref": 0,
+        "Will": 0,
+        "skill_points": 2,
+        "hit_points": 10,
+        "special_abilities": ["Bonus Feat"]
+      },
+      "2": {
+        "BAB": 2,
+        "Fort": 3,
+        "Ref": 0,
+        "Will": 0,
+        "skill_points": 2,
+        "hit_points": 10,
+        "special_abilities": ["Bonus Feat"]
+      }
+    }
+  },
+  "monk": {
+    "levels": {
+      "1": {
+        "BAB": 1,
+        "Fort": 0,
+        "Ref": 2,
+        "Will": 0,
+        "skill_points": 4,
+        "hit_points": 8,
+        "special_abilities": ["Flurry of Blows", "Evasion"],
+        "unarmed_damage": "1d4",
+        "fast_movement_bonus": 10
+      },
+      "2": {
+        "BAB": 2,
+        "Fort": 1,
+        "Ref": 2,
+        "Will": 1,
+        "skill_points": 4,
+        "hit_points": 8,
+        "special_abilities": ["Improved Flurry"],
+        "unarmed_damage": "1d6",
+        "fast_movement_bonus": 10
+      }
+    }
+  },
+  "paladin": {
+    "levels": {
+      "1": {
+        "BAB": 1,
+        "Fort": 2,
+        "Ref": 0,
+        "Will": 2,
+        "skill_points": 2,
+        "hit_points": 10,
+        "special_abilities": ["Lay on Hands", "Divine Grace"]
+      },
+      "2": {
+        "BAB": 2,
+        "Fort": 3,
+        "Ref": 0,
+        "Will": 3,
+        "skill_points": 2,
+        "hit_points": 10,
+        "special_abilities": []
+      }
+    }
+  },
+  "ranger": {
+    "levels": {
+      "1": {
+        "BAB": 1,
+        "Fort": 2,
+        "Ref": 2,
+        "Will": 0,
+        "skill_points": 6,
+        "hit_points": 10,
+        "special_abilities": ["Favored Enemy", "Combat Style"]
+      },
+      "2": {
+        "BAB": 2,
+        "Fort": 3,
+        "Ref": 3,
+        "Will": 0,
+        "skill_points": 6,
+        "hit_points": 10,
+        "special_abilities": ["Improved Combat Style"]
+      }
+    }
+  },
+  "rogue": {
+    "levels": {
+      "1": {
+        "BAB": 0,
+        "Fort": 0,
+        "Ref": 2,
+        "Will": 0,
+        "skill_points": 8,
+        "hit_points": 8,
+        "special_abilities": ["Sneak Attack"],
+        "sneak_attack": "1d6"
+      },
+      "2": {
+        "BAB": 1,
+        "Fort": 0,
+        "Ref": 3,
+        "Will": 0,
+        "skill_points": 8,
+        "hit_points": 8,
+        "special_abilities": [],
+        "sneak_attack": "2d6"
+      }
+    }
+  },
+  "sorcerer": {
+    "levels": {
+      "1": {
+        "BAB": 0,
+        "Fort": 0,
+        "Ref": 2,
+        "Will": 2,
+        "skill_points": 2,
+        "hit_points": 6,
+        "special_abilities": ["Bloodline Power"],
+        "spell_slots": {
+          "0": 2,
+          "1": 1
+        }
+      },
+      "2": {
+        "BAB": 0,
+        "Fort": 0,
+        "Ref": 3,
+        "Will": 3,
+        "skill_points": 2,
+        "hit_points": 6,
+        "special_abilities": [],
+        "spell_slots": {
+          "0": 3,
+          "1": 1
+        }
+      }
+    }
+  },
+  "wizard": {
+    "levels": {
+      "1": {
+        "BAB": 0,
+        "Fort": 0,
+        "Ref": 0,
+        "Will": 2,
+        "skill_points": 2,
+        "hit_points": 6,
+        "special_abilities": ["Arcane Bond", "Spellbook"],
+        "spell_slots": {
+          "0": 3,
+          "1": 1
+        }
+      },
+      "2": {
+        "BAB": 0,
+        "Fort": 0,
+        "Ref": 0,
+        "Will": 3,
+        "skill_points": 2,
+        "hit_points": 6,
+        "special_abilities": [],
+        "spell_slots": {
+          "0": 4,
+          "1": 1
+        }
+      }
+    }
   }
-  
+}
