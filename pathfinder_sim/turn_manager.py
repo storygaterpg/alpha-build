@@ -8,18 +8,10 @@ All core action classes are now imported from actions.py.
 """
 
 import json
-from enum import Enum
-from typing import List, Dict, Any, Tuple
+from typing import List, Dict, Any
 from character import Character
-from rules_engine import rules_engine  # Global rules engine instance
 from actions import AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction, GameAction
-
-class ActionType(Enum):
-    STANDARD = "standard"
-    MOVE = "move"
-    SWIFT = "swift"
-    FREE = "free"
-    FULL_ROUND = "full_round"
+from action_types import ActionType  # Import ActionType from the new module
 
 class Turn:
     def __init__(self, turn_number: int):
@@ -119,7 +111,7 @@ class TurnManager:
                 raise ValueError(f"Unknown actor: {actor_name}")
             actor = characters[actor_name]
             try:
-                action_type = ActionType(action_type_str)
+                action_type = ActionType(action_type_str.lower())
             except ValueError:
                 raise ValueError(f"Invalid action type: {action_type_str}")
             if action_type == ActionType.STANDARD:

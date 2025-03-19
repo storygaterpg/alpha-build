@@ -11,11 +11,16 @@ from character import Character
 import os
 import json
 from logger import format_log  # Import our logging helper
+from action_types import ActionType  # Import the ActionType enum from our new module
 
 class GameAction:
-    def __init__(self, actor: Character, action_type: str, parameters: Dict[str, Any] = None):
+    def __init__(self, actor: Character, action_type, parameters: Dict[str, Any] = None):
         self.actor = actor
-        self.action_type = action_type  # e.g., "attack", "move", etc.
+        # If action_type is already an instance of ActionType, use it; otherwise, convert from string.
+        if isinstance(action_type, ActionType):
+            self.action_type = action_type
+        else:
+            self.action_type = ActionType(action_type.lower())
         self.action_id: int = 0
         self.parameters = parameters if parameters is not None else {}
         self.rules_engine = None  # To be injected by TurnManager.
@@ -36,9 +41,7 @@ class AttackAction(GameAction):
         self.target_flat_footed = target_flat_footed
 
     def execute(self) -> Dict[str, Any]:
-        # Resolve the attack using the rules engine.
         result = self.rules_engine.combat_resolver.resolve_attack(self)
-        # Build a data dictionary for logging.
         log_data = {
             "attacker_name": result.get("attacker_name", ""),
             "defender_name": result.get("defender_name", ""),
@@ -49,7 +52,6 @@ class AttackAction(GameAction):
             "hit": result.get("hit", ""),
             "critical": result.get("critical", False)
         }
-        # Format log message using our logger helper.
         result["log"] = format_log("attack", log_data)
         return result
 
@@ -82,7 +84,6 @@ class SkillCheckAction(GameAction):
 
     def execute(self) -> Dict[str, Any]:
         result = self.rules_engine.skill_resolver.resolve_skill_check(self)
-        # Simple logging for skill checks.
         result["log"] = f"Skill check by {result.get('character_name')} on {result.get('skill_name')}: Roll={result.get('roll')}, Total={result.get('total')}, DC={result.get('dc')}."
         return result
 
@@ -95,7 +96,6 @@ class MoveAction(GameAction):
     def execute(self) -> Dict[str, Any]:
         from movement import MovementAction
         movement_action = MovementAction(self.game_map, self.actor.position, self.target)
-        # Record starting position.
         start_pos = self.actor.position
         path = movement_action.execute()
         if path:
@@ -145,7 +145,6 @@ class FullRoundAction(GameAction):
                 "attack_result": attack_result,
                 "justification": "Charge executed as a full-round action."
             }
-            # For simplicity, log directly.
             result["log"] = f"Full-round charge by {self.actor.name} to {target}. Attack result: {attack_result}."
             return result
         else:

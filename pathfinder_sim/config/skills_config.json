@@ -1,0 +1,451 @@
+{
+    "Acrobatics": {
+      "stat": "DEX",
+      "description": "Acrobatics measures your ability to perform feats of balance, coordination, and agility. It is used for balancing on narrow surfaces, tumbling, and executing acrobatic maneuvers in combat such as dodging attacks or escaping restraints.",
+      "dc_examples": [
+        {"task": "Balancing on a wide beam", "dc": 0},
+        {"task": "Balancing on a narrow beam (1–3 ft wide)", "dc": 5},
+        {"task": "Tumbling through an enemy’s threatened area", "dc": "Opponent’s CMD (with adjustments)"},
+        {"task": "Squeezing through a gap", "dc": 30}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Slightly slippery surface", "modifier": "+2"},
+        {"condition": "Severely slippery (icy)", "modifier": "+5"},
+        {"condition": "Slightly sloped surface (<45°)", "modifier": "+2"},
+        {"condition": "Severely sloped (>45°)", "modifier": "+5"}
+      ]
+    },
+    "Appraise": {
+      "stat": "INT",
+      "description": "Appraise measures your ability to evaluate the worth and quality of items. It is used to determine the value, authenticity, and craftsmanship of objects, such as antiques, jewelry, and art.",
+      "dc_examples": [
+        {"task": "Assessing common goods", "dc": 10},
+        {"task": "Evaluating a rare artifact", "dc": 20},
+        {"task": "Identifying a forgery", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Poor lighting", "modifier": "-2"},
+        {"condition": "Distractions", "modifier": "-2"}
+      ]
+    },
+    "Bluff": {
+      "stat": "CHA",
+      "description": "Bluff allows you to deceive, mislead, or distract others. It is used for lying convincingly, feinting in combat, and misleading opponents about your true intentions.",
+      "dc_examples": [
+        {"task": "Telling a common lie", "dc": 10},
+        {"task": "Feinting in combat", "dc": "Opponent’s Perception DC"},
+        {"task": "Convincing someone of an outlandish story", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Target is distracted", "modifier": "+2"},
+        {"condition": "Lie is far-fetched", "modifier": "-10"}
+      ]
+    },
+    "Climb": {
+      "stat": "STR",
+      "description": "Climb measures your ability to scale walls, trees, or other vertical surfaces. It is used for scaling obstacles, moving over difficult terrain, and can be affected by environmental conditions.",
+      "dc_examples": [
+        {"task": "Climbing a rope with support", "dc": 5},
+        {"task": "Scaling a rough stone wall", "dc": 25},
+        {"task": "Ascending an overhanging cliff", "dc": 30}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Slippery surface", "modifier": "+5"},
+        {"condition": "Bracing against two walls (chimney)", "modifier": "-10"}
+      ]
+    },
+    "Craft": {
+      "stat": "INT",
+      "description": "Craft represents your ability to create, repair, or modify items. It covers various disciplines such as alchemy, carpentry, and jewelry making. It is used to produce crafted goods, earn income from your trade, or create masterwork items.",
+      "dc_examples": [
+        {"task": "Crafting a very simple item (wooden spoon)", "dc": 5},
+        {"task": "Crafting a typical item (iron pot)", "dc": 10},
+        {"task": "Crafting a complex item (lock)", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Using improvised tools", "modifier": "-2"},
+        {"condition": "Using masterwork artisan’s tools", "modifier": "+2"}
+      ]
+    },
+    "Diplomacy": {
+      "stat": "CHA",
+      "description": "Diplomacy measures your ability to negotiate, persuade, and influence others through conversation. It is used to make a good impression, negotiate deals, and change the attitudes of NPCs.",
+      "dc_examples": [
+        {"task": "Making a favorable impression in a short conversation", "dc": 10},
+        {"task": "Gathering a common rumor", "dc": 10},
+        {"task": "Changing an NPC’s attitude by one step", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "NPC is predisposed to like you", "modifier": "-5"},
+        {"condition": "NPC is hostile", "modifier": "+5"}
+      ]
+    },
+    "Disable Device": {
+      "stat": "DEX",
+      "description": "Disable Device is used to disarm traps or tamper with mechanical devices. It is critical in avoiding harm from traps, unlocking chests, or disabling enemy contraptions.",
+      "dc_examples": [
+        {"task": "Disabling a simple trap", "dc": 15},
+        {"task": "Disabling a complex mechanical lock", "dc": 25},
+        {"task": "Disabling magical traps (with higher complexity)", "dc": 30}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Using improvised tools", "modifier": "-2"},
+        {"condition": "High-quality tools available", "modifier": "+2"}
+      ]
+    },
+    "Disguise": {
+      "stat": "CHA",
+      "description": "Disguise measures your ability to alter your appearance convincingly. It is used to impersonate others, hide your identity, or mislead observers.",
+      "dc_examples": [
+        {"task": "Simple disguise to hide minor features", "dc": 10},
+        {"task": "Complete transformation into another person", "dc": 20},
+        {"task": "Disguise under stressful conditions", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Wearing a disguise kit", "modifier": "+2"},
+        {"condition": "Observer is familiar with your appearance", "modifier": "+5"}
+      ]
+    },
+    "Escape Artist": {
+      "stat": "DEX",
+      "description": "Escape Artist represents your ability to wriggle free from restraints, grab hold of ledges, or slip away from grapples. It is used both in combat and for avoiding hazards.",
+      "dc_examples": [
+        {"task": "Escaping from a simple grapple", "dc": 15},
+        {"task": "Escaping from bindings or manacles", "dc": 30},
+        {"task": "Slipping through a net", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "If restrained by rope/bindings", "modifier": "DC = Binder’s CMB + 20"},
+        {"condition": "Under duress in combat", "modifier": "+5"}
+      ]
+    },
+    "Fly": {
+      "stat": "DEX",
+      "description": "Fly measures your ability to maneuver while airborne. It is used to navigate the skies, avoid aerial hazards, or perform aerial maneuvers in combat.",
+      "dc_examples": [
+        {"task": "Simple maneuver in calm air", "dc": 10},
+        {"task": "Flying in turbulent conditions", "dc": 20},
+        {"task": "Executing a complex aerial maneuver", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Windy conditions", "modifier": "+5"},
+        {"condition": "Using a fly speed", "modifier": "-8 (racial bonus)"}
+      ]
+    },
+    "Handle Animal": {
+      "stat": "CHA",
+      "description": "Handle Animal measures your ability to train, control, and care for animals. It covers tasks such as riding, directing, and calming animals, as well as teaching tricks.",
+      "dc_examples": [
+        {"task": "Getting a common animal to obey simple commands", "dc": 10},
+        {"task": "Directing an animal in a stressful situation", "dc": 15},
+        {"task": "Training an animal for complex tasks", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Animal is nervous", "modifier": "+5"},
+        {"condition": "Animal is well-trained", "modifier": "-5"}
+      ]
+    },
+    "Heal": {
+      "stat": "WIS",
+      "description": "Heal is used to treat injuries, diseases, and poison. It allows you to provide first aid, stabilize dying creatures, and even tend long-term ailments.",
+      "dc_examples": [
+        {"task": "Treating a minor wound", "dc": 10},
+        {"task": "Stabilizing a dying character", "dc": 15},
+        {"task": "Treating a serious injury over time", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Using proper medical tools", "modifier": "+2"},
+        {"condition": "In a chaotic or stressful environment", "modifier": "-2"}
+      ]
+    },
+    "Intimidate": {
+      "stat": "CHA",
+      "description": "Intimidate measures your ability to influence others through fear, threats, or displays of aggression. It is used to coerce or scare opponents into compliance.",
+      "dc_examples": [
+        {"task": "Intimidating a meek individual", "dc": 10},
+        {"task": "Forcing an NPC to back down", "dc": 15},
+        {"task": "Intimidating a hardened warrior", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Target is smaller than you", "modifier": "+4 bonus"},
+        {"condition": "Target is larger than you", "modifier": "-4 penalty"}
+      ]
+    },
+    "Knowledge (arcana)": {
+      "stat": "INT",
+      "description": "Knowledge (arcana) represents your understanding of magical lore, spellcraft, and the workings of arcane magic. It is used to identify spells, magical items, and supernatural phenomena.",
+      "dc_examples": [
+        {"task": "Identifying a common magical effect", "dc": 15},
+        {"task": "Recalling details about an obscure spell", "dc": 20},
+        {"task": "Identifying a complex magical aura", "dc": "15 + spell level"}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Access to a magical library", "modifier": "+2 bonus (if available)"}
+      ]
+    },
+    "Knowledge (dungeoneering)": {
+      "stat": "INT",
+      "description": "Knowledge (dungeoneering) covers information about underground hazards, caverns, traps, and creatures that dwell below the surface. It is used to recall lore about dungeon environments and subterranean threats.",
+      "dc_examples": [
+        {"task": "Identifying a common underground hazard", "dc": 15},
+        {"task": "Determining the depth of a cavern", "dc": 20},
+        {"task": "Recognizing a trap’s mechanism", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Recent exploration in dungeons", "modifier": "+2 bonus"}
+      ]
+    },
+    "Knowledge (engineering)": {
+      "stat": "INT",
+      "description": "Knowledge (engineering) deals with the design, construction, and functioning of buildings, bridges, and technological devices. It is used to understand mechanisms, determine structural weaknesses, and identify technological devices.",
+      "dc_examples": [
+        {"task": "Identifying a common structural flaw", "dc": 10},
+        {"task": "Determining the weakness of a building", "dc": 15},
+        {"task": "Understanding a complex technological device", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Having specialized tools or blueprints", "modifier": "+2 bonus"}
+      ]
+    },
+    "Knowledge (geography)": {
+      "stat": "INT",
+      "description": "Knowledge (geography) encompasses the study of lands, terrain, climates, and the distribution of populations. It is used for navigation, identifying local features, and understanding environmental conditions.",
+      "dc_examples": [
+        {"task": "Identifying local terrain features", "dc": 15},
+        {"task": "Determining the location of a settlement", "dc": 20},
+        {"task": "Recognizing regional climatic patterns", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Familiarity with the region", "modifier": "-5 bonus"}
+      ]
+    },
+    "Knowledge (history)": {
+      "stat": "INT",
+      "description": "Knowledge (history) covers information about past events, wars, cultures, and ancient civilizations. It is used to recall significant historical events, identify historical figures, and understand the development of societies.",
+      "dc_examples": [
+        {"task": "Recalling a famous battle", "dc": 10},
+        {"task": "Dating an ancient ruin", "dc": 15},
+        {"task": "Identifying obscure historical lore", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Using historical texts", "modifier": "+2 bonus"}
+      ]
+    },
+    "Knowledge (local)": {
+      "stat": "INT",
+      "description": "Knowledge (local) represents your familiarity with the customs, legends, personalities, laws, and geography of a specific area. It is used to gather information about local inhabitants, rumors, and significant local landmarks.",
+      "dc_examples": [
+        {"task": "Recalling local rumors", "dc": 10},
+        {"task": "Knowing the local law or ruler", "dc": 10},
+        {"task": "Uncovering hidden local secrets", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Long-term residence", "modifier": "+5 bonus"}
+      ]
+    },
+    "Knowledge (nature)": {
+      "stat": "INT",
+      "description": "Knowledge (nature) is your understanding of the natural world, including flora, fauna, weather patterns, and natural hazards. It is used for identifying plants and animals, predicting weather, and recognizing natural threats.",
+      "dc_examples": [
+        {"task": "Identifying a common plant or animal", "dc": 10},
+        {"task": "Recognizing an unnatural weather phenomenon", "dc": 15},
+        {"task": "Determining natural hazards", "dc": "15 + hazard’s CR"}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Access to natural studies", "modifier": "+2 bonus"}
+      ]
+    },
+    "Knowledge (nobility)": {
+      "stat": "INT",
+      "description": "Knowledge (nobility) involves the study of heraldry, lineages, and the history of noble families. It is used to determine the legitimacy of a noble title, identify heraldic symbols, and understand the relationships between noble houses.",
+      "dc_examples": [
+        {"task": "Recognizing a common noble symbol", "dc": 10},
+        {"task": "Identifying a line of succession", "dc": 20},
+        {"task": "Understanding obscure noble relationships", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Well-read in noble history", "modifier": "+2 bonus"}
+      ]
+    },
+    "Knowledge (planes)": {
+      "stat": "INT",
+      "description": "Knowledge (planes) is the study of the cosmology, including the Inner Planes, Outer Planes, and the Astral and Ethereal Planes. It is used to understand planar travel, identify extraplanar creatures, and recall magical traditions tied to the planes.",
+      "dc_examples": [
+        {"task": "Naming the planes", "dc": 10},
+        {"task": "Recognizing a creature’s planar origin", "dc": 20},
+        {"task": "Understanding complex planar magic", "dc": "15 + spell level"}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Access to planar libraries", "modifier": "+2 bonus"}
+      ]
+    },
+    "Knowledge (religion)": {
+      "stat": "INT",
+      "description": "Knowledge (religion) covers information about deities, religious practices, ecclesiastical history, and holy symbols. It is used to recognize the signs of divine influence, understand religious lore, and identify undead or extraplanar beings connected to deities.",
+      "dc_examples": [
+        {"task": "Recognizing a common deity’s symbol", "dc": 10},
+        {"task": "Recalling common mythology", "dc": 15},
+        {"task": "Identifying obscure religious lore", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Having access to religious texts", "modifier": "+2 bonus"}
+      ]
+    },
+    "Linguistics": {
+      "stat": "INT",
+      "description": "Linguistics measures your knowledge of languages and your ability to decipher writing, understand foreign scripts, and communicate in different tongues. It is used to translate, interpret coded messages, and even to learn new languages.",
+      "dc_examples": [
+        {"task": "Deciphering a simple code", "dc": 10},
+        {"task": "Translating archaic writing", "dc": 15},
+        {"task": "Understanding an obscure language", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Having access to reference materials", "modifier": "+2 bonus"}
+      ]
+    },
+    "Perception": {
+      "stat": "WIS",
+      "description": "Perception represents your ability to notice subtle details, detect hidden objects, and sense danger. It is used for spotting traps, hearing whispers, and noticing ambushes or changes in the environment.",
+      "dc_examples": [
+        {"task": "Noticing a concealed door", "dc": 15},
+        {"task": "Hearing a whispered conversation", "dc": 15},
+        {"task": "Spotting an ambush", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Poor lighting", "modifier": "+2"},
+        {"condition": "Background noise", "modifier": "+5"}
+      ]
+    },
+    "Perform": {
+      "stat": "CHA",
+      "description": "Perform measures your ability to entertain, persuade, and captivate an audience through artistic expression. It is used for musical, dramatic, or other performance-based actions and can also be used to disguise your true intentions.",
+      "dc_examples": [
+        {"task": "A routine street performance", "dc": 10},
+        {"task": "An impressive stage show", "dc": 20},
+        {"task": "A memorable performance that earns a commission", "dc": 25}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Using a masterwork instrument", "modifier": "+2"},
+        {"condition": "Performing under duress", "modifier": "-2"}
+      ]
+    },
+    "Profession": {
+      "stat": "WIS",
+      "description": "Profession reflects your ability to earn a living through a trade or vocation. It covers a wide range of professions and is used to determine how much income you can earn through your work, as well as to answer questions about your field.",
+      "dc_examples": [
+        {"task": "Earning a modest weekly wage", "dc": 10},
+        {"task": "Answering basic questions about your trade", "dc": 10},
+        {"task": "Completing a difficult professional task", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Using proper tools of your trade", "modifier": "+2"},
+        {"condition": "Working under unfavorable conditions", "modifier": "+5"}
+      ]
+    },
+    "Ride": {
+      "stat": "DEX",
+      "description": "Ride measures your ability to control and maneuver a mount, whether in calm conditions or in the heat of combat. It is used for mounting, dismounting, and navigating while riding.",
+      "dc_examples": [
+        {"task": "Riding a well-trained horse in calm conditions", "dc": 5},
+        {"task": "Controlling a skittish mount", "dc": 10},
+        {"task": "Performing complex maneuvers in combat", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Rough terrain", "modifier": "+5"},
+        {"condition": "Using a particularly spirited mount", "modifier": "+2"}
+      ]
+    },
+    "Sense Motive": {
+      "stat": "WIS",
+      "description": "Sense Motive is used to detect lies, assess the true intentions of others, and gauge their emotional state. It is used to counteract deception and determine whether someone is being sincere.",
+      "dc_examples": [
+        {"task": "Detecting a simple lie", "dc": 10},
+        {"task": "Noticing subtle cues in a complex interaction", "dc": 15},
+        {"task": "Sensing deceit in a high-stakes negotiation", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Distracted target", "modifier": "-2"},
+        {"condition": "Cultural differences", "modifier": "+2"}
+      ]
+    },
+    "Sleight of Hand": {
+      "stat": "DEX",
+      "description": "Sleight of Hand represents your ability to perform manual tricks, such as picking pockets or palming objects, without being noticed. It is used for theft, misdirection, and subtle manipulations.",
+      "dc_examples": [
+        {"task": "Stealing a small item unnoticed", "dc": 15},
+        {"task": "Performing a subtle pickpocketing attempt", "dc": 20},
+        {"task": "Palming an object during a distraction", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Observer is distracted", "modifier": "+2"},
+        {"condition": "Wearing bulky clothing", "modifier": "+5"}
+      ]
+    },
+    "Spellcraft": {
+      "stat": "INT",
+      "description": "Spellcraft measures your understanding of magical theory and practice. It is used to identify spells as they are cast, determine the properties of magic items, and learn new spells from scrolls or spellbooks.",
+      "dc_examples": [
+        {"task": "Identifying a common magical effect", "dc": "15 + spell level"},
+        {"task": "Deciphering the properties of a magic item", "dc": "15 + caster level"},
+        {"task": "Identifying a spell that just targeted you", "dc": "25 + spell level"}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Using detect magic", "modifier": "standard DC modifiers apply"},
+        {"condition": "Magical interference", "modifier": "+5 penalty"}
+      ]
+    },
+    "Stealth": {
+      "stat": "DEX",
+      "description": "Stealth represents your ability to move quietly and remain unseen. It is used to avoid detection, move silently, and hide from enemies.",
+      "dc_examples": [
+        {"task": "Moving silently in open terrain", "dc": 10},
+        {"task": "Hiding in a crowded room", "dc": 15},
+        {"task": "Evading notice while moving in heavy cover", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Wearing light armor", "modifier": "no penalty"},
+        {"condition": "Wearing heavy armor", "modifier": "+5 penalty"},
+        {"condition": "Moving quickly", "modifier": "+5 penalty"}
+      ]
+    },
+    "Survival": {
+      "stat": "WIS",
+      "description": "Survival measures your ability to endure in the wilderness, find food and water, track creatures, and avoid natural hazards. It is used both in foraging and in navigating harsh environments.",
+      "dc_examples": [
+        {"task": "Finding a trail in soft ground", "dc": 5},
+        {"task": "Tracking creatures on firm ground", "dc": 15},
+        {"task": "Avoiding a natural hazard like quicksand", "dc": 15}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Adverse weather", "modifier": "+5"},
+        {"condition": "Excellent terrain conditions", "modifier": "-2"}
+      ]
+    },
+    "Swim": {
+      "stat": "STR",
+      "description": "Swim measures your ability to move through water. It is used for swimming in calm, rough, or stormy waters and is affected by the water conditions and your body’s build.",
+      "dc_examples": [
+        {"task": "Swimming in calm water", "dc": 10},
+        {"task": "Swimming in rough water", "dc": 15},
+        {"task": "Swimming in stormy conditions", "dc": 20}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Turbulent water", "modifier": "+5"},
+        {"condition": "Using a swim speed", "modifier": "-8 (racial bonus)"}
+      ]
+    },
+    "Use Magic Device": {
+      "stat": "CHA",
+      "description": "Use Magic Device measures your ability to activate or use magical items that you normally wouldn’t be able to use. It represents intuition and flair in handling magic.",
+      "dc_examples": [
+        {"task": "Activating a simple magic item", "dc": 15},
+        {"task": "Using a scroll of moderate difficulty", "dc": 20},
+        {"task": "Activating an artifact with complex properties", "dc": 25}
+      ],
+      "conditions_modifiers": [
+        {"condition": "Familiarity with the item’s lore", "modifier": "-2"},
+        {"condition": "Stressful or combat conditions", "modifier": "+5"}
+      ]
+    }
+  }
+  

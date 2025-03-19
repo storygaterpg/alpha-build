@@ -77,12 +77,9 @@ def create_condition(name: str, duration: int = None) -> DataCondition:
     final_duration = duration if duration is not None else default_duration
     description = condition_data.get("description", f"{name} condition.")
     modifiers = condition_data.get("modifiers", {})
-    return DataCondition(name, final_duration, description, modifiers)
+    return DataCondition(name.capitalize(), final_duration, description, modifiers)
 
-# --------------------------
-# Specific condition subclasses
-# These wrap the generic create_condition for conditions defined in the config.
-# --------------------------
+# Specific condition subclasses using create_condition from config
 
 class BlindedCondition(DataCondition):
     def __init__(self, duration: int = None):
@@ -184,7 +181,7 @@ class EntangledCondition(DataCondition):
         cond = create_condition("entangled", duration)
         super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
 
-# Conditions not defined in the config; define defaults.
+# For conditions not defined in config, define defaults:
 class ProneCondition(DataCondition):
     def __init__(self, duration: int = None):
         description = "Prone: The creature falls prone, incurring a -4 penalty to AC."
