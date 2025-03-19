@@ -78,3 +78,123 @@ def create_condition(name: str, duration: int = None) -> DataCondition:
     description = condition_data.get("description", f"{name} condition.")
     modifiers = condition_data.get("modifiers", {})
     return DataCondition(name, final_duration, description, modifiers)
+
+# --------------------------
+# Specific condition subclasses
+# These wrap the generic create_condition for conditions defined in the config.
+# --------------------------
+
+class BlindedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("blinded", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class CharmedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("charmed", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class ConfusedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("confused", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class DazedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("dazed", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class DeafenedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("deafened", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class DyingCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("dying", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class FatiguedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("fatigued", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class FlatfootedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("flatfooted", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class FrightenedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("frightened", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class GrappledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("grappled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class ImmobilizedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("immobilized", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class ParalyzedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("paralyzed", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class PetrifiedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("petrified", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class SickenedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("sickened", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class StaggeredCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("staggered", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class StunnedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("stunned", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class UnconsciousCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("unconscious", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class EnfeebledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("enfeebled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class DazzledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("dazzled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+class EntangledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("entangled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+
+# Conditions not defined in the config; define defaults.
+class ProneCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        description = "Prone: The creature falls prone, incurring a -4 penalty to AC."
+        modifiers = {"ac": -4}
+        default_duration = duration if duration is not None else 1
+        super().__init__("Prone", default_duration, description, modifiers)
+
+class ShakenCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        description = "Shaken: The creature is unnerved; no direct AC penalty."
+        modifiers = {}
+        default_duration = duration if duration is not None else 1
+        super().__init__("Shaken", default_duration, description, modifiers)

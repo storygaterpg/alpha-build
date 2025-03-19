@@ -58,6 +58,10 @@ class Character:
             return (self.dexterity - 10) // 2
         return 0
 
+    def has_condition(self, condition_names: list) -> bool:
+        """Return True if the character has any condition in the given list (case-insensitive)."""
+        return any(cond.name.lower() in [name.lower() for name in condition_names] for cond in self.conditions)
+
     def add_condition(self, condition: conditions.Condition) -> None:
         self.conditions.append(condition)
         print(f"{self.name} gains condition: {condition.name} (Duration: {condition.duration} rounds)")
@@ -106,15 +110,12 @@ class Character:
         """
         total_bab = 0
         # For each class, determine the contribution.
-        # We assume each class level contributes based on its progression type.
         for class_name, level in self.class_levels.items():
-            # Load class data from the configuration.
-            # For efficiency, we can use create_rpg_class from rpg_class.py.
             from rpg_class import create_rpg_class
             rpg_class = create_rpg_class(class_name)
             progression = rpg_class.base_attack_bonus_progression.lower()
             if progression == "full":
-                total_bab += level  # +1 per level.
+                total_bab += level
             elif progression == "average":
                 total_bab += int(0.75 * level)
             elif progression == "poor":
@@ -126,9 +127,7 @@ class Character:
     def level_up(self, rpg_class: "RPGClass") -> None:
         """
         Increases the character's level in the given RPG class.
-        Supports multiclassing: if the character already has levels in that class,
-        increment the level; otherwise, set it to 1.
-        After leveling up, recalculate derived statistics.
+        Supports multiclassing.
         """
         class_name = rpg_class.name.lower()
         if class_name in self.class_levels:
@@ -139,25 +138,39 @@ class Character:
         print(f"{self.name} levels up as {rpg_class.name} to level {self.class_levels[class_name]}.")
 
     def get_ac(self) -> int:
-        base_ac = (10 + self.armor_bonus + self.shield_bonus + self.natural_armor +
-                   self.deflection_bonus + self.dodge_bonus + self.get_modifier("DEX") + self.size_modifier)
+        """
+        Computes the character's Armor Class (AC).
+        Base AC = 10 + armor_bonus + shield_bonus + natural_armor + deflection_bonus + size_modifier.
+        Adds Dexterity mod and dodge_bonus only if the character is not affected by conditions
+        that remove them (e.g., blinded, flatfooted, paralyzed, unconscious).
+        Then adds any additional modifiers from active conditions.
+        """
+        base_ac = 10 + self.armor_bonus + self.shield_bonus + self.natural_armor + self.deflection_bonus + self.size_modifier
+        if not self.has_condition(["blinded", "flatfooted", "paralyzed", "unconscious"]):
+            base_ac += self.get_modifier("DEX") + self.dodge_bonus
         for cond in self.conditions:
-            modifiers = cond.get_modifiers(self)
-            base_ac += modifiers.get("ac", 0)
+            base_ac += cond.get_modifiers(self).get("ac", 0)
         return base_ac
 
     def get_flatfooted_ac(self) -> int:
+        """
+        Flat-footed AC excludes the Dexterity and dodge bonuses.
+        """
         base_ac = 10 + self.armor_bonus + self.shield_bonus + self.natural_armor + self.deflection_bonus + self.size_modifier
         for cond in self.conditions:
-            modifiers = cond.get_modifiers(self)
-            base_ac += modifiers.get("ac", 0)
+            base_ac += cond.get_modifiers(self).get("ac", 0)
         return base_ac
 
     def get_touch_ac(self) -> int:
-        base_ac = 10 + self.get_modifier("DEX") + self.dodge_bonus + self.size_modifier
+        """
+        Touch AC normally = 10 + Dexterity mod + dodge bonus + size_modifier.
+        If affected by conditions (blinded, flatfooted, paralyzed, unconscious), these bonuses are omitted.
+        """
+        base_ac = 10 + self.size_modifier
+        if not self.has_condition(["blinded", "flatfooted", "paralyzed", "unconscious"]):
+            base_ac += self.get_modifier("DEX") + self.dodge_bonus
         for cond in self.conditions:
-            modifiers = cond.get_modifiers(self)
-            base_ac += modifiers.get("ac", 0)
+            base_ac += cond.get_modifiers(self).get("ac", 0)
         return base_ac
 
     def get_threatened_squares(self) -> set:
