@@ -162,6 +162,19 @@ class Character:
                     continue
                 threatened.add((x + dx, y + dy))
         return threatened
+    
+    def get_effective_skill_modifier(self, ability: str) -> int:
+        """
+        Returns the effective modifier for a given ability (e.g., 'DEX' or 'STR') for skill checks,
+        factoring in the base ability modifier plus any cumulative skill penalties from active conditions.
+        """
+        base = self.get_modifier(ability)
+        penalty = 0
+        for cond in self.conditions:
+            if hasattr(cond, "skill_penalty"):
+                penalty += cond.skill_penalty
+        return base + penalty
+
 
     def __str__(self) -> str:
         class_info = ", ".join([f"{name.title()} (lvl {lvl})" for name, lvl in self.class_levels.items()])

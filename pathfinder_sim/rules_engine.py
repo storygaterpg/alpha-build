@@ -16,6 +16,7 @@ from typing import List, Dict, Any
 import math
 import json
 import os
+from skill_utils import get_skill_modifier
 
 class Dice:
     """
@@ -236,7 +237,9 @@ class SkillResolver:
 
     def resolve_skill_check(self, skill_action) -> Dict[str, Any]:
         roll = self.dice.roll_d20()
-        total = roll + 2  # Simplified bonus.
+        # Use the new skill_utils function to get the effective modifier.
+        modifier = get_skill_modifier(skill_action.actor, skill_action.skill_name)
+        total = roll + modifier
         result = {
             "action": "skill_check",
             "character_name": skill_action.actor.name,
@@ -244,7 +247,7 @@ class SkillResolver:
             "roll": roll,
             "total": total,
             "dc": skill_action.dc,
-            "justification": "Skill check processed."
+            "justification": f"Skill check processed using base modifier {modifier} (roll {roll} + modifier = {total})."
         }
         return result
 
