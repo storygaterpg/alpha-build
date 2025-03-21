@@ -6,10 +6,14 @@ This module implements the conditions framework for our Pathfinder simulation us
 Condition definitions are loaded from an external JSON configuration file, allowing for flexibility and easy adjustments.
 """
 
+from __future__ import annotations  # Optionally, you can add this for postponed evaluation.
 from abc import ABC, abstractmethod
-from typing import Dict, Any, List
+from typing import Dict, Any, List, TYPE_CHECKING
 import json
 import os
+
+if TYPE_CHECKING:
+    from character import Character
 
 # Global variable to cache the conditions configuration.
 _CONDITIONS_CONFIG = None

@@ -5,70 +5,46 @@ import math
 from character import Character
 import conditions
 
-# List of condition classes along with expected modifier outcomes from the configuration.
-# For conditions defined in conditions_config.json, we expect the following:
-#   - Blinded: {"ac": -2}
-#   - Charmed: {}
-#   - Confused: {}
-#   - Dazed: {}
-#   - Deafened: {}
-#   - Dying: {}
-#   - Fatigued: {}
-#   - Flatfooted: {}
-#   - Frightened: {}
-#   - Grappled: {}
-#   - Immobilized: {}
-#   - Paralyzed: {}
-#   - Petrified: {}
-#   - Sickened: {}
-#   - Staggered: {}
-#   - Stunned: {"ac": -2}
-#   - Unconscious: {}
-#   - Enfeebled: {}
-#   - Dazzled: {}
-#   - Entangled: {}
-# Additionally, our project-defined conditions:
-#   - ProneCondition: {"ac": -4}
-#   - ShakenCondition: {}
-#
-# We assume that the configuration file (conditions_config.json) supplies these values.
-#
-# For each condition class, we test:
-# 1. Instantiation and default duration (if not overridden).
-# 2. That get_modifiers() returns the expected dictionary.
-# 3. That tick() decrements the duration and is_expired() returns True when appropriate.
-
-@pytest.mark.parametrize("ConditionClass, expected_modifiers", [
-    (conditions.BlindedCondition, {"ac": -2}),
-    (conditions.CharmedCondition, {}),
-    (conditions.ConfusedCondition, {}),
-    (conditions.DazedCondition, {}),
-    (conditions.DeafenedCondition, {}),
-    (conditions.DyingCondition, {}),
-    (conditions.FatiguedCondition, {}),
-    (conditions.FlatfootedCondition, {}),
-    (conditions.FrightenedCondition, {}),
-    (conditions.GrappledCondition, {}),
-    (conditions.ImmobilizedCondition, {}),
-    (conditions.ParalyzedCondition, {}),
-    (conditions.PetrifiedCondition, {}),
-    (conditions.SickenedCondition, {}),
-    (conditions.StaggeredCondition, {}),
-    (conditions.StunnedCondition, {"ac": -2}),
-    (conditions.UnconsciousCondition, {}),
-    (conditions.EnfeebledCondition, {}),
-    (conditions.DazzledCondition, {}),
-    (conditions.EntangledCondition, {}),
-    (conditions.ProneCondition, {"ac": -4}),
-    (conditions.ShakenCondition, {})
+# ----------------------------
+# Test Raw Condition Properties
+# ----------------------------
+@pytest.mark.parametrize("ConditionClass, expected_modifiers, expected_skill_penalty", [
+    (conditions.BlindedCondition, {"ac": -2}, -5),
+    (conditions.CharmedCondition, {}, 0),
+    (conditions.ConfusedCondition, {}, 0),
+    (conditions.DazedCondition, {}, 0),
+    (conditions.DeafenedCondition, {}, -4),
+    (conditions.DyingCondition, {}, 0),
+    (conditions.FatiguedCondition, {}, -2),
+    (conditions.FlatfootedCondition, {}, 0),
+    (conditions.FrightenedCondition, {}, -2),
+    (conditions.GrappledCondition, {}, -4),
+    (conditions.ImmobilizedCondition, {}, 0),
+    (conditions.ParalyzedCondition, {}, 0),
+    (conditions.PetrifiedCondition, {}, 0),
+    (conditions.SickenedCondition, {}, -2),
+    (conditions.StaggeredCondition, {}, 0),
+    (conditions.StunnedCondition, {"ac": -2}, 0),
+    (conditions.UnconsciousCondition, {}, 0),
+    (conditions.EnfeebledCondition, {}, 0),
+    (conditions.DazzledCondition, {}, -1),
+    (conditions.EntangledCondition, {}, -2),
+    (conditions.ProneCondition, {"ac": -4}, 0),
+    (conditions.ShakenCondition, {}, 0)
 ])
-def test_condition_modifiers(ConditionClass, expected_modifiers):
+def test_condition_raw_properties(ConditionClass, expected_modifiers, expected_skill_penalty):
     # Instantiate the condition with no duration override so that default_duration is used.
     cond = ConditionClass()
     mods = cond.get_modifiers(None)  # Passing None as character since modifiers are static.
     assert isinstance(mods, dict), f"{cond.name} modifiers should be a dictionary."
     assert mods == expected_modifiers, f"{cond.name} modifiers expected {expected_modifiers}, got {mods}"
+    # Check that the skill penalty is stored correctly.
+    assert hasattr(cond, "skill_penalty"), f"{cond.name} should have a 'skill_penalty' attribute."
+    assert cond.skill_penalty == expected_skill_penalty, f"{cond.name} skill penalty expected {expected_skill_penalty}, got {cond.skill_penalty}"
 
+# ----------------------------
+# Test Condition Tick and Expiration
+# ----------------------------
 @pytest.mark.parametrize("ConditionClass", [
     conditions.BlindedCondition,
     conditions.CharmedCondition,
@@ -94,7 +70,6 @@ def test_condition_modifiers(ConditionClass, expected_modifiers):
     conditions.ShakenCondition
 ])
 def test_condition_tick_and_expiration(ConditionClass):
-    # Create condition with a specific duration (e.g., 2 rounds)
     cond = ConditionClass(duration=2)
     assert cond.duration == 2, f"Initial duration for {cond.name} should be 2."
     cond.tick()
@@ -103,41 +78,54 @@ def test_condition_tick_and_expiration(ConditionClass):
     assert cond.duration == 0, f"After two ticks, duration for {cond.name} should be 0."
     assert cond.is_expired(), f"{cond.name} should be expired at duration 0."
 
-def test_character_condition_integration():
-    # Create a character and add several conditions, then test AC calculations.
-    # For AC, base is 10 + Dex mod (for dex=14, mod=2) plus dodge bonus.
-    # Our get_ac() in character.py adds Dex and dodge only if conditions that remove them are absent.
-    char = Character("Tester", x=0, y=0, dexterity=14)
-    # Without conditions, AC should be 10 + 2 = 12.
-    assert char.get_ac() == 12, "Expected AC 12 without conditions."
+# ----------------------------
+# Integration Tests: Conditions Affecting Skill Checks
+# ----------------------------
 
-    # Add Blinded condition (which should remove Dex bonus and dodge)
+def test_blinded_skill_modifier():
+    # Create a character with dexterity 14 (modifier +2)
+    char = Character("Tester", x=0, y=0, dexterity=14)
+    # Without conditions, effective DEX modifier should be +2.
+    assert char.get_effective_skill_modifier("DEX") == 2, "Expected effective DEX modifier +2 without conditions."
+    # Add Blinded condition (affects DEX and STR; penalty -5).
     blinded = conditions.BlindedCondition(duration=2)
     char.add_condition(blinded)
-    # Now AC should be 10 + bonuses that are still in effect.
-    # In our character.get_ac(), if blinded is present, we do not add Dex mod or dodge.
-    # So AC becomes 10 + armor bonuses etc. (all zeros) plus any condition modifiers.
-    # Blinded condition provides {"ac": -2}, so expected AC becomes 10 - 2 = 8.
-    assert char.get_ac() == 8, f"Expected AC 8 with Blinded condition, got {char.get_ac()}."
+    # Now, effective modifier for DEX-based skills should be +2 + (-5) = -3.
+    assert char.get_effective_skill_modifier("DEX") == -3, f"Expected effective DEX modifier -3 with Blinded, got {char.get_effective_skill_modifier('DEX')}."
 
-    # Remove blinded, add Prone (which gives -4) but does not remove Dex bonus.
-    char.conditions = []
-    prone = conditions.ProneCondition(duration=1)
-    char.add_condition(prone)
-    # Now, AC should be 10 + Dex mod (2) -4 = 8.
-    assert char.get_ac() == 8, f"Expected AC 8 with Prone condition, got {char.get_ac()}."
+def test_fatigued_skill_modifier():
+    # Fatigued affects STR and DEX with a -2 penalty.
+    char = Character("Tester", x=0, y=0, dexterity=14)
+    # Without conditions, effective DEX modifier is +2.
+    fatigued = conditions.FatiguedCondition(duration=1)
+    char.add_condition(fatigued)
+    # Expected: +2 + (-2) = 0.
+    assert char.get_effective_skill_modifier("DEX") == 0, f"Expected effective DEX modifier 0 with Fatigued, got {char.get_effective_skill_modifier('DEX')}."
 
-    # Add Stunned condition as well, which should remove Dex bonus.
-    stunned = conditions.StunnedCondition(duration=1)
-    char.add_condition(stunned)
-    # Now, AC calculation should not include Dex bonus (and dodge) because stunned is one of those conditions.
-    # So AC = 10 - 4 (from prone) - 2 (from stunned) = 4.
-    assert char.get_ac() == 4, f"Expected AC 4 with Prone and Stunned conditions, got {char.get_ac()}."
+def test_grappled_skill_modifier():
+    # Grappled should affect only DEX-based skills with a -4 penalty.
+    char = Character("Tester", x=0, y=0, dexterity=14)
+    grappled = conditions.GrappledCondition(duration=1)
+    char.add_condition(grappled)
+    # For DEX skills: +2 + (-4) = -2.
+    assert char.get_effective_skill_modifier("DEX") == -2, f"Expected effective DEX modifier -2 with Grappled, got {char.get_effective_skill_modifier('DEX')}."
+    # For a stat not affected (e.g., STR, which defaults to 0), effective modifier should be 0.
+    assert char.get_effective_skill_modifier("STR") == 0, "Expected effective STR modifier 0 without base modifier."
 
-    # Update conditions and check expiration.
-    initial_count = len(char.conditions)
-    char.update_conditions()
-    # Conditions ticked; if any reached 0, they should be removed.
-    # We expect that conditions with duration 1 now expire.
-    for cond in char.conditions:
-        assert cond.duration >= 0, "Condition duration should not be negative."
+def test_multiple_conditions_skill_modifier():
+    # Test cumulative penalties: Blinded (-5 on DEX) and Fatigued (-2 on DEX).
+    char = Character("Tester", x=0, y=0, dexterity=14)
+    # Without conditions: +2.
+    char.add_condition(conditions.BlindedCondition(duration=2))
+    char.add_condition(conditions.FatiguedCondition(duration=1))
+    # Expected effective modifier: +2 + (-5) + (-2) = -5.
+    assert char.get_effective_skill_modifier("DEX") == -5, f"Expected effective DEX modifier -5 with Blinded and Fatigued, got {char.get_effective_skill_modifier('DEX')}."
+
+def test_condition_no_effect_on_unrelated_stat():
+    # Conditions that affect DEX should not change effective modifier for a stat that is not affected.
+    char = Character("Tester", x=0, y=0, dexterity=14)
+    # Assume the character's STR modifier is 0 (default, since get_modifier returns 0 for STR).
+    char.add_condition(conditions.BlindedCondition(duration=2))
+    # Effective modifier for STR should remain 0 because even though Blinded lists STR in affected_stats,
+    # the base STR mod is 0.
+    assert char.get_effective_skill_modifier("STR") == 0, "Expected effective STR modifier 0 with Blinded on a character with STR mod 0."

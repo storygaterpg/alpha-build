@@ -9,9 +9,12 @@ based on levels in different RPG classes.
 """
 
 from typing import List, Dict, Any
-import conditions
 import json
 import os
+import conditions
+
+# Import RPGClass for type annotations.
+from rpg_class import RPGClass
 
 class Character:
     """
@@ -99,7 +102,17 @@ class Character:
         return [cond.get_status() for cond in self.conditions]
 
     def recalc_stats(self) -> None:
+        """
+        Recalculate derived attributes based on multiclass levels.
+        Currently, we update the Base Attack Bonus (BAB) based on the sum of contributions
+        from each class. Using the following simplified progression:
+          - Full: +1 per level.
+          - Average: floor(0.75 * level).
+          - Poor: floor(0.5 * level).
+        The RPGClass data is assumed to be provided by our rpg_class.py configuration.
+        """
         total_bab = 0
+        # For each class, determine the contribution.
         for class_name, level in self.class_levels.items():
             from rpg_class import create_rpg_class
             rpg_class = create_rpg_class(class_name)
@@ -111,10 +124,16 @@ class Character:
             elif progression == "poor":
                 total_bab += int(0.5 * level)
             else:
-                total_bab += level
+                total_bab += level  # Default to full progression.
         self.BAB = total_bab
 
-    def level_up(self, rpg_class: "RPGClass") -> None:
+    def level_up(self, rpg_class: RPGClass) -> None:
+        """
+        Increases the character's level in the given RPG class.
+        Supports multiclassing: if the character already has levels in that class,
+        increment the level; otherwise, set it to 1.
+        After leveling up, recalculate derived statistics.
+        """
         class_name = rpg_class.name.lower()
         if class_name in self.class_levels:
             self.class_levels[class_name] += 1
@@ -127,9 +146,8 @@ class Character:
         """
         Computes the character's Armor Class (AC).
         Base AC = 10 + armor_bonus + shield_bonus + natural_armor + deflection_bonus + size_modifier.
-        Adds Dexterity mod and dodge_bonus only if conditions that remove them are absent.
-        For Pathfinder 1e, conditions such as blinded, flatfooted, paralyzed, and unconscious remove the Dex bonus.
-        Stunned does NOT remove the Dex bonus.
+        Adds Dexterity mod and dodge_bonus only if the character is not affected by conditions
+        that remove them (e.g., blinded, flatfooted, paralyzed, unconscious).
         Then adds any additional modifiers from active conditions.
         """
         base_ac = 10 + self.armor_bonus + self.shield_bonus + self.natural_armor + self.deflection_bonus + self.size_modifier
@@ -162,19 +180,18 @@ class Character:
                     continue
                 threatened.add((x + dx, y + dy))
         return threatened
-    
+
     def get_effective_skill_modifier(self, ability: str) -> int:
         """
         Returns the effective modifier for a given ability (e.g., 'DEX' or 'STR') for skill checks,
-        factoring in the base ability modifier plus any cumulative skill penalties from active conditions.
+        factoring in the base ability modifier plus cumulative skill penalties from active conditions.
         """
         base = self.get_modifier(ability)
         penalty = 0
         for cond in self.conditions:
-            if hasattr(cond, "skill_penalty"):
+            if ability.upper() in [stat.upper() for stat in getattr(cond, "affected_stats", [])]:
                 penalty += cond.skill_penalty
         return base + penalty
-
 
     def __str__(self) -> str:
         class_info = ", ".join([f"{name.title()} (lvl {lvl})" for name, lvl in self.class_levels.items()])
