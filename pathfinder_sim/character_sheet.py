@@ -8,7 +8,7 @@ import jsonschema
 
 # Load the JSON schema from file.
 def load_character_sheet_schema() -> dict:
-    schema_path = os.path.join(os.path.dirname(__file__), "character_sheet_schema.json")
+    schema_path = os.path.join(os.path.dirname(__file__), "config", "character_sheet_schema.json")
     with open(schema_path, "r") as f:
         schema = json.load(f)
     return schema
@@ -71,7 +71,7 @@ def create_character_sheet(character, narrative: Optional[str] = None) -> dict:
         "timestamp": datetime.datetime.now().isoformat(),
         "character": {
             **identity,
-            "position": character.position,
+            "position": list(character.position),
             "level": level,
             "experience": getattr(character, "experience", 0),
             "abilities": abilities,
