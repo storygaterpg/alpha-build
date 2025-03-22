@@ -1,0 +1,234 @@
+{
+    "ranger": {
+      "levels": {
+        "1": {
+          "BAB": [1],
+          "Fort": 2,
+          "Ref": 2,
+          "Will": 0,
+          "special_abilities": ["1st favored enemy, track, wild empathy"],
+          "spell_slots": {}
+        },
+        "2": {
+          "BAB": [2],
+          "Fort": 3,
+          "Ref": 3,
+          "Will": 0,
+          "special_abilities": ["Combat style feat"],
+          "spell_slots": {}
+        },
+        "3": {
+          "BAB": [3],
+          "Fort": 3,
+          "Ref": 3,
+          "Will": 1,
+          "special_abilities": ["Endurance, 1st favored terrain"],
+          "spell_slots": {}
+        },
+        "4": {
+          "BAB": [4],
+          "Fort": 4,
+          "Ref": 4,
+          "Will": 1,
+          "special_abilities": ["Hunter’s bond"],
+          "spell_slots": {
+            "1st": 0
+          }
+        },
+        "5": {
+          "BAB": [5],
+          "Fort": 4,
+          "Ref": 4,
+          "Will": 1,
+          "special_abilities": ["2nd favored enemy"],
+          "spell_slots": {
+            "1st": 1
+          }
+        },
+        "6": {
+          "BAB": [6, 1],
+          "Fort": 5,
+          "Ref": 5,
+          "Will": 2,
+          "special_abilities": ["Combat style feat"],
+          "spell_slots": {
+            "1st": 1
+          }
+        },
+        "7": {
+          "BAB": [7, 2],
+          "Fort": 5,
+          "Ref": 5,
+          "Will": 2,
+          "special_abilities": ["Woodland stride"],
+          "spell_slots": {
+            "1st": 1,
+            "2nd": 0
+          }
+        },
+        "8": {
+          "BAB": [8, 3],
+          "Fort": 6,
+          "Ref": 6,
+          "Will": 2,
+          "special_abilities": ["Swift tracker, 2nd favored terrain"],
+          "spell_slots": {
+            "1st": 1,
+            "2nd": 1
+          }
+        },
+        "9": {
+          "BAB": [9, 4],
+          "Fort": 6,
+          "Ref": 6,
+          "Will": 3,
+          "special_abilities": ["Evasion"],
+          "spell_slots": {
+            "1st": 2,
+            "2nd": 1
+          }
+        },
+        "10": {
+          "BAB": [10, 5],
+          "Fort": 7,
+          "Ref": 7,
+          "Will": 3,
+          "special_abilities": ["3rd favored enemy, combat style feat"],
+          "spell_slots": {
+            "1st": 2,
+            "2nd": 1,
+            "3rd": 0
+          }
+        },
+        "11": {
+          "BAB": [11, 6, 1],
+          "Fort": 7,
+          "Ref": 7,
+          "Will": 3,
+          "special_abilities": ["Quarry"],
+          "spell_slots": {
+            "1st": 2,
+            "2nd": 1,
+            "3rd": 1
+          }
+        },
+        "12": {
+          "BAB": [12, 7, 2],
+          "Fort": 8,
+          "Ref": 8,
+          "Will": 4,
+          "special_abilities": ["Camouflage"],
+          "spell_slots": {
+            "1st": 2,
+            "2nd": 2,
+            "3rd": 1
+          }
+        },
+        "13": {
+          "BAB": [13, 8, 3],
+          "Fort": 8,
+          "Ref": 8,
+          "Will": 4,
+          "special_abilities": ["3rd favored terrain"],
+          "spell_slots": {
+            "1st": 3,
+            "2nd": 2,
+            "3rd": 1,
+            "4th": 0
+          }
+        },
+        "14": {
+          "BAB": [14, 9, 4],
+          "Fort": 9,
+          "Ref": 9,
+          "Will": 4,
+          "special_abilities": ["Combat style feat"],
+          "spell_slots": {
+            "1st": 3,
+            "2nd": 2,
+            "3rd": 1,
+            "4th": 1
+          }
+        },
+        "15": {
+          "BAB": [15, 10, 5],
+          "Fort": 9,
+          "Ref": 9,
+          "Will": 5,
+          "special_abilities": ["4th favored enemy"],
+          "spell_slots": {
+            "1st": 3,
+            "2nd": 2,
+            "3rd": 2,
+            "4th": 1
+          }
+        },
+        "16": {
+          "BAB": [16, 11, 6, 1],
+          "Fort": 10,
+          "Ref": 10,
+          "Will": 5,
+          "special_abilities": ["Improved evasion"],
+          "spell_slots": {
+            "1st": 3,
+            "2nd": 3,
+            "3rd": 2,
+            "4th": 1
+          }
+        },
+        "17": {
+          "BAB": [17, 12, 7, 2],
+          "Fort": 10,
+          "Ref": 10,
+          "Will": 5,
+          "special_abilities": ["Hide in plain sight"],
+          "spell_slots": {
+            "1st": 4,
+            "2nd": 3,
+            "3rd": 2,
+            "4th": 1
+          }
+        },
+        "18": {
+          "BAB": [18, 13, 8, 3],
+          "Fort": 11,
+          "Ref": 11,
+          "Will": 6,
+          "special_abilities": ["4th favored terrain, combat style feat"],
+          "spell_slots": {
+            "1st": 4,
+            "2nd": 3,
+            "3rd": 2,
+            "4th": 2
+          }
+        },
+        "19": {
+          "BAB": [19, 14, 9, 4],
+          "Fort": 11,
+          "Ref": 11,
+          "Will": 6,
+          "special_abilities": ["Improved quarry"],
+          "spell_slots": {
+            "1st": 4,
+            "2nd": 3,
+            "3rd": 3,
+            "4th": 2
+          }
+        },
+        "20": {
+          "BAB": [20, 15, 10, 5],
+          "Fort": 12,
+          "Ref": 12,
+          "Will": 6,
+          "special_abilities": ["5th favored enemy, master hunter"],
+          "spell_slots": {
+            "1st": 4,
+            "2nd": 4,
+            "3rd": 3,
+            "4th": 3
+          }
+        }
+      }
+    }
+  }
+  

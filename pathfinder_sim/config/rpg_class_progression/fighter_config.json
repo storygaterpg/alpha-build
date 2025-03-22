@@ -1,0 +1,147 @@
+{
+    "fighter": {
+      "levels": {
+        "1": {
+          "BAB": [1],
+          "Fort": 2,
+          "Ref": 0,
+          "Will": 0,
+          "special_abilities": ["Bonus feat"]
+        },
+        "2": {
+          "BAB": [2],
+          "Fort": 3,
+          "Ref": 0,
+          "Will": 0,
+          "special_abilities": ["Bonus feat, bravery +1"]
+        },
+        "3": {
+          "BAB": [3],
+          "Fort": 3,
+          "Ref": 1,
+          "Will": 1,
+          "special_abilities": ["Armor training"]
+        },
+        "4": {
+          "BAB": [4],
+          "Fort": 4,
+          "Ref": 1,
+          "Will": 1,
+          "special_abilities": ["Bonus feat"]
+        },
+        "5": {
+          "BAB": [5],
+          "Fort": 4,
+          "Ref": 1,
+          "Will": 1,
+          "special_abilities": ["Weapon training"]
+        },
+        "6": {
+          "BAB": [6, 1],
+          "Fort": 5,
+          "Ref": 2,
+          "Will": 2,
+          "special_abilities": ["Bonus feat, bravery +2"]
+        },
+        "7": {
+          "BAB": [7, 2],
+          "Fort": 5,
+          "Ref": 2,
+          "Will": 2,
+          "special_abilities": ["Armor training"]
+        },
+        "8": {
+          "BAB": [8, 3],
+          "Fort": 6,
+          "Ref": 2,
+          "Will": 2,
+          "special_abilities": ["Bonus feat"]
+        },
+        "9": {
+          "BAB": [9, 4],
+          "Fort": 6,
+          "Ref": 3,
+          "Will": 3,
+          "special_abilities": ["Weapon training (or advanced weapon training*)"]
+        },
+        "10": {
+          "BAB": [10, 5],
+          "Fort": 7,
+          "Ref": 3,
+          "Will": 3,
+          "special_abilities": ["Bonus feat, bravery +3"]
+        },
+        "11": {
+          "BAB": [11, 6, 1],
+          "Fort": 7,
+          "Ref": 3,
+          "Will": 3,
+          "special_abilities": ["Armor training"]
+        },
+        "12": {
+          "BAB": [12, 7, 2],
+          "Fort": 8,
+          "Ref": 4,
+          "Will": 4,
+          "special_abilities": ["Bonus feat"]
+        },
+        "13": {
+          "BAB": [13, 8, 3],
+          "Fort": 8,
+          "Ref": 4,
+          "Will": 4,
+          "special_abilities": ["Weapon training"]
+        },
+        "14": {
+          "BAB": [14, 9, 4],
+          "Fort": 9,
+          "Ref": 4,
+          "Will": 4,
+          "special_abilities": ["Bonus feat, bravery +4"]
+        },
+        "15": {
+          "BAB": [15, 10, 5],
+          "Fort": 9,
+          "Ref": 5,
+          "Will": 5,
+          "special_abilities": ["Armor training"]
+        },
+        "16": {
+          "BAB": [16, 11, 6, 1],
+          "Fort": 10,
+          "Ref": 5,
+          "Will": 5,
+          "special_abilities": ["Bonus feat"]
+        },
+        "17": {
+          "BAB": [17, 12, 7, 2],
+          "Fort": 10,
+          "Ref": 5,
+          "Will": 5,
+          "special_abilities": ["Weapon training"]
+        },
+        "18": {
+          "BAB": [18, 13, 8, 3],
+          "Fort": 11,
+          "Ref": 6,
+          "Will": 6,
+          "special_abilities": ["Bonus feat, bravery +5"]
+        },
+        "19": {
+          "BAB": [19, 14, 9, 4],
+          "Fort": 11,
+          "Ref": 6,
+          "Will": 6,
+          "special_abilities": ["Armor mastery"]
+        },
+        "20": {
+          "BAB": [20, 15, 10, 5],
+          "Fort": 12,
+          "Ref": 6,
+          "Will": 6,
+          "special_abilities": ["Bonus feat, Weapon mastery"]
+        }
+      }
+    }
+  }
+  

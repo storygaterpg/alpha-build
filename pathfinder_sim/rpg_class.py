@@ -5,15 +5,17 @@ rpg_class.py
 This module implements the core RPG class system for our Pathfinder simulation.
 We use the term 'RPGClass' to represent the character's archetype (e.g., Barbarian, Bard, etc.).
 Class-specific data—including base stats and progression tables—is loaded from external configuration files.
+Now, progression data for each class is stored in its own file under config/rpg_class_progression/.
 """
 
 import json
 import os
 from typing import List, Dict, Any
 
-# Global cache for RPG class configuration.
+# Global cache for the base classes configuration.
 _RPG_CLASSES_CONFIG = None
-_RPG_CLASSES_PROGRESSION = None
+# Global cache for individual class progression configurations.
+_RPG_CLASSES_PROGRESSION_CACHE: Dict[str, Dict[str, Any]] = {}
 
 def load_rpg_classes_config() -> Dict[str, Any]:
     global _RPG_CLASSES_CONFIG
@@ -23,13 +25,25 @@ def load_rpg_classes_config() -> Dict[str, Any]:
             _RPG_CLASSES_CONFIG = json.load(f)
     return _RPG_CLASSES_CONFIG
 
-def load_rpg_class_progression() -> Dict[str, Any]:
-    global _RPG_CLASSES_PROGRESSION
-    if _RPG_CLASSES_PROGRESSION is None:
-        config_path = os.path.join(os.path.dirname(__file__), "config", "rpg_class_progression.json")
-        with open(config_path, "r") as f:
-            _RPG_CLASSES_PROGRESSION = json.load(f)
-    return _RPG_CLASSES_PROGRESSION
+def load_rpg_class_progression_for_class(class_name: str) -> Dict[str, Any]:
+    """
+    Loads the progression data for a given class from its dedicated file.
+    Expected file path: config/rpg_class_progression/<class_name>_config.json
+    """
+    global _RPG_CLASSES_PROGRESSION_CACHE
+    key = class_name.lower()
+    if key in _RPG_CLASSES_PROGRESSION_CACHE:
+        return _RPG_CLASSES_PROGRESSION_CACHE[key]
+    progression_path = os.path.join(
+        os.path.dirname(__file__),
+        "config",
+        "rpg_class_progression",
+        f"{key}_config.json"
+    )
+    with open(progression_path, "r") as f:
+        data = json.load(f)
+    _RPG_CLASSES_PROGRESSION_CACHE[key] = data
+    return data
 
 class RPGClass:
     """
@@ -89,17 +103,19 @@ class RPGClass:
 
 def create_rpg_class(name: str) -> RPGClass:
     """
-    Factory function to create an RPGClass instance by name,
-    loading its base data from 'config/rpg_classes.json' and its progression data
-    from 'config/rpg_class_progression.json'.
+    Factory function to create an RPGClass instance by name.
+    It loads base data from 'config/rpg_classes.json' and progression data from
+    'config/rpg_class_progression/<class name>_config.json'.
     """
     classes_config = load_rpg_classes_config()
-    progression_config = load_rpg_class_progression()
     key = name.lower()
     if key not in classes_config:
         raise ValueError(f"RPG class '{name}' is not defined in configuration.")
     base_data = classes_config[key]
-    progression_data = progression_config.get(key, {}).get("levels", {})
+    # Load progression data from the dedicated file for this class.
+    progression_data_full = load_rpg_class_progression_for_class(key)
+    # Expecting the individual file to follow the structure: { "<class>": { "levels": { ... } } }
+    progression_data = progression_data_full.get(key, {}).get("levels", {})
     return RPGClass(
         name=name,
         hit_die=base_data.get("hit_die"),

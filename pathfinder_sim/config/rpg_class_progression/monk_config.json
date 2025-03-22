@@ -1,0 +1,227 @@
+{
+    "monk": {
+      "levels": {
+        "1": {
+          "BAB": [0],
+          "Fort": 2,
+          "Ref": 2,
+          "Will": 2,
+          "special_abilities": ["Bonus feat, flurry of blows, stunning fist, unarmed strike"],
+          "flurry_of_blows_attack_bonus": [-1, -1],
+          "unarmed_damage": "1d6",
+          "ac_bonus": 0,
+          "fast_movement": 0
+        },
+        "2": {
+          "BAB": [1],
+          "Fort": 3,
+          "Ref": 3,
+          "Will": 3,
+          "special_abilities": ["Bonus feat, evasion"],
+          "flurry_of_blows_attack_bonus": [0, 0],
+          "unarmed_damage": "1d6",
+          "ac_bonus": 0,
+          "fast_movement": 0
+        },
+        "3": {
+          "BAB": [2],
+          "Fort": 3,
+          "Ref": 3,
+          "Will": 3,
+          "special_abilities": ["Fast movement, maneuver training, still mind"],
+          "flurry_of_blows_attack_bonus": [1, 1],
+          "unarmed_damage": "1d6",
+          "ac_bonus": 0,
+          "fast_movement": 10
+        },
+        "4": {
+          "BAB": [3],
+          "Fort": 4,
+          "Ref": 4,
+          "Will": 4,
+          "special_abilities": ["Ki pool (magic), slow fall 20 ft."],
+          "flurry_of_blows_attack_bonus": [2, 2],
+          "unarmed_damage": "1d8",
+          "ac_bonus": 1,
+          "fast_movement": 10
+        },
+        "5": {
+          "BAB": [3],
+          "Fort": 4,
+          "Ref": 4,
+          "Will": 4,
+          "special_abilities": ["High jump, purity of body"],
+          "flurry_of_blows_attack_bonus": [3, 3],
+          "unarmed_damage": "1d8",
+          "ac_bonus": 1,
+          "fast_movement": 10
+        },
+        "6": {
+          "BAB": [4],
+          "Fort": 5,
+          "Ref": 5,
+          "Will": 5,
+          "special_abilities": ["Bonus feat, slow fall 30 ft."],
+          "flurry_of_blows_attack_bonus": [4, 4, -1],
+          "unarmed_damage": "1d8",
+          "ac_bonus": 1,
+          "fast_movement": 20
+        },
+        "7": {
+          "BAB": [5],
+          "Fort": 5,
+          "Ref": 5,
+          "Will": 5,
+          "special_abilities": ["Ki pool (cold iron/silver), wholeness of body"],
+          "flurry_of_blows_attack_bonus": [5, 5, 0],
+          "unarmed_damage": "1d8",
+          "ac_bonus": 1,
+          "fast_movement": 20
+        },
+        "8": {
+          "BAB": [6, 1],
+          "Fort": 6,
+          "Ref": 6,
+          "Will": 6,
+          "special_abilities": ["Slow fall 40 ft."],
+          "flurry_of_blows_attack_bonus": [6, 6, 1, 1],
+          "unarmed_damage": "1d10",
+          "ac_bonus": 2,
+          "fast_movement": 20
+        },
+        "9": {
+          "BAB": [6, 1],
+          "Fort": 6,
+          "Ref": 6,
+          "Will": 6,
+          "special_abilities": ["Improved evasion"],
+          "flurry_of_blows_attack_bonus": [7, 7, 2, 2],
+          "unarmed_damage": "1d10",
+          "ac_bonus": 2,
+          "fast_movement": 30
+        },
+        "10": {
+          "BAB": [7, 2],
+          "Fort": 7,
+          "Ref": 7,
+          "Will": 7,
+          "special_abilities": ["Bonus feat, Ki pool (lawful), slow fall 50 ft."],
+          "flurry_of_blows_attack_bonus": [8, 8, 3, 3],
+          "unarmed_damage": "1d10",
+          "ac_bonus": 2,
+          "fast_movement": 30
+        },
+        "11": {
+          "BAB": [8, 3],
+          "Fort": 7,
+          "Ref": 7,
+          "Will": 7,
+          "special_abilities": ["Diamond body"],
+          "flurry_of_blows_attack_bonus": [9, 9, 4, 4, -1],
+          "unarmed_damage": "1d10",
+          "ac_bonus": 2,
+          "fast_movement": 30
+        },
+        "12": {
+          "BAB": [9, 4],
+          "Fort": 8,
+          "Ref": 8,
+          "Will": 8,
+          "special_abilities": ["Abundant step, slow fall 60 ft."],
+          "flurry_of_blows_attack_bonus": [10, 10, 5, 5, 0],
+          "unarmed_damage": "2d6",
+          "ac_bonus": 3,
+          "fast_movement": 40
+        },
+        "13": {
+          "BAB": [9, 4],
+          "Fort": 8,
+          "Ref": 8,
+          "Will": 8,
+          "special_abilities": ["Diamond soul"],
+          "flurry_of_blows_attack_bonus": [11, 11, 6, 6, 1],
+          "unarmed_damage": "2d6",
+          "ac_bonus": 3,
+          "fast_movement": 40
+        },
+        "14": {
+          "BAB": [10, 5],
+          "Fort": 9,
+          "Ref": 9,
+          "Will": 9,
+          "special_abilities": ["Bonus feat, slow fall 70 ft."],
+          "flurry_of_blows_attack_bonus": [12, 12, 7, 7, 2],
+          "unarmed_damage": "2d6",
+          "ac_bonus": 3,
+          "fast_movement": 40
+        },
+        "15": {
+          "BAB": [11, 6, 1],
+          "Fort": 9,
+          "Ref": 9,
+          "Will": 9,
+          "special_abilities": ["Quivering palm"],
+          "flurry_of_blows_attack_bonus": [13, 13, 8, 8, 3, 3],
+          "unarmed_damage": "2d6",
+          "ac_bonus": 3,
+          "fast_movement": 50
+        },
+        "16": {
+          "BAB": [12, 7, 2],
+          "Fort": 10,
+          "Ref": 10,
+          "Will": 10,
+          "special_abilities": ["Ki pool (adamantine), slow fall 80 ft."],
+          "flurry_of_blows_attack_bonus": [14, 14, 9, 9, 4, 4, -1],
+          "unarmed_damage": "2d8",
+          "ac_bonus": 4,
+          "fast_movement": 50
+        },
+        "17": {
+          "BAB": [12, 7, 2],
+          "Fort": 10,
+          "Ref": 10,
+          "Will": 10,
+          "special_abilities": ["Timeless body, tongue of the sun and moon"],
+          "flurry_of_blows_attack_bonus": [15, 15, 10, 10, 5, 5, 0],
+          "unarmed_damage": "2d8",
+          "ac_bonus": 4,
+          "fast_movement": 50
+        },
+        "18": {
+          "BAB": [13, 8, 3],
+          "Fort": 11,
+          "Ref": 11,
+          "Will": 11,
+          "special_abilities": ["Bonus feat, slow fall 90 ft."],
+          "flurry_of_blows_attack_bonus": [16, 16, 11, 11, 6, 6, 1],
+          "unarmed_damage": "2d8",
+          "ac_bonus": 4,
+          "fast_movement": 60
+        },
+        "19": {
+          "BAB": [14, 9, 4],
+          "Fort": 11,
+          "Ref": 11,
+          "Will": 11,
+          "special_abilities": ["Empty body"],
+          "flurry_of_blows_attack_bonus": [17, 17, 12, 12, 7, 7, 2],
+          "unarmed_damage": "2d8",
+          "ac_bonus": 4,
+          "fast_movement": 60
+        },
+        "20": {
+          "BAB": [15, 10, 5],
+          "Fort": 12,
+          "Ref": 12,
+          "Will": 12,
+          "special_abilities": ["Perfect self, slow fall any distance"],
+          "flurry_of_blows_attack_bonus": [18, 18, 13, 13, 8, 8, 3],
+          "unarmed_damage": "2d10",
+          "ac_bonus": 5,
+          "fast_movement": 60
+        }
+      }
+    }
+  }
+  
