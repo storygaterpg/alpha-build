@@ -34,7 +34,7 @@ def create_character_sheet(character, narrative: Optional[str] = None) -> dict:
     """
     abilities = getattr(character, "abilities", {
         "STR": getattr(character, "strength", 10),
-        "DEX": character.dexterity,
+        "DEX": getattr(character, "dexterity", 10),
         "CON": getattr(character, "constitution", 10),
         "INT": getattr(character, "intelligence", 10),
         "WIS": getattr(character, "wisdom", 10),
