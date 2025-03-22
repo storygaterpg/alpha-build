@@ -3,6 +3,7 @@
 import math
 import pytest
 from rules_engine import Dice, RulesEngine, CombatResolver, SpellResolver, SkillResolver
+from character import Character
 
 # Create a dummy weapon for testing.
 class DummyWeapon:
@@ -13,33 +14,18 @@ class DummyWeapon:
         self.critical_multiplier = critical_multiplier
         self.check_penalty = check_penalty
 
-# Create a minimal dummy character for testing.
-class DummyCharacter:
+# Create a minimal dummy character for testing. It inherits from Character.
+class DummyCharacter(Character):
     def __init__(self, name, dexterity, BAB, ac):
-        self.name = name
-        self.dexterity = dexterity
+        # Initialize with x, y default to 0.
+        super().__init__(name, x=0, y=0, dexterity=dexterity)
+        # Override BAB and AC as provided.
         self.BAB = BAB
         self._ac = ac
+        # Ensure conditions and spells are empty lists.
         self.conditions = []
         self.spells = []
-        
-    def get_modifier(self, ability: str) -> int:
-        if ability.upper() == "DEX":
-            return (self.dexterity - 10) // 2
-        if ability.upper() == "STR":
-            return (self.dexterity - 10) // 2  # For simplicity, assume same as Dex for now.
-        return 0
 
-    def get_ac(self) -> int:
-        return self._ac
-
-    def get_flatfooted_ac(self) -> int:
-        # For testing, flat-footed AC is full AC minus Dex mod.
-        return self._ac - self.get_modifier("DEX")
-
-    def get_touch_ac(self) -> int:
-        # For testing, touch AC is 10 plus Dex mod.
-        return 10 + self.get_modifier("DEX")
 
 # ---- Dice Tests ----
 def test_dice_roll():

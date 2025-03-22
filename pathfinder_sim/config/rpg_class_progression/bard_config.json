@@ -1,0 +1,291 @@
+{
+    "1": {
+        "BAB": [0],
+        "Fort": 0,
+        "Ref": 2,
+        "Will": 2,
+        "special_abilities": [
+            "Bardic knowledge, bardic performance, cantrips, countersong, distraction, fascinate, inspire courage +1"
+        ],
+        "spell_slots": {
+            "1st": 1
+        }
+    },
+    "2": {
+        "BAB": [1],
+        "Fort": 0,
+        "Ref": 3,
+        "Will": 3,
+        "special_abilities": [
+            "Versatile performance, well-versed"
+        ],
+        "spell_slots": {
+            "1st": 2
+        }
+    },
+    "3": {
+        "BAB": [2],
+        "Fort": 1,
+        "Ref": 3,
+        "Will": 3,
+        "special_abilities": [
+            "Inspire competence +2"
+        ],
+        "spell_slots": {
+            "1st": 3
+        }
+    },
+    "4": {
+        "BAB": [3],
+        "Fort": 1,
+        "Ref": 4,
+        "Will": 4,
+        "special_abilities": [],
+        "spell_slots": {
+            "1st": 3,
+            "2nd": 1
+        }
+    },
+    "5": {
+        "BAB": [3],
+        "Fort": 1,
+        "Ref": 4,
+        "Will": 4,
+        "special_abilities": [
+            "Inspire courage +2, lore master 1/day"
+        ],
+        "spell_slots": {
+            "1st": 4,
+            "2nd": 2
+        }
+    },
+    "6": {
+        "BAB": [4],
+        "Fort": 2,
+        "Ref": 5,
+        "Will": 5,
+        "special_abilities": [
+            "Suggestion, versatile performance"
+        ],
+        "spell_slots": {
+            "1st": 4,
+            "2nd": 3
+        }
+    },
+    "7": {
+        "BAB": [5],
+        "Fort": 2,
+        "Ref": 5,
+        "Will": 5,
+        "special_abilities": [
+            "Inspire competence +3"
+        ],
+        "spell_slots": {
+            "1st": 4,
+            "2nd": 3,
+            "3rd": 1
+        }
+    },
+    "8": {
+        "BAB": [6, 1],
+        "Fort": 2,
+        "Ref": 6,
+        "Will": 6,
+        "special_abilities": [
+            "Dirge of doom"
+        ],
+        "spell_slots": {
+            "1st": 4,
+            "2nd": 4,
+            "3rd": 2
+        }
+    },
+    "9": {
+        "BAB": [6, 1],
+        "Fort": 3,
+        "Ref": 6,
+        "Will": 6,
+        "special_abilities": [
+            "Inspire greatness"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 4,
+            "3rd": 3
+        }
+    },
+    "10": {
+        "BAB": [7, 2],
+        "Fort": 3,
+        "Ref": 7,
+        "Will": 7,
+        "special_abilities": [
+            "Jack-of-all-trades, versatile performance"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 4,
+            "3rd": 3,
+            "4th": 1
+        }
+    },
+    "11": {
+        "BAB": [8, 3],
+        "Fort": 3,
+        "Ref": 7,
+        "Will": 7,
+        "special_abilities": [
+            "Inspire competence +4, inspire courage +3, lore master 2/day"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 4,
+            "3rd": 4,
+            "4th": 2
+        }
+    },
+    "12": {
+        "BAB": [9, 4],
+        "Fort": 4,
+        "Ref": 8,
+        "Will": 8,
+        "special_abilities": [
+            "Soothing performance"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 4,
+            "4th": 3
+        }
+    },
+    "13": {
+        "BAB": [9, 4],
+        "Fort": 4,
+        "Ref": 8,
+        "Will": 8,
+        "special_abilities": [],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 4,
+            "4th": 3,
+            "5th": 1
+        }
+    },
+    "14": {
+        "BAB": [10, 5],
+        "Fort": 4,
+        "Ref": 9,
+        "Will": 9,
+        "special_abilities": [
+            "Frightening tune, versatile performance"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 4,
+            "4th": 4,
+            "5th": 2
+        }
+    },
+    "15": {
+        "BAB": [11, 6, 1],
+        "Fort": 5,
+        "Ref": 9,
+        "Will": 9,
+        "special_abilities": [
+            "Inspire competence +5, inspire heroics"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 5,
+            "4th": 4,
+            "5th": 3
+        }
+    },
+    "16": {
+        "BAB": [12, 7, 2],
+        "Fort": 5,
+        "Ref": 10,
+        "Will": 10,
+        "special_abilities": [],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 5,
+            "4th": 4,
+            "5th": 3,
+            "6th": 1
+        }
+    },
+    "17": {
+        "BAB": [12, 7, 2],
+        "Fort": 5,
+        "Ref": 10,
+        "Will": 10,
+        "special_abilities": [
+            "Inspire courage +4, lore master 3/day"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 5,
+            "4th": 4,
+            "5th": 4,
+            "6th": 2
+        }
+    },
+    "18": {
+        "BAB": [13, 8, 3],
+        "Fort": 6,
+        "Ref": 11,
+        "Will": 11,
+        "special_abilities": [
+            "Mass suggestion, versatile performance"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 5,
+            "4th": 5,
+            "5th": 4,
+            "6th": 3
+        }
+    },
+    "19": {
+        "BAB": [14, 9, 4],
+        "Fort": 6,
+        "Ref": 11,
+        "Will": 11,
+        "special_abilities": [
+            "Inspire competence +6"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 5,
+            "4th": 5,
+            "5th": 5,
+            "6th": 4
+        }
+    },
+    "20": {
+        "BAB": [15, 10, 5],
+        "Fort": 6,
+        "Ref": 12,
+        "Will": 12,
+        "special_abilities": [
+            "Deadly performance"
+        ],
+        "spell_slots": {
+            "1st": 5,
+            "2nd": 5,
+            "3rd": 5,
+            "4th": 5,
+            "5th": 5,
+            "6th": 5
+        }
+    }
+}

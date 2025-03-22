@@ -1,0 +1,11 @@
+{
+    "bonus_types": {
+      "dodge": { "stacks": true },
+      "untyped": { "stacks": true },
+      "bab": { "stacks": false },
+      "ability": { "stacks": false },
+      "weapon": { "stacks": false },
+      "penalty": { "stacks": false }
+    }
+  }
+  

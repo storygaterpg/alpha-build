@@ -2,47 +2,46 @@
 conditions.py
 --------------
 
-This module implements the conditions framework for our Pathfinder simulation.
-Each condition is defined as a subclass of the base Condition class. Each condition
-has a name, duration (in rounds), and a detailed description that covers both its explicit
-mechanical effects and its implicit (self‑explanatory) effects.
-
-Currently implemented conditions include:
-  - BlindedCondition
-  - ConfusedCondition
-  - ProneCondition
-  - ShakenCondition
-  - StunnedCondition
-
-Additional conditions can be added following this pattern.
+This module implements the conditions framework for our Pathfinder simulation using a data-driven approach.
+Condition definitions are loaded from an external JSON configuration file, allowing for flexibility and easy adjustments.
 """
 
+from __future__ import annotations  # Optionally, you can add this for postponed evaluation.
 from abc import ABC, abstractmethod
-from typing import Dict, Any, TYPE_CHECKING
+from typing import Dict, Any, List, TYPE_CHECKING
+import json
+import os
 
 if TYPE_CHECKING:
-    from character import Character  # Forward reference for type checking
+    from character import Character
+
+# Global variable to cache the conditions configuration.
+_CONDITIONS_CONFIG = None
+
+def load_conditions_config() -> Dict[str, Any]:
+    """
+    Loads condition definitions from 'config/conditions_config.json' and caches the result.
+    """
+    global _CONDITIONS_CONFIG
+    if _CONDITIONS_CONFIG is None:
+        config_path = os.path.join(os.path.dirname(__file__), "config", "conditions_config.json")
+        with open(config_path, "r") as f:
+            _CONDITIONS_CONFIG = json.load(f)
+    return _CONDITIONS_CONFIG
 
 class Condition(ABC):
     """
-    Base class for conditions affecting a character.
-    
-    Each condition has:
-      - a name,
-      - a duration (in rounds),
-      - a detailed description covering both explicit and implicit effects,
-      - and a method get_modifiers() that returns any numeric modifiers (e.g., to AC).
+    Abstract base class for conditions affecting a character.
     """
     def __init__(self, name: str, duration: int, description: str) -> None:
-        self.name = name
-        self.duration = duration
+        self.name = name            # Condition name (e.g., "Blinded")
+        self.duration = duration    # Duration in rounds
         self.description = description
 
     @abstractmethod
     def get_modifiers(self, character: "Character") -> Dict[str, int]:
         """
-        Return a dictionary of numeric modifiers imposed by this condition.
-        For conditions primarily affecting non-numeric aspects, return {}.
+        Return a dictionary of modifiers applied by the condition (e.g., {"ac": -2}).
         """
         pass
 
@@ -56,62 +55,274 @@ class Condition(ABC):
 
     def get_status(self) -> Dict[str, Any]:
         """
-        Return a summary of the condition, including its name, remaining duration,
-        and its detailed description.
+        Return a summary of the condition, including its name, remaining duration, and description.
         """
         return {"name": self.name, "duration": self.duration, "description": self.description}
 
-class BlindedCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Blinded: The creature cannot see, loses its Dexterity bonus to AC and dodge bonuses, "
-            "and takes an additional -2 penalty to AC. It cannot perceive visual cues, impairing its situational awareness."
-        )
-        super().__init__("Blinded", duration, description)
+class DataCondition(Condition):
+    """
+    A condition defined by data from the configuration file.
+    """
+    def __init__(self, name: str, duration: int, description: str, modifiers: Dict[str, int]):
+        super().__init__(name, duration, description)
+        self.modifiers = modifiers
+        # New attributes for skill effects:
+        self.skill_penalty = 0        # General penalty to applicable skills
+        self.affected_stats: List[str] = []   # E.g., ["DEX", "STR"]
+        self.affected_skills: List[str] = []  # Specific skill names
 
     def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {"ac": - character.get_modifier('DEX') - 2}
+        return self.modifiers
 
-class ConfusedCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Confused: The creature's actions become erratic and unpredictable. It must roll on a confusion table "
-            "each round to determine its behavior. No direct numeric modifiers, but its behavior is chaotic."
-        )
-        super().__init__("Confused", duration, description)
+def create_condition(name: str, duration: int = None) -> DataCondition:
+    """
+    Factory function to create a condition instance by looking up its definition in the configuration.
+    If duration is not provided, uses the default_duration from the config.
+    Also loads:
+      - "skill_penalty": numeric penalty for affected skills.
+      - "affected_stats": list of ability abbreviations affected.
+      - "affected_skills": list of specific skills affected.
+    """
+    config = load_conditions_config()
+    key = name.lower()
+    if key not in config:
+        raise ValueError(f"Condition '{name}' is not defined in the configuration.")
+    condition_data = config[key]
+    default_duration = condition_data.get("default_duration", 1)
+    final_duration = duration if duration is not None else default_duration
+    description = condition_data.get("description", f"{name} condition.")
+    modifiers = condition_data.get("modifiers", {})
+    skill_penalty = condition_data.get("skill_penalty", 0)
+    affected_stats = condition_data.get("affected_stats", [])
+    affected_skills = condition_data.get("affected_skills", [])
+    dc = DataCondition(name.capitalize(), final_duration, description, modifiers)
+    dc.skill_penalty = skill_penalty
+    dc.affected_stats = affected_stats
+    dc.affected_skills = affected_skills
+    return dc
 
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {}
+def condition_from_status(status: dict) -> Condition:
+    """
+    Reconstruct a Condition object from a status dictionary.
+    The status dictionary should have at least "name" and "duration" keys.
+    """
+    name = status.get("name", "").lower()
+    duration = status.get("duration", 1)
+    mapping = {
+        "blinded": BlindedCondition,
+        "charmed": CharmedCondition,
+        "confused": ConfusedCondition,
+        "dazed": DazedCondition,
+        "deafened": DeafenedCondition,
+        "dying": DyingCondition,
+        "fatigued": FatiguedCondition,
+        "flatfooted": FlatfootedCondition,
+        "frightened": FrightenedCondition,
+        "grappled": GrappledCondition,
+        "immobilized": ImmobilizedCondition,
+        "paralyzed": ParalyzedCondition,
+        "petrified": PetrifiedCondition,
+        "sickened": SickenedCondition,
+        "staggered": StaggeredCondition,
+        "stunned": StunnedCondition,
+        "unconscious": UnconsciousCondition,
+        "enfeebled": EnfeebledCondition,
+        "dazzled": DazzledCondition,
+        "entangled": EntangledCondition,
+        "prone": ProneCondition,
+        "shaken": ShakenCondition
+    }
+    cond_class = mapping.get(name)
+    if cond_class is None:
+        raise ValueError(f"Unknown condition '{name}' in save data.")
+    return cond_class(duration=duration)
 
-class ProneCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Prone: The creature is lying on the ground, cannot move normally, must crawl to move, "
-            "and requires a move action to stand up. It suffers a -4 penalty to AC against melee attacks."
-        )
-        super().__init__("Prone", duration, description)
+def condition_from_status_list(status_list: list) -> list:
+    """
+    Reconstruct a list of Condition objects from a list of status dictionaries.
+    """
+    return [condition_from_status(status) for status in status_list]
 
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {"ac": -4}
 
-class ShakenCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Shaken: The creature is unnerved, taking a -2 penalty on attack rolls, saving throws, "
-            "skill checks, and ability checks. AC is not directly affected."
-        )
-        super().__init__("Shaken", duration, description)
+# Specific condition subclasses using create_condition from config.
 
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {}
+class BlindedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("blinded", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
 
-class StunnedCondition(Condition):
-    def __init__(self, duration: int) -> None:
-        description = (
-            "Stunned: The creature is so disoriented that it can take no actions except free actions, "
-            "and it suffers a -2 penalty to AC. It is completely incapacitated during this time."
-        )
-        super().__init__("Stunned", duration, description)
+class CharmedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("charmed", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
 
-    def get_modifiers(self, character: "Character") -> Dict[str, int]:
-        return {"ac": -2}
+class ConfusedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("confused", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class DazedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("dazed", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class DeafenedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("deafened", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class DyingCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("dying", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class FatiguedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("fatigued", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class FlatfootedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("flatfooted", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class FrightenedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("frightened", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class GrappledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("grappled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class ImmobilizedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("immobilized", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class ParalyzedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("paralyzed", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class PetrifiedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("petrified", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class SickenedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("sickened", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class StaggeredCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("staggered", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class StunnedCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("stunned", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class UnconsciousCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("unconscious", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class EnfeebledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("enfeebled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class DazzledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("dazzled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+class EntangledCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        cond = create_condition("entangled", duration)
+        super().__init__(cond.name, cond.duration, cond.description, cond.modifiers)
+        self.skill_penalty = cond.skill_penalty
+        self.affected_stats = cond.affected_stats
+        self.affected_skills = cond.affected_skills
+
+# Conditions not defined in config; provide defaults.
+class ProneCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        description = "Prone: The creature falls prone, incurring a -4 penalty to AC."
+        modifiers = {"ac": -4}
+        default_duration = duration if duration is not None else 1
+        super().__init__("Prone", default_duration, description, modifiers)
+        self.skill_penalty = 0
+        self.affected_stats = []  # Prone does not affect skill checks directly.
+        self.affected_skills = []
+
+class ShakenCondition(DataCondition):
+    def __init__(self, duration: int = None):
+        description = "Shaken: The creature is unnerved; no direct AC penalty."
+        modifiers = {}
+        default_duration = duration if duration is not None else 1
+        super().__init__("Shaken", default_duration, description, modifiers)
+        self.skill_penalty = 0
+        self.affected_stats = []
+        self.affected_skills = []

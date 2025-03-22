@@ -1,0 +1,37 @@
+{
+  "spell_slots": {
+    "scaling_formula": "Determined by class progression (e.g., Wizard/Sorcerer spell progression)",
+    "regen_rate": 0,
+    "reset_period": "per long rest",
+    "cost_per_use": 1,
+    "description": "Spell slots are the limited magical resource used to cast spells. Their maximum number is determined by the character's class and level and are restored only after a long rest. Implicitly, this resource forces spellcasters to carefully manage their magic."
+  },
+  "rage_rounds": {
+    "scaling_formula": "Determined by Barbarian level and class features",
+    "regen_rate": 0,
+    "reset_period": "per day",
+    "cost_per_use": 1,
+    "description": "Rage rounds allow a barbarian to enter a state of heightened combat prowess. The total number available depends on the barbarian’s level and abilities and are restored only after a long rest (per day). Implicitly, they represent a barbarian's limited bursts of ferocity."
+  },
+  "ki_points": {
+    "scaling_formula": "Determined by Monk level",
+    "regen_rate": 0,
+    "reset_period": "per long rest",
+    "cost_per_use": 1,
+    "description": "Ki points fuel a monk’s special abilities and are tied to the monk’s level. They are restored only after a long rest, representing the monk's finite inner energy."
+  },
+  "channel_energy": {
+    "scaling_formula": "Determined by Cleric level (and modified by Wisdom)",
+    "regen_rate": 0,
+    "reset_period": "per long rest",
+    "cost_per_use": 1,
+    "description": "Channel energy is a divine resource used by clerics (or similar classes) to heal or damage undead. Its maximum number is determined by the cleric's level and relevant modifiers, and it is restored only after a long rest. Implicitly, it reflects the cleric’s divine connection and resource management in encounters with undead."
+  },
+  "daily_ability": {
+    "scaling_formula": "Typically fixed at 1 per day, but may be modified by class features",
+    "regen_rate": 0,
+    "reset_period": "per day",
+    "cost_per_use": 1,
+    "description": "Daily abilities are powerful actions available once per day. Their maximum is generally determined by class features and do not regenerate during encounters. Implicitly, their use is reserved for critical moments, requiring careful strategic planning."
+  }
+}

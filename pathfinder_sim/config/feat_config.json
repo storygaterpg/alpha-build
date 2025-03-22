@@ -1,0 +1,1761 @@
+{
+    "Aberrant Tumor": {
+      "prerequisites": {
+        "Special": "Aberrant bloodline"
+      },
+      "benefit": "Gain a tumor familiar."
+    },
+    "Absorb Spirit": {
+      "prerequisites": {
+        "Stat": {"CON": 13},
+        "Special": "Died or possessed by an undead"
+      },
+      "benefit": "Temporarily absorb a spirit to prevent rejuvenation"
+    },
+    "Abundant Revelations": {
+      "prerequisites": {
+        "Special": "Mystery class feature"
+      },
+      "benefit": "Use a single revelation more times each day."
+    },
+    "Accursed Hex": {
+      "prerequisites": {
+        "Special": "Hex class feature"
+      },
+      "benefit": "Target a creature with a hex a second time that day if it made its save the first time."
+    },
+    "Accomplished Sneak Attacker": {
+      "prerequisites": {
+        "Special": "Sneak attack class feature"
+      },
+      "benefit": "Your sneak attack damage increases by 1d6, up to half your level in dice (rounded up)."
+    },
+    "Acrobatic": {
+      "prerequisites": {},
+      "benefit": "+2 bonus on Acrobatics and Fly checks."
+    },
+    "Acute Shot": {
+      "prerequisites": {
+        "Feat": [
+          "Far Shot",
+          "Precise Shot"
+        ]
+      },
+      "benefit": "Whenever you gain a magic bonus on an attack roll with a ranged weapon, you can deduct any range penalties from your damage roll, instead of your attack roll. Additionally, when you gain a magic bonus on a ranged attack roll, you can deal sneak attack damage to a target that has concealment (but not total concealment) as long as the attack otherwise qualifies to deal sneak attack damage. The maximum number of sneak attack dice you can use in this way is equal to the value of your magic bonus on attack rolls."
+    },
+    "Adept Champion": {
+      "prerequisites": {
+        "Special": "Smite evil class feature",
+        "BAB": 5
+      },
+      "benefit": "Trade smite evil damage for bonus on combat maneuver checks."
+    },
+    "Additional Traits": {
+      "prerequisites": {},
+      "benefit": "Gain two additional character traits."
+    },
+    "Adept Channel": {
+      "prerequisites": {
+        "Special": [
+          "Ability to cast divine spells",
+          "Summon familiar class ability"
+        ],
+        "Caster Level": 4,
+        "Stat": {"CHA": 13}
+      },
+      "benefit": "Learn how to channel energy like a cleric."
+    },
+    "Advanced Ranger Trap": {
+      "prerequisites": {
+        "Special": "Trap class feature",
+        "Class": {"Ranger": 5}
+      },
+      "benefit": "Add +1 to the Disable Device and Perception check DCs for your ranger traps."
+    },
+    "Agent of Fear": {
+      "prerequisites": {
+        "Feat": "Persuasive",
+        "Special": "Frightening appearance class feature"
+      },
+      "benefit": "Target a creature more often with appearances."
+    },
+    "Agent of Purity": {
+      "prerequisites": {
+        "Special": "A friend or ally must have been significantly corrupted by a specific natural or supernatural blight, or you must have a regional background trait tied to a specific blight."
+      },
+      "benefit": "You have devoted your life to purging blight from the world."
+    },
+    "Agonizing Obedience": {
+      "prerequisites": {
+        "Skill": {"Heal": 3}
+      },
+      "benefit": "Each time you gain this feat you choose an agony. You can perform an obedience for only a single agony in a 24-hour period."
+    },
+    "Alertness": {
+      "prerequisites": {},
+      "benefit": "+2 bonus on Perception and Sense Motive checks."
+    },
+    "Alien Mindpaths": {
+      "prerequisites": {
+        "Race": [
+          "Android",
+          "Kasatha",
+          "Lashunta",
+          "Triaxian"
+        ]
+      },
+      "benefit": "Gain +4 on saves vs. mind-affecting effects and scrying."
+    },
+    "Align Equipment": {
+      "prerequisites": {
+        "Feat": [
+          "Alignment Channel",
+          "Bless Equipment"
+        ],
+        "Caster Level": 3,
+        "Special": "channel energy"
+      },
+      "benefit": "You can imbue weapons, shields, and armor with a special ability listed in the table (see text)."
+    },
+    "Alignment Channel": {
+      "prerequisites": {
+        "Special": "Channel energy class feature"
+      },
+      "benefit": "Channel energy can heal or harm outsiders."
+    },
+    "Aligned Crafting": {
+      "prerequisites": {
+        "Feat": [
+          "Craft Magic Arms and Armor",
+          "Craft Wondrous Item"
+        ]
+      },
+      "benefit": "Your magical creations reject those you oppose."
+    },
+    "Alter Binary Mindscape": {
+      "prerequisites": {
+        "Stat": {"INT": 13},
+        "Special": "ability to cast instigate psychic duel"
+      },
+      "benefit": "Opponent must spend 1 extra manifestation point to defend itself."
+    },
+    "Altitude Affinity": {
+      "prerequisites": {},
+      "benefit": "Become unaffected by problems with high altitude and gain a +4 bonus to Survival in high altitudes."
+    },
+    "Amateur Investigator": {
+      "prerequisites": {
+        "Stat": {"INT": 13},
+        "Skill": {
+          "Knowledge": 1
+        },
+        "Special": "No levels in a class that has inspiration"
+      },
+      "benefit": "Gain a minor pool of inspiration for use with Knowledge, Linguistics, or Spellcraft checks."
+    },
+    "Amplified Radiance": {
+      "prerequisites": {
+        "Race": "Aasimar",
+        "Special": "daylight racial spell-like ability"
+      },
+      "benefit": "Shed an aura of light when near allies who share this feat."
+    },
+    "Ancestral Scorn": {
+      "prerequisites": {
+        "Skill": {"Intimidate": 5},
+        "Race": "Tiefling"
+      },
+      "benefit": "Whenever you successfully demoralize an outsider of the evil subtype with an Intimidate check, it becomes sickened for 1 round in addition to being affected by the normal effects of being demoralized. If you beat the DC by 5 or more, the creature is nauseated for 1 round instead."
+    },
+    "Animal Affinity": {
+      "prerequisites": {},
+      "benefit": "+2 bonus on Handle Animal and Ride checks."
+    },
+    "Animal Ally": {
+      "prerequisites": {
+        "Feat": "Nature Soul",
+        "Level": 4,
+        "Special": "Must not have an animal companion or mount that advances as an animal companion"
+      },
+      "benefit": "Gain an animal companion as if you were a druid of your character level –3 from the following list: badger, bird, camel, cat (small), dire rat, dog, horse, pony, snake (viper), or wolf. If you later gain an animal companion through another source (such as the Animal domain, divine bond, hunter’s bond, mount, or nature bond class features), the effective druid level granted by this feat stacks with that granted by other sources."
+    },
+    "Animal Call": {
+      "prerequisites": {
+        "Skill": {
+          "Bluff": 1,
+          "Knowledge (nature)": 1
+        }
+      },
+      "benefit": "Make convincing animal sounds with Bluff checks."
+    },
+    "Animal Disguise": {
+      "prerequisites": {
+        "Skill": {
+          "Disguise": 6,
+          "Knowledge (nature)": 6
+        }
+      },
+      "benefit": "Disguise yourself as an animal using pelts and animal parts."
+    },
+    "Animal Soul": {
+      "prerequisites": {
+        "Special": "Animal companion or mount class feature"
+      },
+      "benefit": "You can shrug off spells that don’t work on animals."
+    },
+    "Antagonize": {
+      "prerequisites": {},
+      "benefit": "Use Diplomacy or Intimidate to goad creatures."
+    },
+    "Arcane Blast": {
+      "prerequisites": {
+        "Special": "Arcane spellcaster",
+        "Caster Level": 10
+      },
+      "benefit": "Sacrifice a spell to make ray attack."
+    },
+    "Arcane Insight": {
+      "prerequisites": {
+        "Feat": "Arcane Shield"
+      },
+      "benefit": "You gain a +1 insight bonus to your AC for 1 round when you use the Arcane Shield feat."
+    },
+    "Arcane Jinxer": {
+      "prerequisites": {
+        "Special": [
+          "Arcane spellcaster",
+          "Halfling Jinx trait"
+        ]
+      },
+      "benefit": "You can expend a prepared arcane spell or available arcane spell slot to give your jinx target a penalty on its jinx save equal to the level of the expended spell or spell slot."
+    },
+    "Arcane School Spirit": {
+      "prerequisites": {
+        "Skill": {"Bluff": 1},
+        "Special": "arcane school class feature",
+        "Race": "Gnome"
+      },
+      "benefit": "Bluff someone into reducing their save against your next spell."
+    },
+    "Arcane Shield": {
+      "prerequisites": {
+        "Special": "Arcane spellcaster",
+        "Caster Level": 10
+      },
+      "benefit": "Sacrifice a spell to gain deflection bonus to AC."
+    },
+    "Arcane Talent": {
+      "prerequisites": {
+        "Stat": {"CHA": 10},
+        "Race": [
+          "Elf",
+          "Half-Elf",
+          "Gnome"
+        ]
+      },
+      "benefit": "Cast a 0-level spell 3 times per day as a spell-like ability."
+    },
+    "Arcane Vendetta": {
+      "prerequisites": {
+        "Skill": {"Spellcraft": 1}
+      },
+      "benefit": "+2 bonus on damage vs. arcane spellcasters."
+    },
+    "Arctic Adaptation": {
+      "prerequisites": {
+        "Special": "Favored terrain (cold) class feature"
+      },
+      "benefit": "Treat cold environments as one step less severe, +2 Perception against creatures adapted to hide in snow, and +5 on saves to avoid snow blindness."
+    },
+    "Area Jinx": {
+      "prerequisites": {
+        "Feat": "Widen Spell",
+        "Special": "Halfling Jinx trait"
+      },
+      "benefit": "Your jinx has a radius of 10 feet possibly affecting multiple targets."
+    },
+    "Arithmancy": {
+      "prerequisites": {
+        "Stat": {"INT": 13},
+        "Feat": "Spell Focus (divination)",
+        "Skill": {"Spellcraft": 3}
+      },
+      "benefit": "It’s complicated (see text)."
+    },
+    "Aspect of the Beast": {
+      "prerequisites": {
+        "Special": "Wild shape class feature"
+      },
+      "benefit": "Gain one of four bestial advantages."
+    },
+    "Associate": {
+      "prerequisites": {
+        "Special": "Maintain a positive relationship with an organization for at least 6 months or achieve a major accomplishment on behalf of an organization."
+      },
+      "benefit": "Gain a bonus on Diplomacy checks to influence members of your organization."
+    },
+    "Athletic": {
+      "prerequisites": {},
+      "benefit": "+2 bonus on Climb and Swim checks."
+    },
+    "Augment Summoning": {
+      "prerequisites": {
+        "Feat": "Spell Focus (conjuration)"
+      },
+      "benefit": "Summoned creatures gain +4 Str and Con."
+    },
+    "Aura Flare": {
+      "prerequisites": {
+        "Stat": {"CHA": 13},
+        "Special": [
+          "aura, aura of good, or aura of evil class feature",
+          "channel energy 4d6",
+          "strong or overwhelming good or evil aura"
+        ]
+      },
+      "benefit": "Flare your alignment aura to fatigue or stagger those who oppose it."
+    },
+    "Aversion Tolerance": {
+      "prerequisites": {
+        "Race": "Vampire"
+      },
+      "benefit": "You are more resistant than most to garlic, holy symbols, or mirrors, depending on your vampire type."
+    },
+    "Babble-Peddler": {
+        "prerequisites": {
+        "Skill": {
+            "Appraise": 5,
+            "Bluff": 5
+        },
+        "Race": "Gnome"
+        },
+        "benefit": "Trick creatures into exchanging valuables for junk."
+    },
+    "Banish Possessor": {
+        "prerequisites": {},
+        "benefit": "Whenever you cast a spell or use a spell-like ability or supernatural ability that allows a creature that is being possessed by another creature to attempt a new saving throw to end the spell or effect (such as protection from evil), the possessed creature can roll the new saving throw twice and take the better of the two results as the actual result."
+    },
+    "Basic Harmony": {
+        "prerequisites": {
+        "Special": "Bardic performance or raging song"
+        },
+        "benefit": "You can attempt a DC 10 Perform check to aid the Perform check of an ally who also has this feat. If you succeed, your ally gains a +1 bonus for each 5 points of your check result; a check result of 10 grants a +2 bonus, a result of 15 grants a +3 bonus, and so on. If you fail, the discord applies a –5 penalty on your ally’s check."
+    },
+    "Battering Repair": {
+        "prerequisites": {
+        "Skill": {
+            "Craft (alchemy)": 3
+        },
+        "Special": "grit class feature or Amateur Gunslinger",
+        "Feat": [
+            "pistol-whip gunslinger deed",
+            "quick clear gunslinger deed"
+        ]
+        },
+        "benefit": "Sometimes smacking your firearm against a solid surface is all that’s needed to unjam it. Sometimes that solid surface is a creature."
+    },
+    "Battle Singer": {
+        "prerequisites": {
+        "Race": "Goblin",
+        "Special": "bardic performance class feature"
+        },
+        "benefit": "You can sing in goblin so your bardic performance inspire courage ability does not affect those who do not understand goblin."
+    },
+    "Believer’s Boon": {
+        "prerequisites": {
+        "Stat": {
+            "WIS": 13
+        },
+        "Special": "alignment must be within one step of your deity’s"
+        },
+        "benefit": "Gain use of a 1st-level cleric domain ability."
+    },
+    "Believer’s Hands": {
+        "prerequisites": {
+        "Feat": "Believer’s Boon",
+        "Alignment": "Lawful Good"
+        },
+        "benefit": "Use lay on hands once per day."
+    },
+    "Bestow Hope": {
+        "prerequisites": {
+        "Special": [
+            "Channel positive energy class feature",
+            "Improved Channel"
+        ]
+        },
+        "benefit": "When you heal a creature by channeling positive energy, you also relieve its fear."
+    },
+    "Betrayer": {
+        "prerequisites": {
+        "Feat": [
+            "Persuasive",
+            "Quick Draw"
+        ],
+        "BAB": 3
+        },
+        "benefit": "Gain free attack upon successful Diplomacy skill check."
+    },
+    "Bewildering Koan": {
+        "prerequisites": {
+        "Skill": {
+            "Bluff": 1
+        },
+        "Special": "ki pool class feature",
+        "Race": "Gnome"
+        },
+        "benefit": "Confuse a creature by bluffing them with an impossible question."
+    },
+    "Big Game Hunter": {
+        "prerequisites": {},
+        "benefit": "+1 bonus on attack rolls and +2 bonus on weapon damage rolls against Large or larger creatures."
+    },
+    "Black Marketeer": {
+        "prerequisites": {},
+        "benefit": "Use black market connections to gather illegal/illicit items."
+    },
+    "Blasting Charge": {
+        "prerequisites": {
+        "BAB": 7,
+        "Special": [
+            "ability to cast 2nd-level bloodrager spells",
+            "bloodrage class feature"
+        ]
+        },
+        "benefit": "Expend a bloodrager spell slot while bloodraging to add force damage to your charge attack."
+    },
+    "Blazing Channel": {
+        "prerequisites": {
+        "Feat": "Turn Undead",
+        "Special": "channel positive energy class feature"
+        },
+        "benefit": "When you use your Turn Undead feat, undead failing their saving throw are engulfed in holy fire. This functions identically to catching on fire, but the damage dealt is divine (like the divine damage from flame strike) rather than fire. Water cannot extinguish this holy fire, but any negative energy effect that heals the creature of at least 5 points of damage extinguishes the flames instantly."
+    },
+    "Bless Equipment": {
+        "prerequisites": {
+        "Caster Level": 3,
+        "Special": "channel energy"
+        },
+        "benefit": "Expend channel energy uses to grant one weapon, suit of armor, or shield a weapon, armor, or shield special ability."
+    },
+    "Improved Bless Equipment": {
+        "prerequisites": {
+        "Feat": "Bless Equipment",
+        "Caster Level": 9,
+        "Special": "channel energy"
+        },
+        "benefit": "Reduce the number of uses of channeled energy you must expend to bless a piece of equipment using Bless Equipment and Align Equipment decreases by one (to a minimum of one)."
+    },
+    "Greater Bless Equipment": {
+        "prerequisites": {
+        "Feat": [
+            "Bless Equipment",
+            "Improved Bless Equipment"
+        ],
+        "Caster Level": 12,
+        "Special": "channel energy"
+        },
+        "benefit": "The duration of your equipment blessings doubles and as a standard action you may bless up to two pieces of equipment with a single blessing, expending uses of channeled energy as if you had only blessed one item."
+    },
+    "Blessed Striker": {
+        "prerequisites": {
+        "BAB": 11,
+        "Special": "ability to cast divine spells",
+        "Alignment": "within one step of your deity’s"
+        },
+        "benefit": "Your attacks are considered to have the alignments you share with your deity."
+    },
+    "Blight Guide": {
+        "prerequisites": {
+        "Feat": [
+            "Blight Survivalist",
+            "Skill Focus (Survival)"
+        ]
+        },
+        "benefit": "Your confidence in exploring dangerous regions inspires the same in your companions."
+    },
+    "Blight Survivalist": {
+        "prerequisites": {
+        "Feat": "Skill Focus (Survival)"
+        },
+        "benefit": "You have learned to survive in dangerous environments."
+    },
+    "Blinding Light": {
+        "prerequisites": {
+        "Feat": "Inner Light",
+        "Race": "Aasimar",
+        "Special": "daylight spell-like ability"
+        },
+        "benefit": "Whenever an enemy unsuccessfully attempts to counter or dispel your daylight spell-like ability, it must succeed at a Fortitude saving throw (DC 10 + 1/2 your character level + your Charisma modifier) or become blinded for 1 round as its mind is overwhelmed with celestial light. This is a supernatural mind-affecting effect."
+    },
+    "Bloatmage Initiate": {
+        "prerequisites": {
+        "Feat": "Spell Focus (any school)"
+        },
+        "benefit": "Learn the secret art of hemotheurgy to enhance your spells."
+    },
+    "Blood Disciple": {
+        "prerequisites": {
+        "Feat": "Associate (a temple)"
+        },
+        "benefit": "Combine your blood and unholy water to create potions."
+    },
+    "Blood of Heroes": {
+        "prerequisites": {
+        "Feat": "Heroic Fortune"
+        },
+        "benefit": "Whenever you gain a level, you gain 2 hero points instead of 1."
+    },
+    "Blood Ties": {
+        "prerequisites": {
+        "Skill": {
+            "Bluff": 1
+        },
+        "Special": "bloodline class feature",
+        "Race": "Gnome"
+        },
+        "benefit": "Use Bluff instead of Diplomacy when influencing a sorcerous creature."
+    },
+    "Blood Vengeance": {
+        "prerequisites": {
+        "Race": [
+            "Half-orc",
+            "Orc"
+        ],
+        "Alignment": "Non-lawful"
+        },
+        "benefit": "Enter a rage-like state when one of your allies is taken down."
+    },
+    "Bloodletting": {
+        "prerequisites": {
+        "Special": "Worship an evil god"
+        },
+        "benefit": "Whenever you threaten a creature with a critical hit inflict bleed damage in subsequent rounds."
+    },
+    "Blustering Bluff": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Skill": {
+            "Bluff": 1,
+            "Intimidate": 1
+        }
+        },
+        "benefit": "Bully people into believing your Bluff"
+    },
+    "Bolster Jinx": {
+        "prerequisites": {
+        "Feat": "Great Fortitude or Iron Will or Lightning Reflexes",
+        "Special": "Halfling Jinx trait"
+        },
+        "benefit": "A jinxed target’s penalty on Fortitude, Reflex, or Will saves increases if you have the Great Fortitude, Lightning Reflexes, or Iron Will feat, respectively."
+    },
+    "Bolstered Resilience": {
+        "prerequisites": {
+        "Special": "Damage reduction"
+        },
+        "benefit": "Increase DR against a single attack."
+    },
+    "Bonded Mind": {
+        "prerequisites": {},
+        "benefit": "As long as you can see each other, you and an ally who also has this feat can trade nonverbal messages. These function as the message spell, except that you don’t need to whisper or point, and you cannot be overheard."
+    },
+    "Bookish Rogue": {
+        "prerequisites": {
+        "Special": "Minor magic rogue talent"
+        },
+        "benefit": "Change your rogue talent spell-like abilities with study."
+    },
+    "Boon Companion": {
+        "prerequisites": {},
+        "benefit": "Calculate your animal companion/familiar abilities as if they were higher."
+    },
+    "Branded for Retribution": {
+        "prerequisites": {
+        "Special": "Bane class feature"
+        },
+        "benefit": "Grant ally’s weapon the Bane quality against a branded opponent."
+    },
+    "Bravery in Action": {
+        "prerequisites": {
+        "Special": [
+            "Bravery class feature",
+            "worshiper of a god of luck or drink"
+        ]
+        },
+        "benefit": "You can add the bonus from bravery to your initiative checks."
+    },
+    "Breadth of Experience": {
+        "prerequisites": {
+        "Race": [
+            "Dwarf",
+            "Elf",
+            "Gnome"
+        ],
+        "Special": "100+ years old"
+        },
+        "benefit": "+2 bonus on all Knowledge and Profession checks."
+    },
+    "Brilliant Planner": {
+        "prerequisites": {
+        "Stat": {
+            "INT": 13
+        },
+        "Level": 5
+        },
+        "benefit": "Use gold to fund unspecified plans"
+    },
+    "Brilliant Spell Preparation": {
+        "prerequisites": {
+        "Stat": {
+            "INT": 13
+        },
+        "Special": "ability to prepare 3rd-level spells"
+        },
+        "benefit": "Prepare spells faster in a reserved slot"
+    },
+    "Bristling Bull Rush": {
+        "prerequisites": {
+        "Stat": {
+            "STR": 13
+        },
+        "Feat": [
+            "Improved Bull Rush",
+            "Power Attack"
+        ],
+        "BAB": 3
+        },
+        "benefit": "Deal additional damage to a foe when you successfully bull rush it through difficult terrain."
+    },
+    "Bristling Drag": {
+        "prerequisites": {
+        "Stat": {
+            "STR": 13
+        },
+        "Feat": [
+            "Improved Drag",
+            "Power Attack"
+        ],
+        "BAB": 1
+        },
+        "benefit": "Deal additional damage to a foe when you drag it through difficult terrain."
+    },
+    "Bully Breed": {
+        "prerequisites": {
+        "Skill": {
+            "Handle Animal": 4,
+            "Intimidate": 4
+        },
+        "Special": "animal companion or mount class feature"
+        },
+        "benefit": "Animal companion or mount gains Intimidate as a class skill and can demoralize foes."
+    },
+    "Burning Amplification": {
+        "prerequisites": {},
+        "benefit": "Whenever you cast a spell with the fire descriptor, you can take a –1 penalty on the spells’ attack rolls and reduce the spell’s saving throw DC by 1 to cause any target that is dealt fire damage to catch on fire. The targets do not take burning damage for catching on fire until their next turn, and each target can attempt a Reflex saving throw to put out the fire before being damaged each round. Rather than the normal DC 15 Reflex saving throw to put the fire out, the target must succeed at a Reflex saving throw with a DC equal 10 + the spell’s level + the modifier of your spellcasting ability score). You must choose to use this feat before making an attack roll or before your targets attempt their saving throws. This feat has no effect on spells that neither allow a saving throw nor require an attack roll."
+    },
+    "Burn! Burn! Burn!": {
+        "prerequisites": {
+        "Race": "Goblin",
+        "Skill": {
+            "Disable Device": 1
+        }
+        },
+        "benefit": "You deal an extra 1d4 fire damage with non-magical or alchemical attacks (such as with torches or alchemical fire) and gain a +4 competence bonus to Reflex saves to avoid catching on fire or putting yourself out when on fire."
+    },
+    "Butterfly’s Sting": {
+        "prerequisites": {
+        "Feat": "Combat Expertise"
+        },
+        "benefit": "When you confirm a critical hit you may instead deal normal damage and grant the next ally to hit the same creature with a melee attack an automatic critical hit."
+    },
+    "Calculating Mind": {
+        "prerequisites": {
+        "Feat": "Sacred Geometry",
+        "Skill": {
+            "Knowledge (engineering)": 5
+        }
+        },
+        "benefit": "It’s complicated (see text)."
+    },
+    "Call Truce": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 15
+        },
+        "Feat": "Persuasive",
+        "Skill": {
+            "Diplomacy": 5
+        }
+        },
+        "benefit": "Call for a truce in combat"
+    },
+    "Camouflaged Trap": {
+        "prerequisites": {
+        "Skill": {
+            "Craft (traps)": 4,
+            "Survival": 4
+        }
+        },
+        "benefit": "Increase the DCs of Perception checks to notice a trap you craft in a wilderness environment by +5"
+    },
+    "Careful Flyer": {
+        "prerequisites": {
+        "Feat": "Acrobatic",
+        "Skill": {
+            "Fly": 5
+        }
+        },
+        "benefit": "Avoid Fly checks and attacks of opportunity when flying slowly"
+    },
+    "Careful Reader": {
+        "prerequisites": {
+        "Skill": {
+            "Linguistics": 3,
+            "Spellcraft": 3
+        }
+        },
+        "benefit": ""
+    },
+    "Careful Sneak": {
+        "prerequisites": {
+        "Stat": {
+            "DEX": 13
+        },
+        "Skill": {
+            "Stealth": 3
+        }
+        },
+        "benefit": "Use Stealth slowly without penalty from most armor"
+    },
+    "Careful Speaker": {
+        "prerequisites": {
+        "Stat": {
+            "WIS": 13
+        }
+        },
+        "benefit": "+2 bonus on some Bluff checks and some Will saves."
+    },
+    "Cartogramancer": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (geography)": 10
+        },
+        "Special": "ability to cast greater teleport"
+        },
+        "benefit": "Use Knowledge to find a destination for greater teleport"
+    },
+    "Cartwheel Dodge": {
+        "prerequisites": {
+        "Special": "Improved evasion class feature",
+        "Skill": {
+            "Acrobatics": 12
+        }
+        },
+        "benefit": "With a successful evasion you may move half your speed."
+    },
+    "Cat’s Fall": {
+        "prerequisites": {
+        "Stat": {
+            "DEX": 13
+        },
+        "Skill": {
+            "Acrobatics": 1
+        }
+        },
+        "benefit": "Take less damage when falling and always land on your feet"
+    },
+    "Caustic Slur": {
+        "prerequisites": {
+        "Skill": {
+            "Bluff": 1
+        },
+        "Special": "favored enemy class feature",
+        "Race": "Gnome"
+        },
+        "benefit": "Bluff to insult your favored enemies into becoming overly angry."
+    },
+    "Cecaelia Focus Tattoo": {
+        "prerequisites": {
+        "Race": "Cecaelia"
+        },
+        "benefit": "You have tattooed the humanoid portion of your skin with a swirling mark that provides you with focus and pride."
+    },
+    "Celestial Obedience": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (planes)": 3
+        },
+        "Special": "must worship an empyreal lord"
+        },
+        "benefit": "Gain a special ability or resistance for an empyreal lord after performing a ritual."
+    },
+    "Chakra Initiate": {
+        "prerequisites": {
+        "Special": "ability to awaken root chakra"
+        },
+        "benefit": "Gain 3 serpent-fire ki points for chakras"
+    },
+    "Chakra Adept": {
+        "prerequisites": {
+        "Feat": "Chakra Initiate",
+        "Special": "ability to awaken heart chakra"
+        },
+        "benefit": "Gain 4 serpent-fire ki points for chakras, attempt one save to maintain chakras, and gain lingering benefits"
+    },
+    "Chakra Master": {
+        "prerequisites": {
+        "Feat": "Chakra Adept",
+        "Special": "ability to awaken crown chakra"
+        },
+        "benefit": "Gain 5 serpent-fire ki for chakras, can spend more ki to gain two chakra benefits"
+    },
+    "Chakra Mandala": {
+        "prerequisites": {
+        "Special": "Ki pool"
+        },
+        "benefit": "If you fail the Fortitude saving throw to maintain your awakened chakras, you take only half the normal damage."
+    },
+    "Channel Deific Essence": {
+        "prerequisites": {
+        "Feat": "Alignment Channel",
+        "Special": [
+            "channel energy 5d6",
+            "domain class feature",
+            "same alignment as patron deity associated with your deity"
+        ]
+        },
+        "benefit": "Expend a use of channel energy to gain a boon"
+    },
+    "Channel, Improved": {
+        "prerequisites": {
+        "Special": "Channel energy class feature"
+        },
+        "benefit": "+2 bonus on channel energy DC."
+    },
+    "Channeled Blessing": {
+        "prerequisites": {
+        "Special": [
+            "Blessings class feature",
+            "channel energy class feature"
+        ]
+        },
+        "benefit": "Bestow a blessing on an ally when you channel energy."
+    },
+    "Channeled Revival": {
+        "prerequisites": {
+        "Special": "Channel positive energy 6d6"
+        },
+        "benefit": "May expend channel energy to cast breath of life."
+    },
+    "Channeled Shield Wall": {
+        "prerequisites": {
+        "Special": [
+            "Channel energy 3d6",
+            "proficiency with a shield"
+        ]
+        },
+        "benefit": "Enhance your shield and the shields of allies adjacent to you."
+    },
+    "Channeling Scourge": {
+        "prerequisites": {
+        "Special": "Channel energy class feature",
+        "Level": {
+            "Inquisitor": 1
+        }
+        },
+        "benefit": "Inquisitor levels count as cleric levels for channeling damage."
+    },
+    "Channel Ray": {
+        "prerequisites": {
+        "Special": "Channel energy class feature"
+        },
+        "benefit": "Channel energy in a ray instead of a burst."
+    },
+    "Channel Spirit": {
+        "prerequisites": {
+        "Special": "Spirit Ridden or spirit class feature"
+        },
+        "benefit": "You can willingly allow spirits to possess you, trading a taste of your life for their knowledge and abilities."
+    },
+    "Channeling Variance": {
+        "prerequisites": {
+        "Special": [
+            "Domain class feature",
+            "channel energy class feature",
+            "must worship and receive spells from a deity"
+        ]
+        },
+        "benefit": "Choose one variant channeling ability that matches one of your deity’s domains, subdomains, or areas of concern. 3x/day when you channel energy, you can apply the modifications of the chosen variant channeling ability to your channeled energy, including reductions to the damage dealt or healing performed by your channeled energy. (See feat for additional details.)"
+    },
+    "Charming Performance": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Skill": {
+            "Perform (any)": 1
+        },
+        "Special": "bardic performance or raging song"
+        },
+        "benefit": "You can use Perform, rather than Diplomacy, to improve an NPC’s starting attitude toward you."
+    },
+    "Charnel Soldiers": {
+        "prerequisites": {
+        "Feat": "Any teamwork feat",
+        "Special": "ability to control or create undead"
+        },
+        "benefit": "When you create undead, they gain one teamwork feat you know as a bonus feat, though they gain its benefits only when cooperating with you or with other undead that you have created. If you control undead with the Command Undead feat or a spell like command undead, they likewise gain one teamwork feat you know as a bonus feat as long as they remain under your control. Intelligent undead gain no benefit from this feat."
+    },
+    "Childlike": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Race": "Halfling"
+        },
+        "benefit": "+2 on Disguise checks to look like human child, take 10 on Bluff checks."
+    },
+    "Child of Two Fates": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (local)": 5
+        },
+        "Race": "Half-elf"
+        },
+        "benefit": "Gain a human or elf ally’s teamwork feat temporarily"
+    },
+    "Chilling Amplification": {
+        "prerequisites": {},
+        "benefit": "Whenever you cast a spell with the cold descriptor, you can take a –1 penalty on attack rolls made with the spell and reduce the spell saving throw’s DC by 1 to cause any target that is dealt cold damage by the spell to have its movement speed reduced by 5 feet and become unable to take 5-foot steps. This effect lasts for 1 round + 1 round per 3 spell levels of the spell. You must choose to use this feat before making an attack roll or before your targets attempt their saving throws. This feat has no effect on spells that neither allow a saving throw nor require an attack roll."
+    },
+    "City Sprinter": {
+        "prerequisites": {
+        "Feat": "Street Smarts"
+        },
+        "benefit": "Move quickly and safely through urban terrain"
+    },
+    "Clarity of Pain": {
+        "prerequisites": {
+        "Stat": {
+            "CON": 13
+        },
+        "Feat": [
+            "Improved Iron Will",
+            "Iron Will"
+        ]
+        },
+        "benefit": "Damage yourself to fight off a charm or compulsion"
+    },
+    "Cleansing Burst": {
+        "prerequisites": {
+        "Special": [
+            "Able to cast remove disease or the ability to cure disease with a mercy",
+            "channel positive energy class feature"
+        ]
+        },
+        "benefit": "When you channel positive energy to harm or turn undead creatures, any undead creatures in the area lose the ability to cause disease with their melee and ranged attacks for 1d4+1 rounds. If an undead creature successfully saves against your channeled energy, this duration is reduced to 1 round for that creature. Immunity to positive energy negates this ability. When you channel positive energy to heal living creatures, any living creatures in the area gain a +4 sacred bonus on saving throws against disease for 1d4+1 rounds. Creatures not healed by positive energy receive no benefit."
+    },
+    "Combat Advice": {
+        "prerequisites": {},
+        "benefit": "Grant an ally a competence bonus on next attack roll against a chosen enemy."
+    },
+    "Combat Casting": {
+        "prerequisites": {},
+        "benefit": "+4 bonus on concentration checks for casting defensively."
+    },
+    "Combat Distraction": {
+        "prerequisites": {
+        "Race": "Goblin",
+        "Skill": {
+            "Acrobatics": 1,
+            "Escape Artist": 1
+        }
+        },
+        "benefit": "Your antics in combat cause others to suffer a -2 penalty to Perception and Concentration checks."
+    },
+    "Command Animals": {
+        "prerequisites": {
+        "Special": [
+            "Animal domain",
+            "channel energy class feature"
+        ]
+        },
+        "benefit": "Use channeled energy to control animals"
+    },
+    "Command Plants": {
+        "prerequisites": {
+        "Special": [
+            "channel energy class feature",
+            "Plant domain"
+        ]
+        },
+        "benefit": "Use channeled energy to control plants"
+    },
+    "Command Undead": {
+        "prerequisites": {
+        "Special": "Channel negative energy class feature"
+        },
+        "benefit": "Channel energy can be used to control undead."
+    },
+    "Companion Figurine": {
+        "prerequisites": {
+        "Skill": {
+            "Handle Animal": 1
+        },
+        "Special": "own a figurine of wondrous power"
+        },
+        "benefit": "Use your figurine of wondrous power as your animal companion or familiar."
+    },
+    "Compelling Harmonies": {
+        "prerequisites": {
+        "Feat": "Basic Harmony",
+        "Skill": {
+            "Perform (keyboard, percussion, sing, string, or wind)": 10
+        },
+        "Special": "bardic performance or raging song"
+        },
+        "benefit": "As a standard action, you may expend one round of bardic performance to boost the effectiveness of the bardic performance of an ally within 60 feet who also has this feat. Until the beginning of your next turn, if that ally uses a bardic performance that allows a saving throw, increase that saving throw DC by 2."
+    },
+    "Compounded Pain": {
+        "prerequisites": {
+        "Level": {
+            "Mesmerist": 13
+        },
+        "Special": "painful stare class feature"
+        },
+        "benefit": "Apply the effects of two stare feats to painful stares"
+    },
+    "Conceal Scent": {
+        "prerequisites": {},
+        "benefit": "Creatures cannot track you by scent."
+    },
+    "Conceal Spell": {
+        "prerequisites": {
+        "Feat": "Deceitful",
+        "Skill": {
+            "Bluff": 1,
+            "Disguise": 1,
+            "Sleight of Hand": 1
+        }
+        },
+        "benefit": "Conceal evidence of spellcasting"
+    },
+    "Improved Conceal Spell": {
+        "prerequisites": {
+        "Feat": "Conceal Spell",
+        "Skill": {
+            "Bluff": 5,
+            "Disguise": 5,
+            "Sleight of Hand": 10
+        },
+        "Special": "ability to cast 3rd level spells or use a 3rd-level spell-like ability"
+        },
+        "benefit": "Hide powerful spells more easily"
+    },
+    "Confabulist": {
+        "prerequisites": {
+        "Skill": {
+            "Bluff": 9,
+            "Sense Motive": 9
+        }
+        },
+        "benefit": "Follow a failed lie with another lie"
+    },
+    "Confounding Tumble Deed": {
+        "prerequisites": {
+        "Special": "Amateur Swashbuckler or panache class feature",
+        "Feat": "Canny Tumble",
+        "Skill": {
+            "Acrobatics": 7
+        }
+        },
+        "benefit": "When you avoid attacks of opportunity and hit a foe, you can deny it its Dex bonus to AC for 1 round."
+    },
+    "Conscript": {
+        "prerequisites": {
+        "Special": "Serf in service to a lord"
+        },
+        "benefit": "When wielding a farm implement (such as hand axe, pick, pitchfork, or scythe) as a weapon, get +1 bonus on damage rolls. When fighting alongside other conscripts get +1 bonus on init checks."
+    },
+    "Contingent Channeling": {
+        "prerequisites": {
+        "Special": [
+            "True healer class feature",
+            "Selective Channeling"
+        ]
+        },
+        "benefit": "May transfer positive energy to ally who can use it to heal."
+    },
+    "Conviction": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        }
+        },
+        "benefit": "Vampires are more averse to your holy symbols than normal."
+    },
+    "Cooperative Counterspelling": {
+        "prerequisites": {
+        "Skill": {
+            "Spellcraft": 5
+        },
+        "Special": "racial spell-like ability of 1st level or higher"
+        },
+        "benefit": "When you and an ally with this feat both ready actions to counterspell, you gain additional counterspelling options"
+    },
+    "Cooperative Crafting": {
+        "prerequisites": {
+        "Skill": {
+            "Craft": 1
+        },
+        "Feat": "any item creation feat"
+        },
+        "benefit": "+2 bonus on Craft or Spellcraft checks while working together."
+    },
+    "Cooperative Disabling": {
+        "prerequisites": {
+        "Skill": {
+            "Disable Device": 1
+        },
+        "Special": "trapfinding class feature"
+        },
+        "benefit": "Ally can attempt a second Disable Device check as an immediate action"
+    },
+    "Coordinated Blast": {
+        "prerequisites": {
+        "Skill": {
+            "Spellcraft": 5
+        },
+        "Special": "any racial spell-like ability"
+        },
+        "benefit": "Exclude allies with this feat from area spells and abilities"
+    },
+    "Corsair": {
+        "prerequisites": {},
+        "benefit": "+2 initiative while on ships, +1 damage with light or one-handed weapons on ships."
+    },
+    "Cosmopolitan": {
+        "prerequisites": {},
+        "benefit": "Read and speak two additional languages."
+    },
+    "Counterpoint to Inspiration": {
+        "prerequisites": {
+        "Feat": [
+            "Basic Harmony",
+            "Compelling Harmonies"
+        ],
+        "Skill": {
+            "Perform (keyboard, percussion, sing, string, or wind)": 10
+        },
+        "Special": "bardic performance or raging song"
+        },
+        "benefit": "When an ally with this feat is within 60 feet and uses a bardic performance or raging song that grants allies a morale bonus or competence bonus, you may perform the same bardic performance or raging song to increase those bonuses by +1. This increase only lasts as long as you and your ally each maintain the same performance, and cannot be extended with effects like Lingering Performance. Additional bards with this feat beyond the second don’t increase the bonuses further."
+    },
+    "Counterspell, Improved": {
+        "prerequisites": {},
+        "benefit": "Counterspell with spell of the same school."
+    },
+    "Coven Caster": {
+        "prerequisites": {
+        "Race": "Changeling"
+        },
+        "benefit": "As a standard action, you can attempt a special aid another action (1d20 + your choice of your Intelligence or Charisma modifier; DC 10). If you succeed, you can increase an adjacent spellcaster’s caster level by 1 until the beginning of your next turn. If you also have the coven witch hex, you can apply this bonus to all members of your coven within 30 feet."
+    },
+    "Cover Tracks": {
+        "prerequisites": {
+        "Skill": {
+            "Survival": 3
+        }
+        },
+        "benefit": "Increase the DC of Survival checks to track you and your allies"
+    },
+    "Craft Cybernetics": {
+        "prerequisites": {
+        "Special": "Technologist",
+        "Skill": {
+            "Heal": 9,
+            "Knowledge (engineering)": 9
+        }
+        },
+        "benefit": "Create and install cybertech."
+    },
+    "Craft Pharmaceutical": {
+        "prerequisites": {
+        "Special": "Technologist",
+        "Skill": {
+            "Heal": 9,
+            "Knowledge (nature)": 9
+        }
+        },
+        "benefit": "Create pharmaceutical items."
+    },
+    "Craft Technological Arms and Armor": {
+        "prerequisites": {
+        "Special": "Technologist",
+        "Skill": {
+            "Craft (mechanical)": 7,
+            "Knowledge (engineering)": 7
+        }
+        },
+        "benefit": "Create technological weapons and armor."
+    },
+    "Craft Technological Item": {
+        "prerequisites": {
+        "Special": "Technologist",
+        "Skill": {
+            "Craft (mechanical)": 5,
+            "Knowledge (engineering)": 5
+        }
+        },
+        "benefit": "Create technological items."
+    },
+    "Cranial Adjustment": {
+        "prerequisites": {
+        "Special": "Deft Hands or Trepanation"
+        },
+        "benefit": "You can perform the hypnotism occult skill unlock even if you can’t use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use hypnotism one additional time per day."
+    },
+    "Cranial Implantation": {
+        "prerequisites": {
+        "Special": "Self-Sufficient or Trepanation",
+        "Skill": {
+            "Heal": 7
+        }
+        },
+        "benefit": "You can perform the phrenology occult skill unlock, though you must use needles or similar sharp implements rather than your fingertips, dealing 1d3 points of damage to the subject. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use phrenology one additional time per day."
+    },
+    "Create Enhanced Firearm": {
+        "prerequisites": {
+        "Feat": "Craft Magic Arms and Armor",
+        "Skill": {
+            "Craft (weapons)": 1
+        },
+        "Special": "or Gunsmithing"
+        },
+        "benefit": "You can craft superior firearms."
+    },
+    "Create Reliquary Arms and Shields": {
+        "prerequisites": {
+        "Feat": "Craft Magic Arms and Armor",
+        "Special": "ability to cast consecrate or desecrate"
+        },
+        "benefit": "Make your shield or weapon a holy symbol."
+    },
+    "Create Sanguine Elixir": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 15
+        },
+        "Feat": "Brew Potion",
+        "Skill": {
+            "Craft (alchemy)": 12
+        },
+        "Level": {
+            "Sorcerer": 3
+        }
+        },
+        "benefit": "Create an elixir that allows another to use a bloodline power."
+    },
+    "Criminal Reputation": {
+        "prerequisites": {
+        "Skill": {
+            "Diplomacy": 5,
+            "Intimidate": 5
+        }
+        },
+        "benefit": "Influence criminals more easily"
+    },
+    "Crusader’s Flurry": {
+        "prerequisites": {
+        "Special": "Channel energy and flurry of blows class feature",
+        "Feat": "Weapon Focus with deity’s favored weapon"
+        },
+        "benefit": "May use flurry of blows with deity’s favored melee weapon."
+    },
+    "Cutting Humiliation": {
+        "prerequisites": {
+        "Feat": "Persuasive",
+        "Skill": {
+            "Intimidate": 5
+        }
+        },
+        "benefit": "Humiliate someone to weaken Charisma-based checks"
+    },
+    "Cypher Magic": {
+        "prerequisites": {
+        "Stat": {
+            "INT": 15
+        },
+        "Feat": "Scribe Scroll"
+        },
+        "benefit": "Gain bonuses to CL when using scrolls."
+    },
+    "Cypher Script": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (arcana)": 1,
+            "Linguistics": 1,
+            "Spellcraft": 1
+        },
+        "Special": "spellbook class feature"
+        },
+        "benefit": "You are more efficient at using your spellbook."
+    },
+    "Dark Adept": {
+        "prerequisites": {
+        "Race": "Drow",
+        "Level": 3
+        },
+        "benefit": "Gain new spell-like abilities."
+    },
+    "Darkness Trick": {
+        "prerequisites": {
+        "Skill": {
+            "Use Magic Device": 5
+        },
+        "Special": "ability to cast darkness"
+        },
+        "benefit": "Deactivate a magic weapon’s light"
+    },
+    "Deadly Dealer": {
+        "prerequisites": {
+        "Feat": "Arcane Strike",
+        "Skill": {
+            "Sleight of Hand": 5
+        }
+        },
+        "benefit": "Throw cards (such as harrow cards) as if they were darts."
+    },
+    "Deadly Trap": {
+        "prerequisites": {
+        "Skill": {
+            "Craft (traps)": 8,
+            "Survival": 8
+        }
+        },
+        "benefit": "Increase one of your trap’s critical threat multiplier by one or give it a +4 bonus on rolls to confirm critical hits"
+    },
+    "Deadly Troupe": {
+        "prerequisites": {
+        "Skill": {
+            "Perform (act/dance)": 3
+        },
+        "Race": "Human"
+        },
+        "benefit": "Gain a +4 bonus on certain combat maneuver checks and skill checks against foes threatened by allies with this feat"
+    },
+    "Death’s Host": {
+        "prerequisites": {
+        "Feat": "Spell Focus (necromancy)"
+        },
+        "benefit": "You become harder to kill when possessed by the undead."
+    },
+    "Deceitful": {
+        "prerequisites": {},
+        "benefit": "+2 bonus on Bluff and Disguise checks."
+    },
+    "Deceptive Exchange": {
+        "prerequisites": {
+        "Feat": "Improved Feint"
+        },
+        "benefit": "Upon successful feint, you may force opponent to accept an object."
+    },
+    "Deep Diver": {
+        "prerequisites": {
+        "Feat": "Endurance"
+        },
+        "benefit": "Gain bonuses on diving into water and swimming deep underwater; hold your breath for longer than normal"
+    },
+    "Deep Drinker": {
+        "prerequisites": {
+        "Stat": {
+            "CON": 13
+        },
+        "Level": {
+            "Monk": 11
+        },
+        "Special": "drunken ki class feature"
+        },
+        "benefit": "Gain 2 temporary ki from drunken ki."
+    },
+    "Deepsight": {
+        "prerequisites": {
+        "Special": "Darkvision 60 feet"
+        },
+        "benefit": "Your darkvision has a range of 120 feet."
+    },
+    "Defending Eidolon": {
+        "prerequisites": {
+        "Special": "Shield ally class feature"
+        },
+        "benefit": "Your eidolon sacrifices its attacks to defend you."
+    },
+    "Deft Catcher": {
+        "prerequisites": {
+        "Feat": "Skill Focus (Sleight of Hand)"
+        },
+        "benefit": "Use Sleight of Hand to avoid dropping an item"
+    },
+    "Deft Hands": {
+        "prerequisites": {},
+        "benefit": "+2 bonus on Disable Device and Sleight of Hand checks."
+    },
+    "Deific Obedience": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (religion)": 3
+        },
+        "Special": "must worship a deity"
+        },
+        "benefit": "Once you’ve performed a specified obedience, you gain the benefit of a special ability or resistance as indicated in the “Obedience” entry for the god to whom you performed the obedience."
+    },
+    "Delay Blast": {
+        "prerequisites": {
+        "BAB": 3,
+        "Special": "kinetic blast class feature"
+        },
+        "benefit": "Delay kinetic blast"
+    },
+    "Demonic Obedience": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (planes)": 3
+        },
+        "Special": "must worship a demon lord"
+        },
+        "benefit": "Gain boons from your demon lord."
+    },
+    "Deny Death": {
+        "prerequisites": {
+        "Special": "Ki pool",
+        "Feat": "Endurance"
+        },
+        "benefit": "Use ki to stave off death."
+    },
+    "Desert Dweller": {
+        "prerequisites": {
+        "Special": "Favored terrain (desert) class feature"
+        },
+        "benefit": "Treat hot environments as one step less severe; reduced penalties for thirst and a +4 bonus on saves to avoid desert-related visual hazards such as mirages"
+    },
+    "Destroy Identity": {
+        "prerequisites": {
+        "Feat": "Critical Focus",
+        "BAB": 11
+        },
+        "benefit": "Whenever you score a critical hit target takes Charisma damage and becomes staggered."
+    },
+    "Destructive Dispel": {
+        "prerequisites": {
+        "Special": "ability to cast dispel magic or greater dispel magic",
+        "Caster Level": 11
+        },
+        "benefit": "Upon successful dispel, opponent must save or is stunned."
+    },
+    "Detect Expertise": {
+        "prerequisites": {
+        "Stat": {
+            "INT": 13
+        },
+        "Special": "ability to cast detect chaos, detect evil, detect good, detect law, or detect magic"
+        },
+        "benefit": "Detect a creature’s magical abilities."
+    },
+    "Diehard": {
+        "prerequisites": {
+        "Feat": "Endurance"
+        },
+        "benefit": "Automatically stabilize and remain conscious below 0 hp."
+    },
+    "Die for Your Master": {
+        "prerequisites": {
+        "Special": "Tumor familiar alchemist discovery"
+        },
+        "benefit": "Tumor familiar dies in place of its master."
+    },
+    "Dilettante": {
+        "prerequisites": {
+        "Special": "2 ranks each in 5 different Knowledge skills"
+        },
+        "benefit": "+2 bonus in Knowledge skills with 1-5 ranks and make higher DC untrained Knowledge checks."
+    },
+    "Dimensional Agility": {
+        "prerequisites": {
+        "Special": "Abundant step class feature or ability to cast dimension door"
+        },
+        "benefit": "May take any additional actions remaining after using dimension door or abundant step"
+    },
+    "Dimensional Assault": {
+        "prerequisites": {
+        "Feat": "Dimensional Agility"
+        },
+        "benefit": "May use dimension door or abundant step as part of a charge action."
+    },
+    "Dimensional Dervish": {
+        "prerequisites": {
+        "Feat": "Dimensional Assault",
+        "BAB": 6
+        },
+        "benefit": "During full-attack action, you may cast dimension door or use abundant step as a swift action."
+    },
+    "Dimensional Maneuvers": {
+        "prerequisites": {
+        "Feat": "Dimensional Dervish",
+        "BAB": 9
+        },
+        "benefit": "Gain +4 on combat maneuver checks while using Dimensional Dervish."
+    },
+    "Dimensional Savant": {
+        "prerequisites": {
+        "Feat": "Dimensional Dervish",
+        "BAB": 9
+        },
+        "benefit": "Provide flanking from all squares you attack from when using Dimensional Dervish"
+    },
+    "Diplomatic Ruse": {
+        "prerequisites": {
+        "Skill": {
+            "Diplomacy": 3
+        },
+        "Race": "Human"
+        },
+        "benefit": "Take a free action as part of your initiative check"
+    },
+    "Disabling Dweomer": {
+        "prerequisites": {
+        "Skill": {
+            "Disable Device": 5,
+            "Use Magic Device": 5
+        },
+        "Special": "trapfinding"
+        },
+        "benefit": "Use Disable Device to suppress magic items."
+    },
+    "Disarming Threat Deed": {
+        "prerequisites": {
+        "Special": "Amateur Swashbuckler or panache class feature",
+        "Skill": {
+            "Diplomacy": 2,
+            "Intimidate": 2
+        }
+        },
+        "benefit": "Use Intimidate without making the target unfriendly."
+    },
+    "Disciplinary Devotee": {
+        "prerequisites": {
+        "Special": "Psychic discipline class feature"
+        },
+        "benefit": "Gain +1 on caster level checks, concentration checks, and saving throws for discipline spells"
+    },
+    "Disconcerting Knowledge": {
+        "prerequisites": {
+        "Special": "Bardic knowledge class ability or Knowledge domain",
+        "Skill": {
+            "Knowledge": "3 ranks each in two different Knowledge skills"
+        }
+        },
+        "benefit": "Demoralize a foe by proving you know its weaknesses"
+    },
+    "Discordant Voice": {
+        "prerequisites": {
+        "Special": "Bardic performance class feature",
+        "Skill": {
+            "Perform (oratory or sing)": 10
+        }
+        },
+        "benefit": "When using bardic performance, allies deal 1d6 extra sonic damage."
+    },
+    "Dislocate": {
+        "prerequisites": {
+        "Stat": {
+            "CON": 13
+        }
+        },
+        "benefit": "As a swift action, you can deal 1d8 points of nonlethal damage to yourself as you pop your joints from their sockets, making yourself more flexible though suffering incredible pain."
+    },
+    "Disorienting Maneuver": {
+        "prerequisites": {
+        "Feat": "Dodge",
+        "Skill": {
+            "Acrobatics": 5
+        }
+        },
+        "benefit": "After successful tumble through opponent’s square, gain +2 on attack rolls vs. that opponent."
+    },
+    "Dispel Synergy": {
+        "prerequisites": {
+        "Skill": {
+            "Spellcraft": 5
+        }
+        },
+        "benefit": "Dispel magic target takes a –2 penalty on saves."
+    },
+    "Dispelling Fist": {
+        "prerequisites": {
+        "Feat": "Improved Unarmed Strike",
+        "Special": "ability to cast dispel magic",
+        "BAB": 11,
+        "Caster Level": 7
+        },
+        "benefit": "May cast dispel magic as a swift action after an attack."
+    },
+    "Disposable Weapon": {
+        "prerequisites": {
+        "Special": "Weapon Proficiency",
+        "BAB": 1
+        },
+        "benefit": "Break a fragile weapon to confirm a critical hit."
+    },
+    "Disruptive Recall": {
+        "prerequisites": {
+        "Special": "Spell recall class feature",
+        "Skill": {
+            "Spellcraft": 5
+        }
+        },
+        "benefit": "Use spell recall after disrupting an opponent’s spell."
+    },
+    "Distant Delivery": {
+        "prerequisites": {
+        "Special": "Deliver touch spells class feature, phantom class feature"
+        },
+        "benefit": "Phantom can deliver touch spells 20 feet farther"
+    },
+    "Distant Jinx": {
+        "prerequisites": {
+        "Special": "Halfling Jinx trait"
+        },
+        "benefit": "The range of your jinx increases by 30 feet."
+    },
+    "Distant Spell Link": {
+        "prerequisites": {
+        "Special": "Enlarge Spell or Reach Spell",
+        "Special2": "animal companion, eidolon, familiar, or other allied creature with the share spells ability"
+        },
+        "benefit": "The range of your allied creature’s share spells ability increases to close (25 feet + 5 feet for every 2 levels) as long as you have line of effect to the creature when you cast the shared spell."
+    },
+    "Diverse Obedience": {
+        "prerequisites": {
+        "Feat": "Deific Obedience",
+        "Skill": {
+            "Knowledge (religion)": 5
+        },
+        "Special": "alignment must match that of your worshiped deity"
+        },
+        "benefit": "You are treated as though you had 2 more Hit Dice than you actually do for the purposes of determining what divine boons you gain as a result of performing your deity’s obedience and whenever you would gain a boon as a result of your Deific Obedience feat (and not through a prestige class), you can choose among the options available for evangelist, exalted, or sentinel boons."
+    },
+    "Divination Guide": {
+        "prerequisites": {
+        "Special": "ability to cast augury or divination",
+        "Caster Level": 3
+        },
+        "benefit": "When you cast augury or divination, you gain a +1 sacred bonus on all saving throws for 10 minutes per your CL in the class you used to cast the spell."
+    },
+    "Divine Communion": {
+        "prerequisites": {
+        "Stat": {
+            "WIS": 13
+        },
+        "Special": "alignment must match that of your worshiped deity"
+        },
+        "benefit": "Once per day as a swift action, you can ponder whether or not your deity would approve or disapprove of a particular course of action, and whether that action would impact your alignment. The GM decides if the action is one your deity would approve of, and if it is, you gain an insight bonus equal to your Wisdom modifier (minimum of +1) on any d20 roll made in association with that action during this round. For every 3 ranks you have in Knowledge (religion), you can use this ability an additional time per day, to a maximum of 6 times a day."
+    },
+    "Divine Deception": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (religion)": 5,
+            "Use Magic Device": 5
+        }
+        },
+        "benefit": "+5 bonus on UMD checks with divine items."
+    },
+    "Divine Defiance": {
+        "prerequisites": {},
+        "benefit": "You gain a +2 bonus on saving throws against divine spells and the spell-like abilities granted by levels in a divine casting class."
+    },
+    "Divine Interference": {
+        "prerequisites": {
+        "Special": "Divine spellcaster",
+        "Caster Level": 10
+        },
+        "benefit": "Sacrifice a spell to force an enemy to reroll a successful attack against your ally."
+    },
+    "Divine Protection": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Skill": {
+            "Knowledge (religion)": 5
+        }
+        },
+        "benefit": "Gain a bonus equal to your Charisma bonus on a saving throw."
+    },
+    "Diviner’s Delving": {
+        "prerequisites": {
+        "Feat": "Spell Focus (divination)"
+        },
+        "benefit": "+2 bonus on CL checks with divinations."
+    },
+    "Dog Killer-Horse Hunter": {
+        "prerequisites": {
+        "Race": "Goblin",
+        "Skill": {
+            "Handle Animal": 1
+        }
+        },
+        "benefit": "You gain a +2 morale bonus on attack and damage rolls as well as rolls to confirm critical hits against dogs and horses (and similar creatures)."
+    },
+    "Double Bane": {
+        "prerequisites": {
+        "Special": "Bane class feature",
+        "Feat": "Two-Weapon Fighting"
+        },
+        "benefit": "Apply your bane to a second weapon."
+    },
+    "Draconic Defender": {
+        "prerequisites": {
+        "Stat": {
+            "CON": 17
+        },
+        "Feat": "Toughness"
+        },
+        "benefit": "Grant a nearby ally your dodge bonus from fighting defensively or Combat Expertise."
+    },
+    "Draconic Discipline": {
+        "prerequisites": {
+        "Stat": {
+            "WIS": 17
+        },
+        "Special": "base Will +10, any lawful alignment, dragon type"
+        },
+        "benefit": "Get a second retry on necromancy or mind-affecting enchantment spells."
+    },
+    "Dragonbane Aura": {
+        "prerequisites": {
+        "Special": "Aura of courage class feature",
+        "Caster Level": 8
+        },
+        "benefit": "Aura of courage expands and grants protection against dragon breath weapons."
+    },
+    "Drunkard’s Recovery": {
+        "prerequisites": {
+        "Stat": {
+            "CON": 13
+        }
+        },
+        "benefit": "Alcohol automatically stabilizes you"
+    },
+    "Dual Enhancement": {
+        "prerequisites": {
+        "Feat": "Two-Weapon Fighting",
+        "Special": "divine bond (weapon) or sacred weapon class feature"
+        },
+        "benefit": "Imbue two weapons with divine bond or sacred weapon instead of just one."
+    }
+}
+    
+
+

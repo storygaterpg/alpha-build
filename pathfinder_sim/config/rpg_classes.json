@@ -1,0 +1,240 @@
+{
+  "barbarian": {
+    "hit_die": 12,
+    "starting_wealth": 105,
+    "class_skills": [
+      "Acrobatics",
+      "Climb",
+      "Craft",
+      "Handle Animal",
+      "Intimidate",
+      "Knowledge (nature)",
+      "Perception",
+      "Ride",
+      "Survival",
+      "Swim"
+    ],
+    "skill_per_level": 4,
+    "description": "Barbarians are fierce warriors who rely on primal rage and brute strength to overcome their foes. Their relentless fury and toughness make them formidable in combat."
+  },
+  "bard": {
+    "hit_die": 8,
+    "starting_wealth": 105,
+    "class_skills": [
+      "Acrobatics",
+      "Appraise",
+      "Bluff",
+      "Climb",
+      "Craft",
+      "Diplomacy",
+      "Disguise",
+      "Escape Artist",
+      "Intimidate",
+      "Knowledge (all)",
+      "Linguistics",
+      "Perception",
+      "Perform",
+      "Profession",
+      "Sense Motive",
+      "Sleight of Hand",
+      "Spellcraft",
+      "Stealth",
+      "Use Magic Device"
+    ],
+    "skill_per_level": 6,
+    "description": "Bards are charismatic and versatile performers who blend magic, music, and social skills to inspire allies and confound enemies."
+  },
+  "cleric": {
+    "hit_die": 8,
+    "starting_wealth": 140,
+    "class_skills": [
+      "Appraise",
+      "Craft",
+      "Diplomacy",
+      "Heal",
+      "Knowledge (arcana)",
+      "Knowledge (history)",
+      "Knowledge (nobility)",
+      "Knowledge (planes)",
+      "Knowledge (religion)",
+      "Linguistics",
+      "Profession",
+      "Sense Motive",
+      "Spellcraft"
+    ],
+    "skill_per_level": 2,
+    "description": "Clerics are devoted servants of the divine, capable of healing wounds and smiting foes with divine power. Their strong connection to their deity grants them potent spellcasting abilities."
+  },
+  "druid": {
+    "hit_die": 8,
+    "starting_wealth": 70,
+    "class_skills": [
+      "Climb",
+      "Craft",
+      "Fly",
+      "Handle Animal",
+      "Heal",
+      "Knowledge (geography)",
+      "Knowledge (nature)",
+      "Perception",
+      "Profession",
+      "Ride",
+      "Spellcraft",
+      "Survival",
+      "Swim"
+    ],
+    "skill_per_level": 4,
+    "description": "Druids are guardians of nature, drawing power from the natural world to cast spells, transform into animals, and protect the balance of life."
+  },
+  "fighter": {
+    "hit_die": 10,
+    "starting_wealth": 175,
+    "class_skills": [
+      "Climb",
+      "Craft",
+      "Handle Animal",
+      "Intimidate",
+      "Knowledge (dungeoneering)",
+      "Knowledge (engineering)",
+      "Profession",
+      "Ride",
+      "Survival",
+      "Swim"
+    ],
+    "skill_per_level": 2,
+    "description": "Fighters are masterful warriors skilled in a wide array of combat techniques and weaponry, able to adapt to any battlefield situation with precision and strength."
+  },
+  "monk": {
+    "hit_die": 8,
+    "starting_wealth": 35,
+    "class_skills": [
+      "Acrobatics",
+      "Climb",
+      "Craft",
+      "Escape Artist",
+      "Intimidate",
+      "Knowledge (history)",
+      "Knowledge (religion)",
+      "Perception",
+      "Perform",
+      "Profession",
+      "Ride",
+      "Sense Motive",
+      "Stealth",
+      "Swim"
+    ],
+    "skill_per_level": 4,
+    "description": "Monks are disciplined martial artists who channel their inner ki to perform extraordinary feats of agility and combat prowess, relying on unarmed strikes and speed."
+  },
+  "paladin": {
+    "hit_die": 10,
+    "starting_wealth": 175,
+    "class_skills": [
+      "Craft",
+      "Diplomacy",
+      "Handle Animal",
+      "Heal",
+      "Knowledge (nobility)",
+      "Knowledge (religion)",
+      "Profession",
+      "Ride",
+      "Sense Motive",
+      "Spellcraft"
+    ],
+    "skill_per_level": 2,
+    "description": "Paladins are holy knights dedicated to upholding justice and righteousness, combining martial skill with divine grace to protect the innocent and vanquish evil."
+  },
+  "ranger": {
+    "hit_die": 10,
+    "starting_wealth": 175,
+    "class_skills": [
+      "Climb",
+      "Craft",
+      "Handle Animal",
+      "Heal",
+      "Intimidate",
+      "Knowledge (dungeoneering)",
+      "Knowledge (geography)",
+      "Knowledge (nature)",
+      "Perception",
+      "Profession",
+      "Ride",
+      "Spellcraft",
+      "Stealth",
+      "Survival",
+      "Swim"
+    ],
+    "skill_per_level": 6,
+    "description": "Rangers are adept wilderness hunters and trackers who excel at both ranged and melee combat, often accompanied by a loyal animal companion and specializing in taking down favored foes."
+  },
+  "rogue": {
+    "hit_die": 8,
+    "starting_wealth": 140,
+    "class_skills": [
+      "Acrobatics",
+      "Appraise",
+      "Bluff",
+      "Climb",
+      "Craft",
+      "Diplomacy",
+      "Disable Device",
+      "Disguise",
+      "Escape Artist",
+      "Intimidate",
+      "Knowledge (dungeoneering)",
+      "Knowledge (local)",
+      "Linguistics",
+      "Perception",
+      "Perform",
+      "Profession",
+      "Sense Motive",
+      "Sleight of Hand",
+      "Stealth",
+      "Swim",
+      "Use Magic Device"
+    ],
+    "skill_per_level": 8,
+    "description": "Rogues are cunning and stealthy operatives, excelling in deception, trap disarming, and sneak attacks to outmaneuver their opponents."
+  },
+  "sorcerer": {
+    "hit_die": 6,
+    "starting_wealth": 70,
+    "class_skills": [
+      "Appraise",
+      "Bluff",
+      "Craft",
+      "Fly",
+      "Intimidate",
+      "Knowledge (arcana)",
+      "Profession",
+      "Spellcraft",
+      "Use Magic Device"
+    ],
+    "skill_per_level": 2,
+    "description": "Sorcerers are innate spellcasters who harness magical power from their bloodline, casting spells spontaneously with raw, potent energy."
+  },
+  "wizard": {
+    "hit_die": 6,
+    "starting_wealth": 70,
+    "class_skills": [
+      "Appraise",
+      "Craft",
+      "Fly",
+      "Knowledge (arcana)",
+      "Knowledge (dungeoneering)",
+      "Knowledge (engineering)",
+      "Knowledge (geography)",
+      "Knowledge (history)",
+      "Knowledge (local)",
+      "Knowledge (nature)",
+      "Knowledge (nobility)",
+      "Knowledge (planes)",
+      "Knowledge (religion)",
+      "Linguistics",
+      "Profession",
+      "Spellcraft"
+    ],
+    "skill_per_level": 2,
+    "description": "Wizards are scholarly masters of arcane magic who prepare a vast repertoire of spells through diligent study, wielding magic with strategic precision."
+  }
+}

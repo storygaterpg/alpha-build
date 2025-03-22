@@ -1,0 +1,142 @@
+{
+    "1": {
+        "BAB": [1],
+        "Fort": 2,
+        "Ref": 0,
+        "Will": 0,
+        "special_abilities": ["Fast movement, rage"]
+    },
+    "2": {
+        "BAB": [2],
+        "Fort": 3,
+        "Ref": 0,
+        "Will": 0,
+        "special_abilities": ["Rage power, uncanny dodge"]
+    },
+    "3": {
+        "BAB": [3],
+        "Fort": 3,
+        "Ref": 1,
+        "Will": 1,
+        "special_abilities": ["Trap sense +1"]
+    },
+    "4": {
+        "BAB": [4],
+        "Fort": 4,
+        "Ref": 1,
+        "Will": 1,
+        "special_abilities": ["Rage power"]
+    },
+    "5": {
+        "BAB": [5],
+        "Fort": 4,
+        "Ref": 1,
+        "Will": 1,
+        "special_abilities": ["Improved uncanny dodge"]
+    },
+    "6": {
+        "BAB": [6, 1],
+        "Fort": 5,
+        "Ref": 2,
+        "Will": 2,
+        "special_abilities": ["Rage power, trap sense +2"]
+    },
+    "7": {
+        "BAB": [7, 2],
+        "Fort": 5,
+        "Ref": 2,
+        "Will": 2,
+        "special_abilities": ["Damage reduction 1/—"]
+    },
+    "8": {
+        "BAB": [8, 3],
+        "Fort": 6,
+        "Ref": 2,
+        "Will": 2,
+        "special_abilities": ["Rage power"]
+    },
+    "9": {
+        "BAB": [9, 4],
+        "Fort": 6,
+        "Ref": 3,
+        "Will": 3,
+        "special_abilities": ["Trap sense +3"]
+    },
+    "10": {
+        "BAB": [10, 5],
+        "Fort": 7,
+        "Ref": 3,
+        "Will": 3,
+        "special_abilities": ["Damage reduction 2/—, rage power"]
+    },
+    "11": {
+        "BAB": [11, 6, 1],
+        "Fort": 7,
+        "Ref": 3,
+        "Will": 3,
+        "special_abilities": ["Greater rage"]
+    },
+    "12": {
+        "BAB": [12, 7, 2],
+        "Fort": 8,
+        "Ref": 4,
+        "Will": 4,
+        "special_abilities": ["Rage power, trap sense +4"]
+    },
+    "13": {
+        "BAB": [13, 8, 3],
+        "Fort": 8,
+        "Ref": 4,
+        "Will": 4,
+        "special_abilities": ["Damage reduction 3/—"]
+    },
+    "14": {
+        "BAB": [14, 9, 4],
+        "Fort": 9,
+        "Ref": 4,
+        "Will": 4,
+        "special_abilities": ["Indomitable will, rage power"]
+    },
+    "15": {
+        "BAB": [15, 10, 5],
+        "Fort": 9,
+        "Ref": 5,
+        "Will": 5,
+        "special_abilities": ["Trap sense +5"]
+    },
+    "16": {
+        "BAB": [16, 11, 6, 1],
+        "Fort": 10,
+        "Ref": 5,
+        "Will": 5,
+        "special_abilities": ["Damage reduction 4/—, rage power"]
+    },
+    "17": {
+        "BAB": [17, 12, 7, 2],
+        "Fort": 10,
+        "Ref": 5,
+        "Will": 5,
+        "special_abilities": ["Tireless rage"]
+    },
+    "18": {
+        "BAB": [18, 13, 8, 3],
+        "Fort": 11,
+        "Ref": 6,
+        "Will": 6,
+        "special_abilities": ["Rage power, trap sense +6"]
+    },
+    "19": {
+        "BAB": [19, 14, 9, 4],
+        "Fort": 11,
+        "Ref": 6,
+        "Will": 6,
+        "special_abilities": ["Damage reduction 5/—"]
+    },
+    "20": {
+        "BAB": [20, 15, 10, 5],
+        "Fort": 12,
+        "Ref": 6,
+        "Will": 6,
+        "special_abilities": ["Mighty rage, rage power"]
+    }
+}

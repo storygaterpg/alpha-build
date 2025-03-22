@@ -1,0 +1,43 @@
+{
+  "bull_rush": {
+    "description": "Bull Rush: The attacker attempts to push the target back. Explicitly, the attacker’s combat maneuver bonus (CMB = BAB + Strength modifier, plus any special bonuses) is compared to the target's combat maneuver defense (CMD = 10 + BAB + Strength modifier, plus additional bonuses if applicable). On success, the target is pushed back by a default number of squares, disrupting its position. Implicitly, this maneuver may force the target into a less advantageous location.",
+    "default_duration": 0,
+    "push_distance_default": 1,
+    "formula": "Roll + CMB >= CMD. (No extra modifiers by default.)"
+  },
+  "grapple": {
+    "description": "Grapple: The attacker attempts to restrain the target. Explicitly, the attacker’s CMB is compared to the target's CMD. On success, the target becomes grappled, limiting its movement and actions. Implicitly, being grappled reduces the target’s tactical options.",
+    "default_duration": 0,
+    "formula": "Roll + CMB >= CMD."
+  },
+  "trip": {
+    "description": "Trip: The attacker attempts to knock the target prone. Explicitly, the attacker’s CMB is compared to the target's CMD. On success, the target falls prone, suffering penalties to AC and mobility. Implicitly, a prone target is less effective in combat and more vulnerable.",
+    "default_duration": 0,
+    "formula": "Roll + CMB >= CMD. (Additional situational bonuses may apply if the target is unprepared.)"
+  },
+  "disarm": {
+    "description": "Disarm: The attacker attempts to knock the target’s weapon from its grasp. Explicitly, the attacker’s CMB is compared to the target's CMD. On success, the target drops its weapon. Implicitly, if the target is armed, it gains a +4 bonus to its CMD against disarm attempts, so this check is more difficult.",
+    "default_duration": 0,
+    "formula": "Roll + CMB >= (CMD + 4 if target is armed)."
+  },
+  "sunder": {
+    "description": "Sunder: The attacker attempts to damage or break a target’s weapon or shield. Explicitly, the attacker’s CMB is compared to the target's CMD. On success, the target's item takes damage and may be broken. Implicitly, items with a high hardness or bonus may resist sunder attempts better.",
+    "default_duration": 0,
+    "formula": "Roll + CMB >= (CMD + 4 if defending item is well-made)."
+  },
+  "dirty_trick": {
+    "description": "Dirty Trick: The attacker attempts to impose a minor negative condition (such as dazing or off-balance) on the target. Explicitly, the attacker’s CMB is compared to the target's CMD. On success, the target suffers the designated condition (typically lasting 1 round). Implicitly, this maneuver represents a subtle, tricky tactic that disrupts the target without a full physical contest.",
+    "default_duration": 1,
+    "formula": "Roll + CMB >= CMD. On success, target suffers the condition for 1 round."
+  },
+  "reposition": {
+    "description": "Reposition: The attacker attempts to move the target to a different square. Explicitly, the attacker’s CMB is compared to the target's CMD. On success, the target is moved to a square chosen by the attacker. Implicitly, this can force the target into an unfavorable location.",
+    "default_duration": 0,
+    "formula": "Roll + CMB >= CMD. On success, target is repositioned as desired."
+  },
+  "overrun": {
+    "description": "Overrun: The attacker attempts to move through the target’s space. Explicitly, the attacker’s CMB is compared to the target's CMD. On success, the attacker can move through the target’s square and may cause the target to fall prone. Implicitly, this maneuver allows the attacker to close distances rapidly but risks provoking attacks of opportunity.",
+    "default_duration": 0,
+    "formula": "Roll + CMB >= CMD. On success, attacker moves through target’s square; target may fall prone."
+  }
+}
