@@ -59,7 +59,8 @@
         "spell_slots": {
           "0": 3,
           "1": 1
-        }
+        },
+        "channel_energy": 1
       },
       "2": {
         "BAB": 1,
@@ -71,7 +72,8 @@
         "spell_slots": {
           "0": 4,
           "1": 2
-        }
+        },
+        "channel_energy": 2
       }
     }
   },
@@ -87,7 +89,8 @@
         "spell_slots": {
           "0": 2,
           "1": 1
-        }
+        },
+        "wild_shape": 1
       },
       "2": {
         "BAB": 1,
@@ -99,7 +102,8 @@
         "spell_slots": {
           "0": 3,
           "1": 2
-        }
+        },
+        "wild_shape": 2
       }
     }
   },
@@ -133,7 +137,9 @@
         "hit_points": 8,
         "special_abilities": ["Flurry of Blows", "Evasion"],
         "unarmed_damage": "1d4",
-        "fast_movement_bonus": 10
+        "fast_movement_bonus": 10,
+        "flurry_of_blows_attack_bonus": [1],
+        "ac_bonus": 0
       },
       "2": {
         "BAB": 2,
@@ -143,7 +149,9 @@
         "hit_points": 8,
         "special_abilities": ["Improved Flurry"],
         "unarmed_damage": "1d6",
-        "fast_movement_bonus": 10
+        "fast_movement_bonus": 10,
+        "flurry_of_blows_attack_bonus": [2, 2],
+        "ac_bonus": 3
       }
     }
   },
@@ -155,7 +163,8 @@
         "Ref": 0,
         "Will": 2,
         "hit_points": 10,
-        "special_abilities": ["Lay on Hands", "Divine Grace"]
+        "special_abilities": ["Lay on Hands", "Divine Grace"],
+        "spell_slots": {}
       },
       "2": {
         "BAB": 2,
@@ -163,7 +172,8 @@
         "Ref": 0,
         "Will": 3,
         "hit_points": 10,
-        "special_abilities": []
+        "special_abilities": [],
+        "spell_slots": {}
       }
     }
   },
@@ -175,7 +185,8 @@
         "Ref": 2,
         "Will": 0,
         "hit_points": 10,
-        "special_abilities": ["Favored Enemy", "Combat Style"]
+        "special_abilities": ["Favored Enemy", "Combat Style"],
+        "spell_slots": {}
       },
       "2": {
         "BAB": 2,
@@ -183,7 +194,8 @@
         "Ref": 3,
         "Will": 0,
         "hit_points": 10,
-        "special_abilities": ["Improved Combat Style"]
+        "special_abilities": ["Improved Combat Style"],
+        "spell_slots": {}
       }
     }
   },
@@ -196,7 +208,7 @@
         "Will": 0,
         "hit_points": 8,
         "special_abilities": ["Sneak Attack"],
-        "sneak_attack": "1d6"
+        "sneak_attack": 1
       },
       "2": {
         "BAB": 1,
@@ -205,7 +217,7 @@
         "Will": 0,
         "hit_points": 8,
         "special_abilities": [],
-        "sneak_attack": "2d6"
+        "sneak_attack": 2
       }
     }
   },
