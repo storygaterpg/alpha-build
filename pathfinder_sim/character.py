@@ -3,18 +3,15 @@ character.py
 ------------
 
 This module defines the Character class for our Pathfinder simulation.
-It manages attributes such as position, dexterity, equipment bonuses, conditions, resources,
-and now also multiclass progression via class_levels. Derived attributes (e.g., BAB) are recalculated
-based on levels in different RPG classes.
+It manages attributes such as position, abilities, combat statistics, conditions, resources,
+and narrative elements. This version includes methods to serialize to and reconstruct from a dictionary.
 """
 
 from typing import List, Dict, Any
 import json
 import os
 import conditions
-
-# Import RPGClass for type annotations.
-from rpg_class import RPGClass
+from rpg_class import RPGClass  # Ensure RPGClass is imported for type annotations
 
 class Character:
     """
@@ -56,9 +53,44 @@ class Character:
         # Multiclass: dictionary mapping RPG class names to levels.
         self.class_levels: Dict[str, int] = {}
 
+        # Additional ability scores (default 10 if not provided)
+        self.strength = 10
+        self.constitution = 10
+        self.intelligence = 10
+        self.wisdom = 10
+        self.charisma = 10
+
+        # Saves and combat details.
+        self.fortitude_save = 0
+        self.reflex_save = 0
+        self.will_save = 0
+        self.hit_points = 0
+        self.experience = 0
+
+        # Identity and narrative.
+        self.race = "Unknown"
+        self.alignment = "Neutral"
+        self.deity = "None"
+        self.feats: List[str] = []
+        self.inventory: List[Dict[str, Any]] = []
+        self.background = ""
+        self.goals = ""
+        self.relationships: List[Dict[str, str]] = []
+
     def get_modifier(self, ability: str) -> int:
-        if ability.upper() == "DEX":
+        ability = ability.upper()
+        if ability == "DEX":
             return (self.dexterity - 10) // 2
+        if ability == "STR":
+            return (self.strength - 10) // 2
+        if ability == "CON":
+            return (self.constitution - 10) // 2
+        if ability == "INT":
+            return (self.intelligence - 10) // 2
+        if ability == "WIS":
+            return (self.wisdom - 10) // 2
+        if ability == "CHA":
+            return (self.charisma - 10) // 2
         return 0
 
     def has_condition(self, condition_names: list) -> bool:
@@ -124,7 +156,7 @@ class Character:
             elif progression == "poor":
                 total_bab += int(0.5 * level)
             else:
-                total_bab += level  # Default to full progression.
+                total_bab += level
         self.BAB = total_bab
 
     def level_up(self, rpg_class: RPGClass) -> None:
@@ -192,6 +224,91 @@ class Character:
             if ability.upper() in [stat.upper() for stat in getattr(cond, "affected_stats", [])]:
                 penalty += cond.skill_penalty
         return base + penalty
+
+    def to_dict(self) -> dict:
+        """
+        Serialize the Character object into a dictionary.
+        """
+        return {
+            "name": self.name,
+            "position": self.position,
+            "dexterity": self.dexterity,
+            "strength": self.strength,
+            "constitution": self.constitution,
+            "intelligence": self.intelligence,
+            "wisdom": self.wisdom,
+            "charisma": self.charisma,
+            "armor_bonus": self.armor_bonus,
+            "shield_bonus": self.shield_bonus,
+            "natural_armor": self.natural_armor,
+            "deflection_bonus": self.deflection_bonus,
+            "dodge_bonus": self.dodge_bonus,
+            "size_modifier": self.size_modifier,
+            "BAB": self.BAB,
+            "spells": self.spells,
+            "conditions": [cond.get_status() for cond in self.conditions],
+            "resources": self.resources,
+            "reach": self.reach,
+            "class_levels": self.class_levels,
+            "fortitude_save": self.fortitude_save,
+            "reflex_save": self.reflex_save,
+            "will_save": self.will_save,
+            "hit_points": self.hit_points,
+            "experience": self.experience,
+            "race": self.race,
+            "alignment": self.alignment,
+            "deity": self.deity,
+            "feats": self.feats,
+            "inventory": self.inventory,
+            "background": self.background,
+            "goals": self.goals,
+            "relationships": self.relationships
+        }
+    
+    @classmethod
+    def from_dict(cls, data: dict) -> "Character":
+        """
+        Reconstruct a Character object from a dictionary.
+        """
+        char = cls(
+            name=data.get("name", "Unnamed"),
+            x=data.get("position", [0, 0])[0],
+            y=data.get("position", [0, 0])[1],
+            dexterity=data.get("dexterity", 10)
+        )
+        char.strength = data.get("strength", 10)
+        char.constitution = data.get("constitution", 10)
+        char.intelligence = data.get("intelligence", 10)
+        char.wisdom = data.get("wisdom", 10)
+        char.charisma = data.get("charisma", 10)
+        char.armor_bonus = data.get("armor_bonus", 0)
+        char.shield_bonus = data.get("shield_bonus", 0)
+        char.natural_armor = data.get("natural_armor", 0)
+        char.deflection_bonus = data.get("deflection_bonus", 0)
+        char.dodge_bonus = data.get("dodge_bonus", 0)
+        char.size_modifier = data.get("size_modifier", 0)
+        char.BAB = data.get("BAB", 0)
+        char.spells = data.get("spells", [])
+        # Reconstruct conditions using our helper function from conditions.py.
+        from conditions import condition_from_status_list
+        char.conditions = condition_from_status_list(data.get("conditions", []))
+        char.resources = data.get("resources", {})
+        char.reach = data.get("reach", 1)
+        char.class_levels = data.get("class_levels", {})
+        char.fortitude_save = data.get("fortitude_save", 0)
+        char.reflex_save = data.get("reflex_save", 0)
+        char.will_save = data.get("will_save", 0)
+        char.hit_points = data.get("hit_points", 0)
+        char.experience = data.get("experience", 0)
+        char.race = data.get("race", "Unknown")
+        char.alignment = data.get("alignment", "Neutral")
+        char.deity = data.get("deity", "None")
+        char.feats = data.get("feats", [])
+        char.inventory = data.get("inventory", [])
+        char.background = data.get("background", "")
+        char.goals = data.get("goals", "")
+        char.relationships = data.get("relationships", [])
+        return char
 
     def __str__(self) -> str:
         class_info = ", ".join([f"{name.title()} (lvl {lvl})" for name, lvl in self.class_levels.items()])

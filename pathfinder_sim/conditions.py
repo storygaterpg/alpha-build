@@ -101,6 +101,49 @@ def create_condition(name: str, duration: int = None) -> DataCondition:
     dc.affected_skills = affected_skills
     return dc
 
+def condition_from_status(status: dict) -> Condition:
+    """
+    Reconstruct a Condition object from a status dictionary.
+    The status dictionary should have at least "name" and "duration" keys.
+    """
+    name = status.get("name", "").lower()
+    duration = status.get("duration", 1)
+    mapping = {
+        "blinded": BlindedCondition,
+        "charmed": CharmedCondition,
+        "confused": ConfusedCondition,
+        "dazed": DazedCondition,
+        "deafened": DeafenedCondition,
+        "dying": DyingCondition,
+        "fatigued": FatiguedCondition,
+        "flatfooted": FlatfootedCondition,
+        "frightened": FrightenedCondition,
+        "grappled": GrappledCondition,
+        "immobilized": ImmobilizedCondition,
+        "paralyzed": ParalyzedCondition,
+        "petrified": PetrifiedCondition,
+        "sickened": SickenedCondition,
+        "staggered": StaggeredCondition,
+        "stunned": StunnedCondition,
+        "unconscious": UnconsciousCondition,
+        "enfeebled": EnfeebledCondition,
+        "dazzled": DazzledCondition,
+        "entangled": EntangledCondition,
+        "prone": ProneCondition,
+        "shaken": ShakenCondition
+    }
+    cond_class = mapping.get(name)
+    if cond_class is None:
+        raise ValueError(f"Unknown condition '{name}' in save data.")
+    return cond_class(duration=duration)
+
+def condition_from_status_list(status_list: list) -> list:
+    """
+    Reconstruct a list of Condition objects from a list of status dictionaries.
+    """
+    return [condition_from_status(status) for status in status_list]
+
+
 # Specific condition subclasses using create_condition from config.
 
 class BlindedCondition(DataCondition):

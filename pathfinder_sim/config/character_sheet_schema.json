@@ -1,0 +1,133 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Pathfinder 1e Character Sheet",
+    "type": "object",
+    "properties": {
+      "version": {
+        "type": "string"
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time"
+      },
+      "character": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "race": { "type": "string" },
+          "alignment": { "type": "string" },
+          "deity": { "type": "string" },
+          "position": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "minItems": 2,
+            "maxItems": 2
+          },
+          "level": { "type": "integer", "minimum": 0 },
+          "experience": { "type": "integer", "minimum": 0 },
+          "abilities": {
+            "type": "object",
+            "properties": {
+              "STR": { "type": "number" },
+              "DEX": { "type": "number" },
+              "CON": { "type": "number" },
+              "INT": { "type": "number" },
+              "WIS": { "type": "number" },
+              "CHA": { "type": "number" }
+            },
+            "required": ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
+          },
+          "ability_modifiers": {
+            "type": "object",
+            "properties": {
+              "STR": { "type": "number" },
+              "DEX": { "type": "number" },
+              "CON": { "type": "number" },
+              "INT": { "type": "number" },
+              "WIS": { "type": "number" },
+              "CHA": { "type": "number" }
+            },
+            "required": ["STR", "DEX", "CON", "INT", "WIS", "CHA"]
+          },
+          "hit_points": { "type": "number" },
+          "saves": {
+            "type": "object",
+            "properties": {
+              "Fortitude": { "type": "number" },
+              "Reflex": { "type": "number" },
+              "Will": { "type": "number" }
+            },
+            "required": ["Fortitude", "Reflex", "Will"]
+          },
+          "combat_stats": {
+            "type": "object",
+            "properties": {
+              "BAB": { "type": "number" },
+              "CMB": { "type": "number" },
+              "CMD": { "type": "number" }
+            },
+            "required": ["BAB", "CMB", "CMD"]
+          },
+          "ac": { "type": "number" },
+          "flatfooted_ac": { "type": "number" },
+          "touch_ac": { "type": "number" },
+          "class_levels": {
+            "type": "object",
+            "additionalProperties": { "type": "number" }
+          },
+          "feats": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "spells": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "resources": {
+            "type": "object",
+            "additionalProperties": { "type": "number" }
+          },
+          "conditions": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "duration": { "type": "number" },
+                "description": { "type": "string" }
+              },
+              "required": ["name", "duration", "description"]
+            }
+          },
+          "inventory": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "quantity": { "type": "number" }
+              },
+              "required": ["name", "quantity"]
+            }
+          },
+          "background": { "type": "string" },
+          "goals": { "type": "string" },
+          "relationships": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "relation": { "type": "string" }
+              },
+              "required": ["name", "relation"]
+            }
+          }
+        },
+        "required": ["name", "position", "level", "experience", "abilities", "ability_modifiers", "hit_points", "saves", "combat_stats", "ac", "flatfooted_ac", "touch_ac", "class_levels", "feats", "spells", "resources", "conditions", "inventory", "background", "goals", "relationships"]
+      },
+      "narrative": { "type": "string" }
+    },
+    "required": ["version", "timestamp", "character", "narrative"]
+  }
+  
