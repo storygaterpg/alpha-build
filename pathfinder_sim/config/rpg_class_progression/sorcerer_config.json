@@ -1,310 +1,305 @@
 {
-    "sorcerer": {
-      "levels": {
-        "1": {
-          "BAB": [0],
-          "Fort": 0,
-          "Ref": 0,
-          "Will": 2,
-          "special_abilities": [
-            "Bloodline power, cantrips, eschew materials"
-          ],
-          "spell_slots": {
-            "0th": 3
-          }
-        },
-        "2": {
-          "BAB": [1],
-          "Fort": 0,
-          "Ref": 0,
-          "Will": 3,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 4
-          }
-        },
-        "3": {
-          "BAB": [1],
-          "Fort": 1,
-          "Ref": 1,
-          "Will": 3,
-          "special_abilities": [
-            "Bloodline power, bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 5
-          }
-        },
-        "4": {
-          "BAB": [2],
-          "Fort": 1,
-          "Ref": 1,
-          "Will": 4,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 3
-          }
-        },
-        "5": {
-          "BAB": [2],
-          "Fort": 1,
-          "Ref": 1,
-          "Will": 4,
-          "special_abilities": [
-            "Bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 4
-          }
-        },
-        "6": {
-          "BAB": [3],
-          "Fort": 2,
-          "Ref": 2,
-          "Will": 5,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 5,
-            "2nd": 3
-          }
-        },
-        "7": {
-          "BAB": [3],
-          "Fort": 2,
-          "Ref": 2,
-          "Will": 5,
-          "special_abilities": [
-            "Bloodline feat, bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 4
-          }
-        },
-        "8": {
-          "BAB": [4],
-          "Fort": 2,
-          "Ref": 2,
-          "Will": 6,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 5,
-            "3rd": 3
-          }
-        },
-        "9": {
-          "BAB": [4],
-          "Fort": 3,
-          "Ref": 3,
-          "Will": 6,
-          "special_abilities": [
-            "Bloodline power, bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 4
-          }
-        },
-        "10": {
-          "BAB": [5],
-          "Fort": 3,
-          "Ref": 3,
-          "Will": 7,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 5,
-            "4th": 3
-          }
-        },
-        "11": {
-          "BAB": [5],
-          "Fort": 3,
-          "Ref": 3,
-          "Will": 7,
-          "special_abilities": [
-            "Bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 4
-          }
-        },
-        "12": {
-          "BAB": [6, 1],
-          "Fort": 4,
-          "Ref": 4,
-          "Will": 8,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 5,
-            "5th": 3
-          }
-        },
-        "13": {
-          "BAB": [6, 1],
-          "Fort": 4,
-          "Ref": 4,
-          "Will": 8,
-          "special_abilities": [
-            "Bloodline feat, bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 4
-          }
-        },
-        "14": {
-          "BAB": [7, 2],
-          "Fort": 4,
-          "Ref": 4,
-          "Will": 9,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 5,
-            "6th": 3
-          }
-        },
-        "15": {
-          "BAB": [7, 2],
-          "Fort": 5,
-          "Ref": 5,
-          "Will": 9,
-          "special_abilities": [
-            "Bloodline power, bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 6,
-            "6th": 4
-          }
-        },
-        "16": {
-          "BAB": [8, 3],
-          "Fort": 5,
-          "Ref": 5,
-          "Will": 10,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 6,
-            "6th": 5,
-            "7th": 3
-          }
-        },
-        "17": {
-          "BAB": [8, 3],
-          "Fort": 5,
-          "Ref": 5,
-          "Will": 10,
-          "special_abilities": [
-            "Bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 6,
-            "6th": 6,
-            "7th": 4
-          }
-        },
-        "18": {
-          "BAB": [9, 4],
-          "Fort": 6,
-          "Ref": 6,
-          "Will": 11,
-          "special_abilities": [],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 6,
-            "6th": 6,
-            "7th": 5,
-            "8th": 3
-          }
-        },
-        "19": {
-          "BAB": [9, 4],
-          "Fort": 6,
-          "Ref": 6,
-          "Will": 11,
-          "special_abilities": [
-            "Bloodline feat, bloodline spell"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 6,
-            "6th": 6,
-            "7th": 6,
-            "8th": 4
-          }
-        },
-        "20": {
-          "BAB": [10, 5],
-          "Fort": 6,
-          "Ref": 6,
-          "Will": 12,
-          "special_abilities": [
-            "Bloodline power"
-          ],
-          "spell_slots": {
-            "0th": 6,
-            "1st": 6,
-            "2nd": 6,
-            "3rd": 6,
-            "4th": 6,
-            "5th": 6,
-            "6th": 6,
-            "7th": 6,
-            "8th": 6,
-            "9th": 6
-          }
-        }
-      }
+  "1": {
+    "BAB": [0],
+    "Fort": 0,
+    "Ref": 0,
+    "Will": 2,
+    "special_abilities": [
+      "Bloodline power, cantrips, eschew materials"
+    ],
+    "spell_slots": {
+      "0th": 3
+    }
+  },
+  "2": {
+    "BAB": [1],
+    "Fort": 0,
+    "Ref": 0,
+    "Will": 3,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 4
+    }
+  },
+  "3": {
+    "BAB": [1],
+    "Fort": 1,
+    "Ref": 1,
+    "Will": 3,
+    "special_abilities": [
+      "Bloodline power, bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 5
+    }
+  },
+  "4": {
+    "BAB": [2],
+    "Fort": 1,
+    "Ref": 1,
+    "Will": 4,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 3
+    }
+  },
+  "5": {
+    "BAB": [2],
+    "Fort": 1,
+    "Ref": 1,
+    "Will": 4,
+    "special_abilities": [
+      "Bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 4
+    }
+  },
+  "6": {
+    "BAB": [3],
+    "Fort": 2,
+    "Ref": 2,
+    "Will": 5,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 5,
+      "2nd": 3
+    }
+  },
+  "7": {
+    "BAB": [3],
+    "Fort": 2,
+    "Ref": 2,
+    "Will": 5,
+    "special_abilities": [
+      "Bloodline feat, bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 4
+    }
+  },
+  "8": {
+    "BAB": [4],
+    "Fort": 2,
+    "Ref": 2,
+    "Will": 6,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 5,
+      "3rd": 3
+    }
+  },
+  "9": {
+    "BAB": [4],
+    "Fort": 3,
+    "Ref": 3,
+    "Will": 6,
+    "special_abilities": [
+      "Bloodline power, bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 4
+    }
+  },
+  "10": {
+    "BAB": [5],
+    "Fort": 3,
+    "Ref": 3,
+    "Will": 7,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 5,
+      "4th": 3
+    }
+  },
+  "11": {
+    "BAB": [5],
+    "Fort": 3,
+    "Ref": 3,
+    "Will": 7,
+    "special_abilities": [
+      "Bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 4
+    }
+  },
+  "12": {
+    "BAB": [6, 1],
+    "Fort": 4,
+    "Ref": 4,
+    "Will": 8,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 5,
+      "5th": 3
+    }
+  },
+  "13": {
+    "BAB": [6, 1],
+    "Fort": 4,
+    "Ref": 4,
+    "Will": 8,
+    "special_abilities": [
+      "Bloodline feat, bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 4
+    }
+  },
+  "14": {
+    "BAB": [7, 2],
+    "Fort": 4,
+    "Ref": 4,
+    "Will": 9,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 5,
+      "6th": 3
+    }
+  },
+  "15": {
+    "BAB": [7, 2],
+    "Fort": 5,
+    "Ref": 5,
+    "Will": 9,
+    "special_abilities": [
+      "Bloodline power, bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 6,
+      "6th": 4
+    }
+  },
+  "16": {
+    "BAB": [8, 3],
+    "Fort": 5,
+    "Ref": 5,
+    "Will": 10,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 6,
+      "6th": 5,
+      "7th": 3
+    }
+  },
+  "17": {
+    "BAB": [8, 3],
+    "Fort": 5,
+    "Ref": 5,
+    "Will": 10,
+    "special_abilities": [
+      "Bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 6,
+      "6th": 6,
+      "7th": 4
+    }
+  },
+  "18": {
+    "BAB": [9, 4],
+    "Fort": 6,
+    "Ref": 6,
+    "Will": 11,
+    "special_abilities": [],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 6,
+      "6th": 6,
+      "7th": 5,
+      "8th": 3
+    }
+  },
+  "19": {
+    "BAB": [9, 4],
+    "Fort": 6,
+    "Ref": 6,
+    "Will": 11,
+    "special_abilities": [
+      "Bloodline feat, bloodline spell"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 6,
+      "6th": 6,
+      "7th": 6,
+      "8th": 4
+    }
+  },
+  "20": {
+    "BAB": [10, 5],
+    "Fort": 6,
+    "Ref": 6,
+    "Will": 12,
+    "special_abilities": [
+      "Bloodline power"
+    ],
+    "spell_slots": {
+      "0th": 6,
+      "1st": 6,
+      "2nd": 6,
+      "3rd": 6,
+      "4th": 6,
+      "5th": 6,
+      "6th": 6,
+      "7th": 6,
+      "8th": 6,
+      "9th": 6
     }
   }
-  
+}

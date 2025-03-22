@@ -132,38 +132,12 @@ class Character:
 
     def get_condition_status(self) -> List[Dict[str, Any]]:
         return [cond.get_status() for cond in self.conditions]
-
-    def recalc_stats(self) -> None:
-        """
-        Recalculate derived attributes based on multiclass levels.
-        Currently, we update the Base Attack Bonus (BAB) based on the sum of contributions
-        from each class. Using the following simplified progression:
-          - Full: +1 per level.
-          - Average: floor(0.75 * level).
-          - Poor: floor(0.5 * level).
-        The RPGClass data is assumed to be provided by our rpg_class.py configuration.
-        """
-        total_bab = 0
-        # For each class, determine the contribution.
-        for class_name, level in self.class_levels.items():
-            from rpg_class import create_rpg_class
-            rpg_class = create_rpg_class(class_name)
-            progression = rpg_class.base_attack_bonus_progression.lower()
-            if progression == "full":
-                total_bab += level
-            elif progression == "average":
-                total_bab += int(0.75 * level)
-            elif progression == "poor":
-                total_bab += int(0.5 * level)
-            else:
-                total_bab += level
-        self.BAB = total_bab
-
+    
     def level_up(self, rpg_class: RPGClass) -> None:
         """
-        Increases the character's level in the given RPG class.
+        Increase the character's level in the given RPG class.
         Supports multiclassing: if the character already has levels in that class,
-        increment the level; otherwise, set it to 1.
+        increment the level; otherwise, initialize it to 1.
         After leveling up, recalculate derived statistics.
         """
         class_name = rpg_class.name.lower()
@@ -171,6 +145,58 @@ class Character:
             self.class_levels[class_name] += 1
         else:
             self.class_levels[class_name] = 1
+        self.recalc_stats()
+        print(f"{self.name} levels up as {rpg_class.name} to level {self.class_levels[class_name]}.")
+
+
+    def recalc_stats(self) -> None:
+        """
+        Recalculate derived attributes based on multiclass levels using the new progression data.
+        For each class in self.class_levels, load the corresponding level data from the progression JSONs
+        and sum the BAB (Base Attack Bonus) from the first value in the "BAB" list.
+        
+        Raises:
+            ValueError: If progression data for a class or a specific level is not found.
+        """
+        total_bab = 0
+        from rpg_class import load_rpg_class_progression
+        all_progressions = load_rpg_class_progression()
+        # Iterate over each class that the character has levels in.
+        for class_name, level in self.class_levels.items():
+            # Normalize the class name: strip any whitespace and convert to lowercase.
+            key = class_name.strip().lower()
+            class_progression = all_progressions.get(key)
+            if not class_progression:
+                raise ValueError(f"No progression data found for class '{class_name}'.")
+            # Levels in the progression data are stored as string keys.
+            level_data = class_progression.get(str(level))
+            if not level_data:
+                raise ValueError(f"No progression data for {class_name} at level {level}.")
+            bab_list = level_data.get("BAB")
+            if bab_list and isinstance(bab_list, list) and len(bab_list) > 0:
+                # Use the first element as the BAB contribution for this level.
+                total_bab += bab_list[0]
+            else:
+                # Fallback: simply add the level if BAB data is missing.
+                total_bab += level
+        self.BAB = total_bab
+
+    def level_up(self, rpg_class: RPGClass) -> None:
+        """
+        Increase the character's level in the given RPG class.
+        Supports multiclassing: if the character already has levels in that class, increment the level;
+        otherwise, initialize it to 1. After leveling up, recalculate derived statistics.
+        
+        Args:
+            rpg_class (RPGClass): The RPG class instance representing the class the character is leveling up in.
+        """
+        # Normalize the class name from the RPGClass instance.
+        class_name = rpg_class.name.strip().lower()
+        if class_name in self.class_levels:
+            self.class_levels[class_name] += 1
+        else:
+            self.class_levels[class_name] = 1
+        # Recalculate derived stats using the new progression data.
         self.recalc_stats()
         print(f"{self.name} levels up as {rpg_class.name} to level {self.class_levels[class_name]}.")
 
