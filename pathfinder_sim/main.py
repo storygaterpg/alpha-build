@@ -20,6 +20,10 @@ import conditions
 from action_types import ActionType
 import spell_utils
 import json
+from movement import Map
+from vertical_movement import determine_edge_options
+from turn_manager import TurnManager, MoveAction  # existing actions for horizontal movement
+
 
 def setup_game_environment():
     # Create a larger map (15x15) with varied terrain.
