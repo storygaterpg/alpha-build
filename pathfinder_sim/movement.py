@@ -20,7 +20,7 @@ Additional types can be added as needed.
 """
 
 import numpy as np
-from typing import List, Tuple
+from typing import Dict, List, Tuple, Any, Optional
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
 
@@ -44,12 +44,20 @@ class Map:
         self.height = height
         # Initialize grid_data with default terrain type "normal"
         self.grid_data = np.full((height, width), "normal", dtype=object)
+        # Create a height map: a 2D array (height x width) of floats representing elevation.
+        self.height_map = np.zeros((height, width), dtype=float)
     
     def set_terrain(self, x: int, y: int, terrain_type: str) -> None:
         terrain_type = terrain_type.lower()
         if terrain_type not in TERRAIN_INFO:
             raise ValueError(f"Unknown terrain type: {terrain_type}")
         self.grid_data[y][x] = terrain_type
+
+    def set_height(self, x: int, y: int, height: float) -> None:
+        self.height_map[y][x] = height
+    
+    def get_height(self, x: int, y: int) -> float:
+        return self.height_map[y][x]
     
     def get_numeric_grid(self) -> List[List[int]]:
         """
@@ -62,7 +70,6 @@ class Map:
             for cell in row:
                 info = TERRAIN_INFO.get(cell)
                 if info is None or info["cost"] is None:
-                    # Use a very high cost to represent impassability.
                     matrix_row.append(9999)
                 else:
                     matrix_row.append(info["cost"])
@@ -82,46 +89,25 @@ class Map:
         end_node = grid.node(end[0], end[1])
         finder = AStarFinder(diagonal_movement=False)
         path, runs = finder.find_path(start_node, end_node, grid)
-        # Convert each GridNode in the path to a tuple (x, y)
         tuple_path = [(node.x, node.y) for node in path] if path else []
         return tuple_path
 
 class MovementAction:
     """
-    Represents a movement action for a character.
+    Represents a standard movement action for a character.
     Uses the Map's terrain data to calculate an optimal path.
-    If a terrain cell requires a skill check (e.g., jumpable), then additional logic (outside this module)
-    must handle the check before or after pathfinding.
+    If a terrain cell requires a skill check (e.g., jumpable), additional logic (in vertical_movement.py)
+    must be applied.
     """
-    def __init__(self, game_map: Map, start: Tuple[int, int], end: Tuple[int, int]):
+    def __init__(self, game_map: Map, actor: Any, start: Tuple[int, int], end: Tuple[int, int]):
         self.game_map = game_map
+        self.actor = actor
         self.start = start
         self.end = end
 
     def execute(self) -> Dict[str, Any]:
-        # Determine if movement crosses an edge with vertical difference.
-        # For simplicity, assume we have edge detection logic that computes vertical_diff and edge_features.
-        vertical_diff, edge_features = self.detect_edge(self.actor.position, self.target)
-        if vertical_diff is not None and abs(vertical_diff) > 0:
-            from vertical_movement import determine_edge_options
-            options = determine_edge_options(self.actor.position, self.target, vertical_diff, edge_features, character=self.actor)
-            # For this example, we choose the first available option.
-            chosen_option = options[0] if options else None
-            if chosen_option:
-                # Log the chosen option; further logic to perform the check would be added here.
-                result = {
-                    "action": chosen_option["action_type"],
-                    "description": chosen_option["description"],
-                    "dc": chosen_option["dc"],
-                    "move_cost": chosen_option["move_cost"]
-                }
-                # In a full system, here we would integrate with the rules engine to perform the skill check.
-                return result
-        # If no edge, or if edge not applicable, fall back to standard pathfinding.
-        from movement import MovementAction
-        movement_action = MovementAction(self.game_map, self.actor.position, self.target)
-        start_pos = self.actor.position
-        path = movement_action.execute()
+        # For standard movement, simply calculate the path.
+        path = self.game_map.calculate_path(self.start, self.end)
         if path:
             self.actor.position = path[-1]
         result = {
@@ -135,12 +121,9 @@ class MovementAction:
 
     def detect_edge(self, start: Tuple[int, int], end: Tuple[int, int]) -> Tuple[Optional[float], Dict[str, Any]]:
         """
-        Dummy edge detection function. In a real implementation, this would use map data to
-        determine if there is a vertical difference between start and end.
-        Returns a tuple: (vertical_diff in feet, edge_features dictionary)
+        A dummy edge detection function. In a mature implementation, this would use map height data.
+        For demonstration, we assume that if moving horizontally, the target is 15 ft lower.
         """
-        # For demonstration, if moving horizontally, assume a vertical drop of 15 ft.
-        # In practice, this function would be much more sophisticated.
         vertical_diff = 15  # Example: target is 15 ft lower.
         edge_features = {
             "ladder": {"height": 15, "climb_rate": 10},
@@ -149,9 +132,11 @@ class MovementAction:
         }
         return vertical_diff, edge_features
 
+# The vertical movement logic is now encapsulated in vertical_movement.py.
+# For vertical movement, we use the CustomMoveAction defined there.
 
-# Example usage for testing:
 if __name__ == "__main__":
+    # Example usage for testing.
     # Create a 10x10 map.
     game_map = Map(10, 10)
     # Set some terrain:
@@ -169,6 +154,29 @@ if __name__ == "__main__":
     # Set cell (8,8) as flyable.
     game_map.set_terrain(8, 8, "flyable")
     
-    movement_action = MovementAction(game_map, (0, 0), (9, 9))
-    path = movement_action.execute()
-    print("Calculated Path:", path)
+    # Create a dummy actor with basic attributes.
+    class DummyActor:
+        def __init__(self):
+            self.name = "TestActor"
+            self.position = (0, 0)
+            self.dexterity = 14
+        def get_effective_skill_modifier(self, skill: str) -> int:
+            # For testing, return a fixed modifier for Acrobatics/Jump.
+            return 2 if skill.lower() in ["acrobatics", "jump"] else 0
+    actor = DummyActor()
+    
+    # Test standard movement.
+    standard_action = MovementAction(game_map, actor, (0, 0), (9, 9))
+    result_standard = standard_action.execute()
+    print("Standard Movement Result:")
+    print(result_standard)
+    
+    # Test edge detection via a dummy vertical movement.
+    # For demonstration, override actor.position to a known value.
+    actor.position = (0, 0)
+    # Create a CustomMoveAction (from vertical_movement.py) to test edge options.
+    from vertical_movement import CustomMoveAction
+    vertical_action = CustomMoveAction(actor, (7, 0), game_map)
+    result_vertical = vertical_action.execute()
+    print("Vertical Movement Option Result:")
+    print(result_vertical)
