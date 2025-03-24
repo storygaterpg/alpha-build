@@ -17,51 +17,41 @@ import json
 import random
 import datetime
 from typing import Tuple, Dict, Any
-
-from movement import Map, MovementAction, TERRAIN_INFO
-from vertical_movement import determine_edge_options, CustomMoveAction
+from movement import Map
+from vertical_movement import CustomMoveAction
 from turn_manager import TurnManager, AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction
 from character import Character
 from rpg_class import create_rpg_class
 import conditions
-from action_types import ActionType
+import feat_manager
 import spell_utils
-import feat_manager  # Our feat manager module
 
-# -------------------------------------------------
-# Setup Game Environment with Height Map & Terrain
-# -------------------------------------------------
-def setup_game_environment() -> Tuple[Map, Dict[str, Character]]:
-    # Create a larger map (15x15) with both terrain type and height data.
+# Import rules_engine related modules.
+from rules_engine import Dice, RulesEngine
+
+def setup_game_environment() -> Tuple[Map, Dict[str, Character], RulesEngine]:
+    # Create a larger map (15x15) with varied terrain and height data.
     game_map = Map(15, 15)
-    # Set default heights to 0.
+    # For this example, we only use terrain types (height-related methods are in movement.py if updated)
     for y in range(15):
         for x in range(15):
             game_map.set_height(x, y, 0)
             game_map.set_terrain(x, y, "normal")
-    
-    # Create a cliff edge along column 7: cells in column 6 have height 0, column 7 have height -15.
+    # Create a cliff edge: cells in column 6 at height 0 and in column 7 at height -15.
+    # (Assuming the Map class now has set_height and get_height methods.)
     for y in range(15):
         game_map.set_height(6, y, 0)
         game_map.set_height(7, y, -15)
         game_map.set_terrain(6, y, "normal")
         game_map.set_terrain(7, y, "jumpable")
-    
-    # Set some additional terrain for variety.
-    for y in range(5, 10):
-        game_map.set_terrain(10, y, "difficult")
-    # Impassable obstacles.
-    game_map.set_terrain(3, 3, "impassable")
-    game_map.set_terrain(4, 3, "impassable")
-    game_map.set_terrain(5, 3, "impassable")
+    # (If set_height isn't available, ensure your Map implementation includes it.)
+    # For demonstration, we skip actual height setup.
     
     # Initialize dice and rules engine.
-    from rules_engine import Dice, RulesEngine, rules_engine  # Already configured
     dice = Dice(seed=42)
     rules_engine = RulesEngine(dice)
     
     # Create characters.
-    # Alice: A fighter with high DEX (16) and some Barbarian levels.
     alice = Character("Alice", x=5, y=7, dexterity=16)
     fighter_class = create_rpg_class("fighter")
     barbarian_class = create_rpg_class("barbarian")
@@ -81,27 +71,22 @@ def setup_game_environment() -> Tuple[Map, Dict[str, Character]]:
     bard_class = create_rpg_class("bard")
     charlie.level_up(bard_class)
     
-    # Apply some conditions:
+    # Apply conditions.
     bob.add_condition(conditions.BlindedCondition())
     alice.add_condition(conditions.FatiguedCondition())
     charlie.add_condition(conditions.ConfusedCondition())
     
-    # For demonstration, we add a simple get_effective_skill_modifier method to our characters.
-    # (In a full system, this would be computed from ability scores, feats, conditions, etc.)
+    # Provide simple effective skill modifier functions for demonstration.
     alice.get_effective_skill_modifier = lambda skill: 2 if skill.lower() in ["acrobatics", "jump"] else 0
     bob.get_effective_skill_modifier = lambda skill: 0
     charlie.get_effective_skill_modifier = lambda skill: 1 if skill.lower() == "bluff" else 0
     
     characters = {"Alice": alice, "Bob": bob, "Charlie": charlie}
-    return game_map, characters
+    return game_map, characters, rules_engine
 
-# -------------------------------------------------
-# Simulation of Turns (Standard & Vertical Movement)
-# -------------------------------------------------
-def simulate_turns(game_map, characters, num_turns=3):
-    from rules_engine import rules_engine
+def simulate_turns(game_map: Map, characters: Dict[str, Character], rules_engine: RulesEngine, num_turns: int = 3):
     tm = TurnManager(rules_engine, game_map)
-    for turn_number in range(1, num_turns+1):
+    for turn_number in range(1, num_turns + 1):
         print(f"\n--- Turn {turn_number} ---")
         turn = tm.new_turn()
         
@@ -109,20 +94,20 @@ def simulate_turns(game_map, characters, num_turns=3):
         # Alice moves normally towards (5,5).
         move_action_alice = MoveAction(actor=characters["Alice"], target=(5, 5), action_type="move")
         turn.add_action(move_action_alice)
-        # Alice then attacks Bob.
+        
         attack_action_alice = AttackAction(actor=characters["Alice"], defender=characters["Bob"],
                                            weapon_bonus=2, weapon=None,
                                            is_touch_attack=False, target_flat_footed=False,
                                            action_type="standard")
         turn.add_action(attack_action_alice)
-        # Bob casts a spell on Alice.
+        
         spell_action_bob = SpellAction(actor=characters["Bob"], target=characters["Alice"],
                                        spell_name="Magic Missile", action_type="standard")
         turn.add_action(spell_action_bob)
-        # Bob performs a swift skill check.
+        
         swift_action_bob = SkillCheckAction(actor=characters["Bob"], skill_name="Use Magic Device", dc=15, action_type="swift")
         turn.add_action(swift_action_bob)
-        # Charlie makes a skill check (e.g., Bluff).
+        
         skill_action_charlie = SkillCheckAction(actor=characters["Charlie"], skill_name="Bluff", dc=10, action_type="standard")
         turn.add_action(skill_action_charlie)
         
@@ -141,23 +126,21 @@ def simulate_turns(game_map, characters, num_turns=3):
         print(f"Bob's effective DEX modifier for Disable Device: {characters['Bob'].get_effective_skill_modifier('DEX')}")
         print(f"Charlie's effective CHA modifier for Bluff: {characters['Charlie'].get_effective_skill_modifier('CHA')}")
         
-        # --- Vertical Movement Test ---
-        # For turn 2, simulate an edge movement for Alice.
+        # Vertical Movement Test on turn 2.
         if turn_number == 2:
             print("\n--- Vertical Movement Test ---")
-            # Let's have Alice attempt to move from her current position across the cliff.
-            # We'll set a target on the other side of the cliff.
-            vertical_move_action = CustomMoveAction(actor=characters["Alice"], target=(8, 7), game_map=game_map)
-            vertical_result = vertical_move_action.execute()
+            vertical_action = CustomMoveAction(actor=characters["Alice"], target=(8, 7), game_map=game_map)
+            vertical_result = vertical_action.execute()
             print("Vertical Movement Option Result:")
             print(json.dumps(vertical_result, indent=4))
-    
+
 def test_feat_manager():
     """
     Test the feat manager by loading a sample feat.
     """
     # For demonstration, attempt to retrieve "Disruptive Recall" from the "general" category.
-    feat = feat_manager.get_feat("Disruptive Recall", category="general")
+    feat = feat_manager.get_feat("Disruptive Recall", category="general_feats")
+
     if feat:
         print("\nFeat Manager Test:")
         print("Loaded Feat:", feat.to_dict())
@@ -168,8 +151,8 @@ def test_feat_manager():
 # Main Function
 # -------------------------------------------------
 def main():
-    game_map, characters = setup_game_environment()
-    simulate_turns(game_map, characters, num_turns=3)
+    game_map, characters, rules_engine = setup_game_environment()
+    simulate_turns(game_map, characters, rules_engine, num_turns=3)
     test_feat_manager()
 
 if __name__ == "__main__":

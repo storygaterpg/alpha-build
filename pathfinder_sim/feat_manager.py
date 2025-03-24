@@ -1,8 +1,15 @@
-# feat_manager.py
+"""
+feat_manager.py
+
+This module manages feats for our Pathfinder simulation.
+Feats are stored as JSON files (one per category) in the config/feat_config/ directory.
+The module builds an index of available categories and supports lazy loading of feat definitions.
+It also provides helper functions to retrieve feats and check prerequisites.
+"""
 
 import os
 import json
-from typing import Dict, Any, Optional, List, Tuple
+from typing import Dict, Any, Optional, List
 import glob
 
 # Global cache for feats: maps category (lowercase) to a dictionary mapping feat names to Feat objects.
@@ -13,15 +20,17 @@ _CATEGORY_INDEX: Dict[str, str] = {}
 
 def build_category_index(feats_folder: str = "config/feat_config") -> None:
     """
-    Build an index mapping each feat category (derived from file name) to its file path.
-    This does not load the entire file—only records the file paths.
+    Build an index mapping each feat category (derived from the JSON file names)
+    to its file path. This does not load the entire file—only records the file paths.
     """
     global _CATEGORY_INDEX
     _CATEGORY_INDEX = {}
-    pattern = os.path.join(feats_folder, "*.json")
+    folder_path = os.path.join(os.path.dirname(__file__), "..", feats_folder)
+    pattern = os.path.join(folder_path, "*.json")
     for filepath in glob.glob(pattern):
         category = os.path.splitext(os.path.basename(filepath))[0].lower()
         _CATEGORY_INDEX[category] = filepath
+
 
 # Build the category index on module import.
 build_category_index()
@@ -55,6 +64,7 @@ class Feat:
 def load_feats_for_category(category: str) -> Dict[str, Feat]:
     """
     Load all feats for a given category from its JSON file and cache them.
+    If the category is not found, log a warning and return an empty dictionary.
     """
     global _FEATS_CACHE
     category = category.lower()
@@ -63,7 +73,9 @@ def load_feats_for_category(category: str) -> Dict[str, Feat]:
     
     # Check if we have the file in our index.
     if category not in _CATEGORY_INDEX:
-        raise ValueError(f"Category '{category}' not found in feat configuration.")
+        print(f"Warning: Category '{category}' not found in feat configuration.")
+        _FEATS_CACHE[category] = {}
+        return _FEATS_CACHE[category]
     
     filepath = _CATEGORY_INDEX[category]
     with open(filepath, "r") as f:
@@ -88,7 +100,7 @@ def get_feat(feat_name: str, category: Optional[str] = None) -> Optional[Feat]:
     """
     Retrieve a Feat object by name.
     If category is specified, only search within that category.
-    Otherwise, search through all categories (loading them as needed).
+    Otherwise, search through all categories.
     Feat names are matched case-insensitively.
     """
     feat_name = feat_name.lower()
@@ -108,7 +120,7 @@ def get_all_feats(category: Optional[str] = None) -> List[Feat]:
     Return a list of all Feat objects.
     If a category is specified, return feats only in that category.
     """
-    feats_list = []
+    feats_list: List[Feat] = []
     if category:
         feats = load_feats_for_category(category)
         feats_list = list(feats.values())
@@ -148,10 +160,9 @@ def check_prerequisites(character, feat: Feat) -> bool:
     return True
 
 if __name__ == "__main__":
-    # Example usage:
-    # Load the "Disruptive Recall" feat from the "general" category.
-    feat = get_feat("Disruptive Recall", category="general")
+    # Example usage: Retrieve the feat "Disruptive Recall" from the "general" category.
+    feat = get_feat("Disruptive Recall", category="general_feats")
     if feat:
         print("Feat found:", feat.to_dict())
     else:
-        print("Feat not found.")
+        print("Feat 'Disruptive Recall' not found in category 'general'.")

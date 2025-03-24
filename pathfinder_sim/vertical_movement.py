@@ -125,13 +125,12 @@ class CustomMoveAction:
         vertical_diff = current_height - target_height
         if vertical_diff == 0:
             return None, {}
-        terrain = self.game_map.grid_data[end[1]][end[0]]
+        terrain = self.game_map.terrain_map[end[1]][end[0]]
         edge_features = {"vertical_diff": vertical_diff, "terrain": terrain}
         if terrain in TERRAIN_INFO and TERRAIN_INFO[terrain].get("check"):
             edge_features["check"] = TERRAIN_INFO[terrain]["check"]
-            # Also include ladder/stairwell info if present in the map or passed separately.
+            # For simplicity, if terrain is "jumpable" or "climbable", assume ladder info.
             if terrain in ["jumpable", "climbable"]:
-                # For simplicity, assume a ladder exists for climbable.
                 edge_features["ladder"] = {"height": abs(vertical_diff), "climb_rate": 10}
         return vertical_diff, edge_features
 
@@ -141,7 +140,6 @@ class CustomMoveAction:
             options = determine_edge_options(self.actor.position, self.target, vertical_diff, edge_features, character=self.actor)
             if options:
                 chosen = options[0]  # For demonstration, automatically choose the first option.
-                # For a jump option, simulate a skill check.
                 if chosen["action_type"] == "jump":
                     roll = random.randint(1, 20)
                     modifier = self.actor.get_effective_skill_modifier(chosen["required_skill"]) if chosen["required_skill"] else 0
@@ -164,38 +162,40 @@ class CustomMoveAction:
                     "dc": chosen["dc"],
                     "move_cost": chosen["move_cost"]
                 }
-        # If no edge is detected, perform standard movement.
+        # If no vertical edge is detected, perform standard movement.
         from movement import MovementAction
-        standard_action = MovementAction(self.game_map, self.actor.position, self.target)
-        path = standard_action.execute()
+        # Correct call: pass game_map, actor, start position, and target.
+        standard_action = MovementAction(self.game_map, self.actor, self.actor.position, self.target)
+        movement_result = standard_action.execute()  # movement_result is a dict.
+        # Extract the path from the result, if available.
+        path = movement_result.get("path", [])
         if path:
             self.actor.position = path[-1]
         return {"action": "move", "path": path, "final_position": self.actor.position}
 
-# Example usage for testing vertical movement (can be removed or integrated into main simulation later):
+# For testing purposes.
 if __name__ == "__main__":
-    # For testing, we assume that the Map class has methods set_height and get_height.
-    # Create a dummy map with height data.
     from movement import Map
+    # Create a dummy map with height data.
     game_map = Map(10, 10)
     for y in range(10):
         for x in range(10):
             game_map.set_height(x, y, 0)
             game_map.set_terrain(x, y, "normal")
-    # Create a cliff: column 5 has height 0; column 6 has height -15.
+    # Create a cliff: column 5 remains at height 0; column 6 is set to -15 ft.
     for y in range(10):
         game_map.set_height(5, y, 0)
         game_map.set_height(6, y, -15)
         game_map.set_terrain(5, y, "normal")
         game_map.set_terrain(6, y, "jumpable")
     
-    # Create a dummy character with a simple effective skill method.
+    # Create a dummy character.
     class DummyCharacter:
         def __init__(self):
+            self.name = "Dummy"
             self.position = (4, 5)
             self.dexterity = 14
         def get_effective_skill_modifier(self, skill: str) -> int:
-            # For testing, return a fixed value.
             return 2 if skill.lower() in ["acrobatics", "jump"] else 0
     dummy = DummyCharacter()
     
