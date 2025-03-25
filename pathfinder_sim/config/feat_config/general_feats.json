@@ -5800,9 +5800,697 @@
     "Sycophant": {
         "prerequisites": {},
         "benefit": "Attempt to use Diplomacy to force an enemy to show you mercy."
+    },
+    "Talented Magician": {
+        "prerequisites": {
+        "Special": [
+            "Major magic rogue talent",
+            "minor magic rogue talent"
+        ]
+        },
+        "benefit": "Gain additional uses of spell-like abilities."
+    },
+    "Tempting Bargain": {
+        "prerequisites": {
+        "Special": [
+            "Unchained summoner level 1st",
+            "eidolon"
+        ]
+        },
+        "benefit": "You can select an eidolon of any alignment, but it tempts class feature you to change alignment over time"
+    },
+    "Taunt": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Size": "Small or smaller"
+        },
+        "benefit": "Demoralize opponents with Bluff instead of Intimidate."
+    },
+    "Technologist": {
+        "prerequisites": {},
+        "benefit": "Can use skills with technological subjects."
+    },
+    "Technophobe": {
+        "prerequisites": {
+        "Feat": "Improved Sunder"
+        },
+        "benefit": "Gain a morale bonus when you destroy a robot or technological item."
+    },
+    "Telepathic Link": {
+        "prerequisites": {
+        "Special": "Have a familiar with the speak with master ability"
+        },
+        "benefit": "You and your familiar can communicate with each other telepathically at a range of up to 1 mile."
+    },
+    "Telepathy Tap": {
+        "prerequisites": {
+        "Skill": {
+            "Sense Motive": 10
+        },
+        "Special": "ability to cast detect thoughts or telepathy as a spell, spell-like ability, or telepathy supernatural ability"
+        },
+        "benefit": "Eavesdrop on telepathic communication"
+    },
+    "Tenacious Transmutation": {
+        "prerequisites": {
+        "Feat": "Spell Focus (transmutation)"
+        },
+        "benefit": "+2 to DC to dispel your transmutations."
+    },
+    "Terrifying Mask": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Feat": "Monstrous Mask",
+        "Race": "Tiefling"
+        },
+        "benefit": "Anytime you can make a Sense Motive check to get a hunch or detect whether someone is trustworthy or not, you can choose to instead make an Intimidate check at a –2 penalty. This ability only works on creatures of the humanoid type."
+    },
+    "Terrifying Strike": {
+        "prerequisites": {
+        "Special": [
+            "Despair special ability",
+            "mummy"
+        ]
+        },
+        "benefit": "Any creature struck by your slam attack must succeed at a Will save at the same DC as your despair ability or be shaken for 1d4 rounds. If the creature is already shaken, frightened, or panicked, it is paralyzed for 1 round instead. This is a mind-affecting fear effect."
+    },
+    "Theurgy": {
+        "prerequisites": {
+        "Stat": {
+            "WIS": 13
+        },
+        "Special": [
+            "Int or CHA 13",
+            "ability to cast 1st-level arcane spells",
+            "ability to cast 1st-level divine spells"
+        ]
+        },
+        "benefit": "Augment arcane spells with divine energy and divine spells with arcane energy."
+    },
+    "Third Eye": {
+        "prerequisites": {
+        "Special": "Psychic Sensitivity or ability to cast psychic spells"
+        },
+        "benefit": "Use third eye to read auras and see the truth"
+    },
+    "Thoughtful Discernment": {
+        "prerequisites": {
+        "Special": "Discern lies class feature"
+        },
+        "benefit": "Detect lies in a statement you heard, even hours after it has been uttered."
+    },
+    "Threatening Negotiator": {
+        "prerequisites": {
+        "Feat": [
+            "Nerve-Racking Negotiator",
+            "Persuasive",
+            "Skill Focus (Intimidate)"
+        ]
+        },
+        "benefit": "Increases Intimidate’s duration to 2d6 hours"
+    },
+    "Timely Coordination": {
+        "prerequisites": {},
+        "benefit": "+1 bonus on attack rolls and skill checks for readied actions triggered by allies"
+    },
+    "Torchbearer": {
+        "prerequisites": {
+        "Level": 5
+        },
+        "benefit": "As Leadership, but you can attract only a 1st-level cohort (referred to hereafter as a torchbearer) with this feat, and can’t recruit followers. You determine your Leadership score according to the rules presented in the Leadership feat, but your torchbearer is always at least 3 levels lower than your level."
+    },
+    "Torrid Tolerance": {
+        "prerequisites": {
+        "Special": "Desert Dweller or Jungle Survivalist"
+        },
+        "benefit": "Treat hot environments as though they were one step less severe; take no penalty on Constitution checks for wearing armor in hot climates"
+    },
+    "Totem Spirit": {
+        "prerequisites": {
+        "Special": "Member of a jungle tribe"
+        },
+        "benefit": "Bonuses depend on which tribe you belong to."
+    },
+    "Totemic Initiate": {
+        "prerequisites": {
+        "Stat": {
+            "STR": 13,
+            "DEX": 13
+        },
+        "BAB": 5,
+        "Feat": "Athletic",
+        "Special": "no barbarian totem rage powers except those chosen with this feat; nonlawful alignment"
+        },
+        "benefit": "Gain benefits of a barbarian lesser totem rage power"
+    },
+    "Totemic Disciple": {
+        "prerequisites": {
+        "Stat": {
+            "STR": 15,
+            "DEX": 13
+        },
+        "BAB": 9,
+        "Feat": [
+            "Athletic",
+            "Totemic Initiate"
+        ],
+        "Special": "no barbarian totem rage powers except those chosen with this feat or Totemic Initiate; nonlawful alignment"
+        },
+        "benefit": "Gain benefits of a rage power linked to your chosen totem"
+    },
+    "Totemic Master": {
+        "prerequisites": {
+        "Stat": {
+            "STR": 17,
+            "DEX": 13,
+            "WIS": 13
+        },
+        "BAB": 13,
+        "Feat": [
+            "Athletic",
+            "Totemic Disciple",
+            "Totemic Initiate"
+        ],
+        "Special": "no barbarian totem rage powers except those chosen with this feat, Totemic Disciple, or Totemic Initiate; nonlawful alignment"
+        },
+        "benefit": "Gain benefits of a greater rage power linked to your chosen totem"
+    },
+    "Touch of Evil": {
+        "prerequisites": {
+        "Special": [
+            "Channel negative energy 6d6",
+            "evil alignment"
+        ]
+        },
+        "benefit": "With a touch, compel other toward evil acts"
+    },
+    "Toughness": {
+        "prerequisites": {},
+        "benefit": "+3 hit points, +1 per Hit Die beyond 3."
+    },
+    "Train Plants": {
+        "prerequisites": {
+        "Skill": {
+            "Handle Animal": 5,
+            "Knowledge (nature)": 5
+        }
+        },
+        "benefit": "You treat plant creatures with Int scores of 3 or lower as animals for the purposes of the Handle Animal skill. Plant creatures without an Int score are treated as animals with an Int of 1 for these purposes."
+    },
+    "Trapper’s Setup": {
+        "prerequisites": {
+        "Skill": {
+            "Craft (traps)": 5
+        }
+        },
+        "benefit": "Manually trigger traps to gain +2 on attack rolls and to DC."
+    },
+    "Tree Leaper": {
+        "prerequisites": {},
+        "benefit": "Count as having a running start when you jump while in a tree"
+    },
+    "Trepanation": {
+        "prerequisites": {
+        "Skill": {
+            "Heal": 5,
+            "Knowledge (arcana)": 2
+        }
+        },
+        "benefit": "You can perform the faith healing occult skill unlock even if you can’t use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use faith healing one additional time per day."
+    },
+    "Triangulate": {
+        "prerequisites": {
+        "Feat": [
+            "Blind-Fight",
+            "Greater Blind-Fight",
+            "Improved Blind-Fight"
+        ],
+        "Skill": {
+            "Perception": 15
+        },
+        "Race": "human"
+        },
+        "benefit": "Automatically pinpoint invisible foes and reroll misses due to concealment when you and an ally who has this feat are within 30 feet"
+    },
+    "Troth of the Forgotten Pharaoh": {
+        "prerequisites": {
+        "Special": "Must be a member of a cult of a forgotten pharaoh"
+        },
+        "benefit": "Fiery snakes erupt from your body when you die, damaging those around you."
+    },
+    "True Breed": {
+        "prerequisites": {
+        "Special": "Two subtypes, elf blood or orc blood racial trait"
+        },
+        "benefit": "You count as neither of your subtypes for the purposes of effects related to subtype"
+    },
+    "True Deception": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 17
+        },
+        "Skill": {
+            "Disguise": 17
+        },
+        "Special": "master disguise master ninja trick or master of disguise advanced rogue talent, ninja level 10th or rogue level 10th"
+        },
+        "benefit": "Fool divinations with Disguise"
+    },
+    "Truth in Wine": {
+        "prerequisites": {
+        "Skill": {
+            "Appraise": 3
+        }
+        },
+        "benefit": "You can perform the psychometry occult skill unlock even if you can’t use psychic magic, though you must consume a drink of high-quality alcohol (costing at least 10 gp per drink) to do so."
+    },
+    "Turn Undead": {
+        "prerequisites": {
+        "Special": "Channel positive energy class feature"
+        },
+        "benefit": "Channel energy can be used to make undead flee."
+    },
+    "Twist Away": {
+        "prerequisites": {
+        "Feat": "Evasion"
+        },
+        "benefit": "Use Reflex in place of Fortitude as an immediate action."
+    },
+    "Umbral Shift": {
+        "prerequisites": {
+        "Special": "Darkness racial spell-like ability"
+        },
+        "benefit": "When in magical darkness, swap places with an ally who also has this feat as a swift action"
+    },
+    "Ultimate Mercy": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 19
+        },
+        "Feat": "Greater Mercy",
+        "Special": "lay on hands, mercy class feature"
+        },
+        "benefit": "Expend 10 uses of lay on hands to bring a dead creature back to life."
+    },
+    "Ultimate Resolve": {
+        "prerequisites": {
+        "Special": "Aura of resolve class feature"
+        },
+        "benefit": "Aura of resolve expands and does not fall when you do."
+    },
+    "Uncanny Alertness": {
+        "prerequisites": {
+        "Feat": "Alertness"
+        },
+        "benefit": "+1 on Perception and Sense Motive checks and a +2 bonus on saving throws against sleep and charm effects."
+    },
+    "Uncanny Concentration": {
+        "prerequisites": {
+        "Feat": "Combat Casting"
+        },
+        "benefit": "Don’t make concentration checks for violent movement, gain a +2 bonus on all other concentration checks."
+    },
+    "Unbound Bravery": {
+        "prerequisites": {
+        "Special": [
+            "Bravery class feature",
+            "worshiper of a god of luck or drink"
+        ]
+        },
+        "benefit": "You can add the bonus from bravery to Escape Artist checks and combat maneuver checks to escape a grapple. If your bonus from bravery is +2 or higher, then once per day, you can grant that bonus to an ally within 30 feet on a Will save against a fear effect, an Escape Artist check, or a combat maneuver check to escape a grapple. Granting this bonus to an ally is an immediate action and must be declared before the result of your ally’s check is revealed."
+    },
+    "Undaunted Bravery": {
+        "prerequisites": {
+        "Special": [
+            "Bravery class feature",
+            "worshiper of a god of luck or drink"
+        ]
+        },
+        "benefit": "You can add your bonus from bravery to Intimidate checks and to the DC to intimidate you."
+    },
+    "Undead Master": {
+        "prerequisites": {
+        "Feat": "Spell Focus (necromancy)",
+        "Special": "ability to cast animate dead or command undead"
+        },
+        "benefit": "Animate and command more undead."
+    },
+    "Undermining Exploit": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (dungeoneering)": 4
+        }
+        },
+        "benefit": "Gain +4 insight bonus on combat maneuvers vs. opponents in rocky, difficult terrain."
+    },
+    "Unfettered Familiar": {
+        "prerequisites": {
+        "Caster Level": 5,
+        "Special": "familiar class feature"
+        },
+        "benefit": "Bestow touch spells on your familiar from a distance."
+    },
+    "Unimpeachable Honor": {
+        "prerequisites": {
+        "Feat": "Iron Will"
+        },
+        "benefit": "+4 bonus to avoid violating beliefs, –4 penalty on attack rolls and damage rolls versus allies"
+    },
+    "Unsanctioned Detection": {
+        "prerequisites": {
+        "Special": "Detect evil class feature"
+        },
+        "benefit": "Use detect evil to gain bonuses on Perception and Sense Motive checks."
+    },
+    "Unsanctioned Knowledge": {
+        "prerequisites": {
+        "Stat": {
+            "INT": 13
+        },
+        "Special": "must be able to cast 1st-level paladin spells"
+        },
+        "benefit": "Add spells to your paladin spell list."
+    },
+    "Urban Forager": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (Local)": 4,
+            "Survival": 4
+        }
+        },
+        "benefit": "You may use the Survival skill to forage and track in urban locations."
+    },
+    "Vampiric Companion": {
+        "prerequisites": {
+        "Race": "Dhampir or vampire",
+        "Alignment": "nongood",
+        "Level": 10,
+        "Special": "Must be in a class that grants a familiar or animal companion"
+        },
+        "benefit": "Your animal companion or familiar’s type changes to “undead.” The creature gains fast healing 5 as well as your vampire or dhampir weaknesses. If you are a vampire, the creature also gains the following abilities, depending on what type of vampire you are."
+    },
+    "Vandal": {
+        "prerequisites": {
+        "Special": "Sneak attack class feature"
+        },
+        "benefit": "You can deal sneak attack damage to unattended objects (but half normal damage)."
+    },
+    "Variant Prayer-Scroll": {
+        "prerequisites": {
+        "Race": "Jiang-shi vampire"
+        },
+        "benefit": "You’ve learned how to create variant vampiric prayer scrolls."
+    },
+    "Vermin Heart": {
+        "prerequisites": {
+        "Special": "Wild empathy class feature"
+        },
+        "benefit": "Target vermin with spells as if they were animals."
+    },
+    "Versatile Channeler": {
+        "prerequisites": {
+        "Special": [
+            "Channel energy class feature",
+            "Worship a neutral deity or have neutral alignment and no deity"
+        ]
+        },
+        "benefit": "Channel both positive and negative energy."
+    },
+    "Versatile Jinxer": {
+        "prerequisites": {
+        "Feat": "Iron Will",
+        "Race": "Halfling",
+        "Special": "jinx trait"
+        },
+        "benefit": "The DC of your jinx is based on your choice of Intelligence or Wisdom instead of Charisma."
+    },
+    "Vigilant Eidolon": {
+        "prerequisites": {
+        "Special": "Eidolon class feature"
+        },
+        "benefit": "+4 bonus on Perception checks when your eidolon is within arm’s reach, conscious, and not helpless."
+    },
+    "Vigilant Phantom": {
+        "prerequisites": {
+        "Special": "Phantom class feature"
+        },
+        "benefit": "+4 on Perception checks within arm’s reach of active phantom"
+    },
+    "Vile Leadership": {
+        "prerequisites": {
+        "Level": 7,
+        "Special": "Good standing in an evil organization"
+        },
+        "benefit": "You can attract a loyal cohort and a number of cowed followers to assist you in your journeys. This feat is similar to Leadership, except you are rewarded for having a cruel reputation."
+    },
+    "Voice of Beasts": {
+        "prerequisites": {
+        "Special": "Wild shape class feature"
+        },
+        "benefit": "Can speak with animals while in wild shape form."
+    },
+    "Voice of the Sibyl": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 15
+        }
+        },
+        "benefit": "Gain bonus to Bluff, Diplomacy, and Perform (oratory) checks."
+    },
+    "Walking Sleight": {
+        "prerequisites": {
+        "Feat": "Deft Hands",
+        "Skill": {
+            "Sleight of Hand": 5
+        }
+        },
+        "benefit": "Use Sleight of Hand as a move action or during a move"
+    },
+    "Wand Dancer": {
+        "prerequisites": {
+        "Stat": {
+            "DEX": 13
+        },
+        "Feat": [
+            "Dodge",
+            "Mobility"
+        ],
+        "Skill": {
+            "Perform (dance)": 5
+        }
+        },
+        "benefit": "You can move both before and after triggering a spell trigger item."
+    },
+    "War Blessing": {
+        "prerequisites": {
+        "Special": "Mystery or domain class feature"
+        },
+        "benefit": "Gain a lesser use of the blessings class feature."
+    },
+    "War Singer": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Special": "Bardic performance",
+        "Race": [
+            "Half-Orc",
+            "Orc"
+        ]
+        },
+        "benefit": "Gain benefits to bardic performance on battlefields and against orcs."
+    },
+    "Warrior Priest": {
+        "prerequisites": {
+        "Special": "Ability to cast divine spells, domain or mystery class feature"
+        },
+        "benefit": "+1 bonus to initiative and +2 on concentration checks when casting defensively."
+    },
+    "Waterway Caster": {
+        "prerequisites": {},
+        "benefit": "Automatically succeed at concentration checks while in rough water, and gain a +4 bonus on concentration checks to cast spells underwater"
+    },
+    "Welcome Pain": {
+        "prerequisites": {
+        "Feat": "Iron Will",
+        "Special": "worship an evil god"
+        },
+        "benefit": "Whenever an ongoing, or repeating, damage effect would reduce you to 0 or fewer hit points, make a Will save to ignore the damage."
+    },
+    "Well-Prepared": {
+        "prerequisites": {
+        "Race": "Halfling"
+        },
+        "benefit": "Retrieve a specific mundane item from your person."
+    },
+    "Wicked Valor": {
+        "prerequisites": {
+        "Stat": {
+            "CON": 15
+        },
+        "Feat": [
+            "Diehard",
+            "Endurance"
+        ],
+        "Race": "Tiefling"
+        },
+        "benefit": "You regain double the normal amount of hit points with a full night’s rest."
+    },
+    "Wild Growth Channel": {
+        "prerequisites": {
+        "Special": [
+            "Channel positive energy class feature",
+            "Plant domain"
+        ]
+        },
+        "benefit": "Cause grasping vines under your control to grow from the ground"
+    },
+    "Wild Growth Hex": {
+        "prerequisites": {
+        "Special": [
+            "Hex class feature",
+            "patron (summer, thorns, or woodlands) class feature"
+        ]
+        },
+        "benefit": "Cause disruptive thorny plants to grow at the feet of victims of a chosen hex"
+    },
+    "Wilding": {
+        "prerequisites": {
+        "Alignment": "Neutral",
+        "Special": "Must be taken at 1st level"
+        },
+        "benefit": "Gain wild empathy ability or bonus and are treated as an animal for the purpose of harmful mind-affecting effects that target animals"
+    },
+    "Wilding Mind": {
+        "prerequisites": {
+        "Stat": {
+            "WIS": 13
+        },
+        "Special": "Wilding"
+        },
+        "benefit": "Can take 1d3 Int damage to reroll a failed saving throw versus a fear effect or versus a mind-affecting effect"
+    },
+    "Wilding Senses": {
+        "prerequisites": {
+        "Stat": {
+            "WIS": 13
+        },
+        "Special": "Wilding"
+        },
+        "benefit": "Gain a +2 bonus on Perception checks (increases to +4 when determining if you can act during a surprise round)"
+    },
+    "Wilding Stride": {
+        "prerequisites": {
+        "Stat": {
+            "CON": 13
+        },
+        "Special": "Wilding"
+        },
+        "benefit": "Base speed increases by 10 feet"
+    },
+    "Wild Speech": {
+        "prerequisites": {
+        "Special": "Wild shape class feature",
+        "Class": {
+            "Druid": 6
+        }
+        },
+        "benefit": "Speak while in wild shape."
+    },
+    "Wild Vigor": {
+        "prerequisites": {
+        "Special": "Wild shape class feature"
+        },
+        "benefit": "Gain temporary hit points equal to your BAB when you use wild shape"
+    },
+    "Willing Accomplice": {
+        "prerequisites": {
+        "Stat": {
+            "CHA": 13
+        },
+        "Skill": {
+            "Bluff": 3,
+            "Sense Motive": 1
+        }
+        },
+        "benefit": "Use Bluff to aid ally’s Disguise"
+    },
+    "Witch Knife": {
+        "prerequisites": {
+        "Class": "Witch"
+        },
+        "benefit": "Use dagger as focus for witch patron spells."
+    },
+    "Wolf Rider": {
+        "prerequisites": {
+        "Special": [
+            "Undersized Mount or effective level 7th in the class that grants the mount or divine bond (mount) class feature",
+            "mount or divine bond (mount) class feature"
+        ],
+        "Skill": {
+            "Knowledge (nature)": 1
+        }
+        },
+        "benefit": "Can select wolf as your mount, and Knowledge (nature) is a class skill"
+    },
+    "Wood Crafter": {
+        "prerequisites": {
+        "Skill": {
+            "Craft (armor)": 3,
+            "Knowledge (nature)": 3
+        }
+        },
+        "benefit": "Gain +4 bonus on Craft (armor) checks when working with wood, can sometimes craft items at a discount"
+    },
+    "Word of Healing": {
+        "prerequisites": {
+        "Special": "Lay on hands class feature"
+        },
+        "benefit": "Use lay on hands from a distance."
+    },
+    "Worst Case Jinx": {
+        "prerequisites": {
+        "Skill": {
+            "Knowledge (arcana)": 5
+        },
+        "Race": "Halfling",
+        "Special": "Jinx trait"
+        },
+        "benefit": "Beneficial variable effects on a jinxed target always result in the minimum possible amount for the effect."
+    },
+    "Wrest Charge": {
+        "prerequisites": {
+        "Skill": {
+            "Disable Device": 5,
+            "Knowledge (engineering)": 5
+        }
+        },
+        "benefit": "Jury-rig a depleted battery to hold 1 charge."
+    },
+    "Xenoglossy": {
+        "prerequisites": {
+        "Stat": {
+            "INT": 13
+        },
+        "Skill": {
+            "Linguistics": 3
+        }
+        },
+        "benefit": "Use Linguistics to communicate with creatures with which you don’t share a language"
+    },
+    "Zealous Mind": {
+        "prerequisites": {
+        "Feat": [
+            "Iron Will",
+            "Unimpeachable Honor"
+        ],
+        "Alignment": "lawful"
+        },
+        "benefit": "Gain additional bonuses against enchantments"
     }
 }
     
-
-
-
