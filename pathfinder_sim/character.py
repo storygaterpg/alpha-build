@@ -32,6 +32,7 @@ class Character:
     def __init__(self, name: str, x: int, y: int, dexterity: int, reach: int = 1):
         self.name = name
         self.position = (x, y)
+        self.climb_state = None  # New attribute to track vertical movement progress (e.g., when climbing a ladder)
         self.dexterity = dexterity
         
         # Defensive stats.

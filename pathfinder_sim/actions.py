@@ -95,19 +95,21 @@ class MoveAction(GameAction):
 
     def execute(self) -> Dict[str, Any]:
         from movement import MovementAction
-        movement_action = MovementAction(self.game_map, self.actor.position, self.target)
+        # Create a MovementAction with game_map, actor, start position, and target.
+        movement_action = MovementAction(self.game_map, self.actor, self.actor.position, self.target)
         start_pos = self.actor.position
-        path = movement_action.execute()
+        movement_result = movement_action.execute()  # This returns a dict.
+        path = movement_result.get("path", [])
         if path:
             self.actor.position = path[-1]
+        else:
+            self.actor.position = start_pos
         result = {
             "action": "move",
             "actor": self.actor.name,
             "path": path,
             "final_position": self.actor.position,
-            "justification": "Movement action executed.",
-            "start_position": start_pos,
-            "end_position": self.actor.position
+            "justification": "Movement action executed." if path else "No valid path found."
         }
         result["log"] = format_log("move", {
             "actor_name": self.actor.name,
@@ -126,8 +128,9 @@ class FullRoundAction(GameAction):
         if self.parameters.get("type") == "charge":
             target = self.parameters.get("target")
             from movement import MovementAction
-            movement_action = MovementAction(self.game_map, self.actor.position, target)
-            path = movement_action.execute()
+            movement_action = MovementAction(self.game_map, self.actor, self.actor.position, target)
+            movement_result = movement_action.execute()
+            path = movement_result.get("path", [])
             if not path:
                 return {"action": "full_round", "result": "failed", "justification": "No clear path for charge."}
             self.actor.position = target
