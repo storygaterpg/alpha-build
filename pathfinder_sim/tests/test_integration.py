@@ -22,6 +22,17 @@ from turn_manager import TurnManager, ActionType, AttackAction, SpellAction, Ski
 from rules_engine import Dice, RulesEngine, rules_engine
 
 # --------------------------
+# Dummy actor for movement tests
+# --------------------------
+class DummyActor:
+    def __init__(self, name, position):
+        self.name = name
+        self.position = position
+
+    def get_effective_skill_modifier(self, skill: str) -> int:
+        return 0
+
+# --------------------------
 # Fixtures for Integration Tests
 # --------------------------
 
@@ -107,6 +118,22 @@ def test_full_turn_simulation_move_and_attack(game_environment):
     # Verify attack action result.
     attack_results = [res for res in results if res["action"] == "attack"]
     assert attack_results, "Attack action should be processed."
+
+def test_obstacle_movement_interaction():
+    """
+    Test a scenario where the path is completely blocked.
+    The movement action should return an empty path.
+    """
+    from movement import Map, MovementAction
+    m = Map(3, 3)
+    for x in range(3):
+        m.set_terrain(x, 1, "impassable")
+    # Create a dummy actor for movement.
+    dummy = DummyActor("TestActor", (0, 0))
+    action = MovementAction(m, dummy, (0, 0), (2, 2))
+    result = action.execute()
+    path = result.get("path", [])
+    assert path == [], "Expected no path due to complete blockage."
 
 def test_full_turn_simulation_spell_and_swift(game_environment):
     """
@@ -209,19 +236,6 @@ def test_action_limit_enforcement(game_environment):
     standard_action = SkillCheckAction(actor=alice, skill_name="Tumble", dc=15, action_type=ActionType.STANDARD)
     with pytest.raises(Exception):
         turn.add_action(standard_action)
-
-def test_obstacle_movement_interaction():
-    """
-    Test a scenario where the path is completely blocked.
-    The movement action should return an empty path.
-    """
-    from movement import Map, MovementAction
-    m = Map(3, 3)
-    for x in range(3):
-        m.set_terrain(x, 1, "impassable")
-    action = MovementAction(m, (0, 0), (2, 2))
-    path = action.execute()
-    assert path == [], "Expected no path due to complete blockage."
 
 def test_full_round_action_charge(game_environment):
     """

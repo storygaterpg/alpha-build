@@ -20,17 +20,35 @@ _CATEGORY_INDEX: Dict[str, str] = {}
 
 def build_category_index(feats_folder: str = "config/feat_config") -> None:
     """
-    Build an index mapping each feat category (derived from the JSON file names)
-    to its file path. This does not load the entire file—only records the file paths.
+    Build an index mapping each feat category (derived from file name) to its file path.
+    For file names that end with '_feats.json', an alias (with '_feats' removed) is also added.
     """
     global _CATEGORY_INDEX
     _CATEGORY_INDEX = {}
-    folder_path = os.path.join(os.path.dirname(__file__), "..", feats_folder)
+    
+    # Compute the absolute path to the feat configuration folder.
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    folder_path = os.path.join(base_dir, feats_folder)
+    print(f"Looking for feat files in: {folder_path}")
+    
+    if not os.path.isdir(folder_path):
+        print("Folder not found!")
+        return
+    else:
+        files = os.listdir(folder_path)
+        print(f"Found files: {files}")
+    
     pattern = os.path.join(folder_path, "*.json")
     for filepath in glob.glob(pattern):
-        category = os.path.splitext(os.path.basename(filepath))[0].lower()
-        _CATEGORY_INDEX[category] = filepath
+        base_name = os.path.splitext(os.path.basename(filepath))[0].lower()
+        _CATEGORY_INDEX[base_name] = filepath
+        # Also add an alias if the filename ends with '_feats'
+        if base_name.endswith("_feats"):
+            alias = base_name.replace("_feats", "")
+            if alias not in _CATEGORY_INDEX:
+                _CATEGORY_INDEX[alias] = filepath
 
+    print(f"Category index: {_CATEGORY_INDEX}")
 
 # Build the category index on module import.
 build_category_index()
@@ -41,7 +59,7 @@ class Feat:
     """
     def __init__(self, name: str, prerequisites: Dict[str, Any], benefit: str, category: str, version: Optional[str] = None):
         self.name = name
-        self.prerequisites = prerequisites  # e.g., {"Special": "Spell recall class feature", "Skill": {"Spellcraft": 5}}
+        self.prerequisites = prerequisites  # Example: {"Special": "Spell recall class feature", "Skill": {"Spellcraft": 5}}
         self.benefit = benefit
         self.category = category
         self.version = version
@@ -78,21 +96,26 @@ def load_feats_for_category(category: str) -> Dict[str, Feat]:
         return _FEATS_CACHE[category]
     
     filepath = _CATEGORY_INDEX[category]
-    with open(filepath, "r") as f:
-        data = json.load(f)
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+    except Exception as e:
+        print(f"Error loading feats from {filepath}: {e}")
+        _FEATS_CACHE[category] = {}
+        return _FEATS_CACHE[category]
     
     # Optionally, if the file includes a version, extract it.
     version = data.get("version")
     
     feats: Dict[str, Feat] = {}
-    # Each key in the JSON corresponds to a feat.
+    # Each key in the JSON (except "version") corresponds to a feat.
     for feat_name, feat_data in data.items():
         # Skip the version key if present.
         if feat_name.lower() == "version":
             continue
         feat = Feat.from_dict(feat_name, feat_data, category, version)
         feats[feat_name.lower()] = feat
-    
+
     _FEATS_CACHE[category] = feats
     return feats
 
@@ -156,13 +179,12 @@ def check_prerequisites(character, feat: Feat) -> bool:
         if current_value < required:
             return False
 
-    # Additional prerequisite types can be added here.
     return True
 
 if __name__ == "__main__":
-    # Example usage: Retrieve the feat "Disruptive Recall" from the "general" category.
+    # Example usage: Retrieve the feat "Disruptive Recall" from the "general_feats" category.
     feat = get_feat("Disruptive Recall", category="general_feats")
     if feat:
         print("Feat found:", feat.to_dict())
     else:
-        print("Feat 'Disruptive Recall' not found in category 'general'.")
+        print("Feat 'Disruptive Recall' not found in category 'general_feats'.")

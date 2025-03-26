@@ -17,6 +17,8 @@ All parameters are data-driven and can be refined later.
 import math
 import random
 from typing import List, Dict, Any, Tuple, Optional
+# Import TERRAIN_INFO from movement so that vertical checks use the same terrain definitions.
+from movement import TERRAIN_INFO
 
 def determine_edge_options(current: Tuple[int, int],
                            target: Tuple[int, int],
@@ -135,6 +137,11 @@ class CustomMoveAction:
         return vertical_diff, edge_features
 
     def execute(self) -> Dict[str, Any]:
+        """
+        Execute the custom movement action.
+        If a vertical edge is detected, choose an option (automatically the first for demo).
+        Otherwise, fall back to standard movement.
+        """
         vertical_diff, edge_features = self.detect_edge(self.actor.position, self.target)
         if vertical_diff is not None:
             options = determine_edge_options(self.actor.position, self.target, vertical_diff, edge_features, character=self.actor)

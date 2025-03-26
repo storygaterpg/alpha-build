@@ -10,7 +10,7 @@ with a base movement cost and, if applicable, a required skill check.
 Terrain Types:
   - "normal": standard cost (1)
   - "difficult": cost 2
-  - "impassable": cannot be traversed (represented with a high cost)
+  - "impassable": cannot be traversed (non‑traversable cells are marked with a cost of 0)
   - "jumpable": requires a Jump check (DC 10, cost 1)
   - "climbable": requires a Climb check (DC 15, cost 1)
   - "swimmable": requires a Swim check (DC 15, cost 1)
@@ -25,6 +25,7 @@ from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
 
 # Define terrain information for each type.
+# Note: For "impassable", we now set cost to 0 so that the grid marks these cells as unwalkable.
 TERRAIN_INFO: Dict[str, Dict[str, Any]] = {
     "normal": {"cost": 1, "check": None},
     "difficult": {"cost": 2, "check": None},
@@ -71,7 +72,7 @@ class Map:
     def get_numeric_grid(self) -> List[List[int]]:
         """
         Convert the terrain_map into a 2D list of numeric movement costs.
-        For impassable terrain, assign a very high cost (9999).
+        For impassable terrain (where cost is None), assign a cost of 0 to indicate non-traversability.
         """
         matrix: List[List[int]] = []
         for y in range(self.height):
@@ -80,7 +81,7 @@ class Map:
                 terrain = self.terrain_map[y][x]
                 info = TERRAIN_INFO.get(terrain, {})
                 cost = info.get("cost")
-                row.append(9999 if cost is None else cost)
+                row.append(0 if cost is None else cost)
             matrix.append(row)
         return matrix
 
