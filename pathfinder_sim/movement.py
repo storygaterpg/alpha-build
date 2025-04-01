@@ -24,6 +24,9 @@ from typing import Dict, List, Tuple, Any, Optional
 from pathfinding.core.grid import Grid
 from pathfinding.finder.a_star import AStarFinder
 
+# Vertical threshold (in feet) for triggering vertical movement options.
+VERTICAL_THRESHOLD = 5
+
 # Define terrain information for each type.
 # Note: For "impassable", we now set cost to 0 so that the grid marks these cells as unwalkable.
 TERRAIN_INFO: Dict[str, Dict[str, Any]] = {
@@ -108,7 +111,7 @@ class MovementAction:
     """
     Represents a standard movement action for a character.
     This action uses the Map's terrain data to calculate an optimal path.
-    Vertical movement (such as edges/cliffs) is handled in vertical_movement.py.
+    Vertical movement (such as edges/cliffs) is handled via vertical_movement.py.
     """
     def __init__(self, game_map: Map, actor: Any, start: Tuple[int, int], end: Tuple[int, int]):
         self.game_map = game_map
@@ -116,12 +119,39 @@ class MovementAction:
         self.start = start
         self.end = end
 
+    def _has_vertical_edge(self, path: List[Tuple[int, int]]) -> bool:
+        """
+        Check the path for any significant vertical differences between consecutive cells.
+        Returns True if any adjacent pair has an elevation difference equal or above VERTICAL_THRESHOLD.
+        """
+        if not path or len(path) < 2:
+            return False
+        for i in range(1, len(path)):
+            prev = path[i - 1]
+            curr = path[i]
+            height_prev = self.game_map.get_height(prev[0], prev[1])
+            height_curr = self.game_map.get_height(curr[0], curr[1])
+            if abs(height_prev - height_curr) >= VERTICAL_THRESHOLD:
+                return True
+        return False
+
     def execute(self) -> Dict[str, Any]:
         """
         Calculate the optimal path from start to end.
-        If a valid path is found, update the actor's position to the final cell and return a result dictionary.
+        If a valid path is found, check for significant vertical differences.
+        If a vertical edge is detected, delegate the move to the vertical movement subsystem.
+        Otherwise, update the actor's position to the final cell and return a result dictionary.
         """
+        # Compute horizontal path using A*.
         path = self.game_map.calculate_path(self.start, self.end)
+        # Check for vertical edges along the path.
+        if path and self._has_vertical_edge(path):
+            # If a vertical edge is detected, delegate to CustomMoveAction.
+            from vertical_movement import CustomMoveAction
+            custom_action = CustomMoveAction(self.actor, self.end, self.game_map)
+            return custom_action.execute()
+        
+        # No significant vertical movement; proceed normally.
         if path:
             self.actor.position = path[-1]
         result = {
@@ -153,13 +183,14 @@ if __name__ == "__main__":
         def __init__(self):
             self.name = "Dummy"
             self.position = (0, 0)
-        # A simple effective skill modifier method.
+            self.dexterity = 14
         def get_effective_skill_modifier(self, skill: str) -> int:
             return 2 if skill.lower() in ["acrobatics", "jump"] else 0
 
     dummy = DummyActor()
     
-    # Test standard movement.
+    # Test movement from (0,0) to (9,9). This should trigger vertical movement if a vertical edge is present.
     action = MovementAction(game_map, actor=dummy, start=(0, 0), end=(9, 9))
     result = action.execute()
-    print("Calculated Path:", result)
+    print("Calculated Movement Result:")
+    print(result)

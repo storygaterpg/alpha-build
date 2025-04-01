@@ -20,6 +20,9 @@ from typing import List, Dict, Any, Tuple, Optional
 # Import TERRAIN_INFO from movement so that vertical checks use the same terrain definitions.
 from movement import TERRAIN_INFO
 
+# (Optional) You can define a constant here for any additional vertical-specific thresholds if needed.
+# For now, vertical movement options are computed based on the full vertical difference.
+
 def determine_edge_options(current: Tuple[int, int],
                            target: Tuple[int, int],
                            vertical_diff: float,
@@ -169,9 +172,8 @@ class CustomMoveAction:
                     "dc": chosen["dc"],
                     "move_cost": chosen["move_cost"]
                 }
-        # If no vertical edge is detected, perform standard movement.
+        # If no vertical edge is detected, perform standard horizontal movement.
         from movement import MovementAction
-        # Correct call: pass game_map, actor, start position, and target.
         standard_action = MovementAction(self.game_map, self.actor, self.actor.position, self.target)
         movement_result = standard_action.execute()  # movement_result is a dict.
         # Extract the path from the result, if available.
