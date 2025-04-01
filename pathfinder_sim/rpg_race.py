@@ -3,9 +3,9 @@ rpg_race.py
 -----------
 
 This module manages race configuration for our Pathfinder simulation.
-Race data is stored in a configuration file (config/races_config.json) that contains
-all core race information such as ability modifiers, size, speed, languages, senses,
-racial traits (each with a name and description), bonus feats, and an overall description.
+Race data is stored in a configuration file (config/races_config.json) that now contains
+a flat mapping of race keys to race definitions (ability modifiers, size, speed, languages,
+senses, racial traits, bonus feats, and description).
 """
 
 import json
@@ -18,10 +18,8 @@ _RACES_CONFIG: Dict[str, Any] = {}
 def load_races_config() -> Dict[str, Any]:
     """
     Loads and caches the races configuration from 'config/races_config.json'.
-    
     Returns:
-        A dictionary containing the races configuration.
-        
+        A dictionary mapping race keys (e.g., "catfolk") to their definitions.
     Raises:
         FileNotFoundError: If the configuration file is not found.
         json.JSONDecodeError: If the file is not valid JSON.
@@ -43,14 +41,14 @@ class Race:
       - name: The name of the race.
       - ability_modifiers: A dict mapping ability names (e.g., "Con", "Wis") to modifiers.
       - size: The size category (e.g., Small, Medium).
-      - creature_type: The creature type (typically 'Humanoid').
-      - subtype: The specific subtype (e.g., dwarf, elf).
-      - speed: The base speed (in feet).
+      - creature_type: Typically 'Humanoid'.
+      - subtype: Specific subtype (e.g., dwarf, elf).
+      - speed: Base speed in feet.
       - languages: List of starting languages.
-      - senses: A dict of sensory abilities (e.g., darkvision range, low-light vision flag).
-      - racial_traits: A list of dicts, each with "name" and "description" for a racial trait.
+      - senses: Dict of sensory abilities (e.g., darkvision range).
+      - racial_traits: List of dicts, each with "name" and "description".
       - bonus_feats: List of bonus feats the race grants.
-      - description: A brief textual description of the race.
+      - description: A brief textual description.
     """
     def __init__(self,
                  name: str,
@@ -101,11 +99,10 @@ def create_race(race_name: str) -> Race:
     Raises:
         ValueError: If the race is not found in the configuration.
     """
-    config = load_races_config()
+    config = load_races_config()  # Now expects a flat mapping of race definitions.
     key = race_name.lower()
     if key not in config:
         raise ValueError(f"Race '{race_name}' is not defined in the configuration.")
-    
     race_data = config[key]
     return Race(
         name=race_data.get("name", race_name),

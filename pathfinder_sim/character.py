@@ -5,7 +5,7 @@ character.py
 This module defines the Character class for our Pathfinder simulation.
 It manages attributes such as position, abilities, combat statistics, conditions, resources,
 and narrative elements. This version includes methods to serialize to and reconstruct from a dictionary.
-Enhanced for CD-01: now includes dynamic calculation of saving throws, CMB/CMD, HP (optional),
+Enhanced for CD-01 and CD-02: now includes dynamic calculation of saving throws, CMB/CMD, HP,
 spell slots, and racial modifier application.
 """
 
@@ -13,12 +13,12 @@ from typing import List, Dict, Any
 import json
 import os
 import conditions
-from rpg_class import RPGClass  # Ensure RPGClass is imported for type annotations
+from rpg_class import RPGClass  # For type annotations
 
 class Character:
     """
     A simplified character class.
-    
+
     Attributes:
       - name: Character's name.
       - position: Grid coordinates (x, y).
@@ -44,7 +44,7 @@ class Character:
         self.position = (x, y)
         self.climb_state = None  # Track vertical movement progress (e.g., when climbing a ladder)
         self.dexterity = dexterity
-        
+
         # Defensive stats.
         self.armor_bonus = 0
         self.shield_bonus = 0
@@ -56,18 +56,18 @@ class Character:
         # Base Attack Bonus (derived from class levels).
         self.BAB = 0
 
-        # New: Combat Maneuver Bonus and Defense.
+        # Combat Maneuver Bonus and Defense.
         self.cmb = 0
         self.cmd = 10  # Base value before adding modifiers
 
         self.spells: List[str] = []
-        self.spell_slots: Dict[str, Any] = {}  # Will store spell slot data per class/day
+        self.spell_slots: Dict[str, Any] = {}  # Spell slot data per class/day
 
         self.conditions: List[conditions.Condition] = []
         self.resources: Dict[str, Any] = self.load_resources()
         self.reach = reach
 
-        # Multiclass: dictionary mapping RPG class names to levels.
+        # Multiclass: mapping of RPG class names to levels.
         self.class_levels: Dict[str, int] = {}
 
         # Ability scores (default 10 if not provided)
@@ -85,7 +85,7 @@ class Character:
         self.experience = 0
 
         # Identity and narrative.
-        self.race = "Unknown"
+        self.race = "Unknown"  # This is a string; use initialize_race() to apply a Race object.
         self.alignment = "Neutral"
         self.deity = "None"
         self.feats: List[str] = []
@@ -121,9 +121,7 @@ class Character:
         print(f"{self.name} gains condition: {condition.name} (Duration: {condition.duration} rounds)")
 
     def remove_condition(self, condition: conditions.Condition) -> None:
-        """
-        Remove a specific condition from the character if present.
-        """
+        """Remove a specific condition from the character if present."""
         if condition in self.conditions:
             self.conditions.remove(condition)
             print(f"{self.name} loses condition: {condition.name}")
@@ -188,7 +186,6 @@ class Character:
           - Saves: Fortitude, Reflex, Will (base save from classes plus ability modifiers).
           - CMB and CMD: Calculated from BAB and ability modifiers.
           - Optionally, compute hit points.
-        
         Raises:
             ValueError: If progression data for a class or a specific level is not found.
         """
@@ -217,22 +214,16 @@ class Character:
             base_ref += level_data.get("Ref", 0)
             base_will += level_data.get("Will", 0)
         self.BAB = total_bab
-
-        # Calculate saves by adding ability modifiers.
         self.fortitude_save = base_fort + self.get_modifier("CON")
         self.reflex_save = base_ref + self.get_modifier("DEX")
         self.will_save = base_will + self.get_modifier("WIS")
-
-        # Calculate Combat Maneuver Bonus and Defense.
         self.compute_cmb_cmd()
-
-        # Compute hit points based on classes and Constitution modifier.
         self.compute_hp()
 
     def compute_cmb_cmd(self) -> None:
         """
         Compute the Combat Maneuver Bonus (CMB) and Combat Maneuver Defense (CMD).
-        Basic formulas:
+        Formulas:
           - CMB = BAB + Strength modifier
           - CMD = 10 + BAB + Strength modifier + Dexterity modifier + size modifier
         """
@@ -243,7 +234,6 @@ class Character:
         """
         Compute hit points based on class hit dice and Constitution modifier.
         For each class level, add the average of the hit die (rounded down) plus CON modifier.
-        This is a simplified version; adjustments for first-level maximum or fractional dice can be added later.
         """
         total_hp = 0
         from rpg_class import load_rpg_classes_config
@@ -262,6 +252,7 @@ class Character:
     def apply_racial_modifiers(self, race_obj: Any) -> None:
         """
         Apply racial ability modifiers from a Race object to this character's ability scores.
+        Then, recalculate derived stats.
         """
         modifiers = getattr(race_obj, "ability_modifiers", {})
         for ability, mod in modifiers.items():
@@ -281,12 +272,19 @@ class Character:
         # Update derived stats after applying racial modifiers.
         self.recalc_stats()
 
+    def initialize_race(self, race_obj: Any) -> None:
+        """
+        Initialize the character's race.
+        This sets the race name and applies racial modifiers.
+        """
+        self.race = race_obj.name
+        self.apply_racial_modifiers(race_obj)
+
     def get_ac(self) -> int:
         """
-        Computes the character's Armor Class (AC).
+        Compute the character's Armor Class (AC).
         Base AC = 10 + armor_bonus + shield_bonus + natural_armor + deflection_bonus + size_modifier.
-        Adds Dexterity mod and dodge_bonus only if the character is not affected by conditions
-        that remove them (e.g., blinded, flatfooted, paralyzed, unconscious).
+        Adds Dexterity mod and dodge_bonus if not affected by conditions that remove them.
         Then adds additional modifiers from active conditions.
         """
         base_ac = 10 + self.armor_bonus + self.shield_bonus + self.natural_armor + self.deflection_bonus + self.size_modifier
@@ -323,7 +321,7 @@ class Character:
     def get_effective_skill_modifier(self, ability: str) -> int:
         """
         Returns the effective modifier for a given ability for skill checks,
-        factoring in base ability modifier plus cumulative penalties from conditions.
+        factoring in the base ability modifier and cumulative penalties from conditions.
         """
         base = self.get_modifier(ability)
         penalty = 0

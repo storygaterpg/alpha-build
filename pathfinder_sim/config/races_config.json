@@ -1,600 +1,151 @@
 {
-  "races": {
-    "catfolk": {
-      "name": "Catfolk",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Cha": 2,
-        "Str": -2
-      },
-      "size": "Small",
-      "type": "Humanoid",
-      "subtype": "catfolk",
-      "speed": 30,
-      "languages": ["Common", "Catfolk"],
-      "senses": {
-        "low_light_vision": true
-      },
-      "racial_traits": [
-        {
-          "name": "Claws",
-          "description": "Catfolk possess natural claw attacks that can be used as primary natural weapons."
-        },
-        {
-          "name": "Agile Grace",
-          "description": "Their natural agility grants them bonuses on Acrobatics and Stealth checks."
-        },
-        {
-          "name": "Keen Senses",
-          "description": "Catfolk have heightened senses, giving them a bonus on Perception checks."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Catfolk are agile, curious, and charismatic small humanoids with feline grace. They excel in acrobatics and stealth, and their natural claws make them formidable in unarmed combat."
+  "catfolk": {
+    "name": "Catfolk",
+    "ability_modifiers": {
+      "Dex": 2,
+      "Cha": 2,
+      "Str": -2
     },
-    "duergar": {
-      "name": "Duergar",
-      "ability_modifiers": {
-        "Con": 2,
-        "Int": 2,
-        "Cha": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "duergar",
-      "speed": 20,
-      "languages": ["Common", "Dwarven", "Duergar"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Psionic Resilience",
-          "description": "Duergar have inherent psionic abilities and resist magic that would induce sleep."
-        },
-        {
-          "name": "Invisibility",
-          "description": "They can turn nearly invisible for brief periods, especially in darkness."
-        },
-        {
-          "name": "Stonecunning",
-          "description": "Duergar detect unusual stonework and hidden doors in stone with uncanny accuracy."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Duergar are grim, dour dark dwarves of the Underdark known for their psionic abilities, stealth, and relentless survival in hostile underground environments."
+    "size": "Small",
+    "type": "Humanoid",
+    "subtype": "catfolk",
+    "speed": 30,
+    "languages": ["Common", "Catfolk"],
+    "senses": {
+      "low_light_vision": true
     },
-    "gnoll": {
-      "name": "Gnoll",
-      "ability_modifiers": {
-        "Str": 2,
-        "Con": 2,
-        "Int": -2,
-        "Cha": -2
+    "racial_traits": [
+      {
+        "name": "Claws",
+        "description": "Catfolk possess natural claw attacks that can be used as primary natural weapons."
       },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "gnoll",
-      "speed": 30,
-      "languages": ["Common", "Gnoll"],
-      "senses": {
-        "darkvision": 60
+      {
+        "name": "Agile Grace",
+        "description": "Their natural agility grants them bonuses on Acrobatics and Stealth checks."
       },
-      "racial_traits": [
-        {
-          "name": "Ferocity",
-          "description": "Gnolls are naturally savage, gaining bonuses on Intimidate checks and combat maneuvers that rely on sheer aggression."
-        },
-        {
-          "name": "Bite Attack",
-          "description": "Gnolls have a natural bite attack that deals damage based on their size."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Gnolls are bestial, hyena-like humanoids renowned for their physical prowess, savage nature, and intimidating presence in battle."
-    },
-    "grippli": {
-      "name": "Grippli",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Con": 2,
-        "Cha": -2
-      },
-      "size": "Small",
-      "type": "Humanoid",
-      "subtype": "grippli",
-      "speed": 20,
-      "languages": ["Common", "Grippli"],
-      "senses": {
-        "low_light_vision": true
-      },
-      "racial_traits": [
-        {
-          "name": "Amphibious",
-          "description": "Grippli can breathe both air and water, and they gain a swim speed."
-        },
-        {
-          "name": "Natural Acrobatics",
-          "description": "Their frog-like bodies grant them bonuses on Jump and Acrobatics checks."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Grippli are small, frog-like humanoids adept at navigating swampy terrain. Their amphibious nature and agility make them excellent climbers and swimmers."
-    },
-    "goblin": {
-      "name": "Goblin",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Str": -2,
-        "Cha": -2
-      },
-      "size": "Small",
-      "type": "Humanoid",
-      "subtype": "goblin",
-      "speed": 30,
-      "languages": ["Common", "Goblin"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Trapfinding",
-          "description": "Goblin characters gain bonuses on Perception checks to find traps and on saving throws against trap effects."
-        },
-        {
-          "name": "Feral Agility",
-          "description": "Their natural quickness gives them bonuses on Acrobatics and Stealth checks."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Goblins are small, quick, and chaotic humanoids known for their ingenuity in setting and disarming traps, as well as their unpredictable, explosive nature."
-    },
-    "hobgoblin": {
-      "name": "Hobgoblin",
-      "ability_modifiers": {
-        "Int": 2,
-        "Cha": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "hobgoblin",
-      "speed": 30,
-      "languages": ["Common", "Goblin", "Hobgoblin"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Military Discipline",
-          "description": "Hobgoblins are trained warriors who gain bonuses on tactical and weapon proficiency checks."
-        },
-        {
-          "name": "Organized Tactics",
-          "description": "Their disciplined nature grants them bonuses on teamwork and leadership in combat."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Hobgoblins are the disciplined, militaristic cousins of goblins. They emphasize organization, training, and tactical prowess, making them excellent soldiers and tacticians."
-    },
-    "ifrit": {
-      "name": "Ifrit",
-      "ability_modifiers": {
-        "Cha": 2,
-        "Wis": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "ifrit",
-      "speed": 30,
-      "languages": ["Common", "Infernal"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Fire Affinity",
-          "description": "Ifrits have a natural connection to fire, granting them fire resistance and innate spell-like abilities related to fire."
-        },
-        {
-          "name": "Fiery Temperament",
-          "description": "Their volatile nature can grant situational bonuses in combat when their emotions run high."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Ifrits are beings of elemental fire, known for their intense passion and innate magical abilities centered on fire. Their volatile nature is both a strength and a potential liability."
-    },
-    "kobold": {
-      "name": "Kobold",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Str": -2
-      },
-      "size": "Small",
-      "type": "Humanoid",
-      "subtype": "kobold",
-      "speed": 30,
-      "languages": ["Common", "Draconic"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Trapfinding",
-          "description": "Kobolds are exceptionally skilled at noticing and disarming traps."
-        },
-        {
-          "name": "Sneaky and Cunning",
-          "description": "Their clever nature grants them bonuses on Stealth and other Dexterity-based checks."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Kobolds are small, reptilian humanoids known for their trapmaking and ambush tactics. Their cunning and affinity for dragons make them both clever and dangerous in large numbers."
-    },
-    "lizardfolk": {
-      "name": "Lizardfolk",
-      "ability_modifiers": {
-        "Str": 2,
-        "Con": 2,
-        "Cha": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "lizardfolk",
-      "speed": 30,
-      "languages": ["Common", "Draconic"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Natural Armor",
-          "description": "Lizardfolk have tough, scaly skin that provides a natural armor bonus."
-        },
-        {
-          "name": "Bite Attack",
-          "description": "They possess a natural bite attack that deals damage appropriate to their size."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Lizardfolk are robust and primal humanoids with a reptilian nature. Their natural armor and bite attack, along with their hardy constitution, make them formidable in harsh environments."
-    },
-    "monkey_goblin": {
-      "name": "Monkey Goblin",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Str": -2,
-        "Cha": -2
-      },
-      "size": "Small",
-      "type": "Humanoid",
-      "subtype": "goblin",
-      "speed": 30,
-      "languages": ["Common", "Goblin"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Enhanced Acrobatics",
-          "description": "Monkey goblins receive bonuses on Acrobatics checks, reflecting their nimble, simian nature."
-        },
-        {
-          "name": "Natural Climber",
-          "description": "They excel at climbing and jumping, granting them exceptional agility."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Monkey goblins are a nimble variant of goblins that emphasize acrobatic movement and agility. Their ability to climb and jump effortlessly makes them unpredictable in combat."
-    },
-    "orc": {
-      "name": "Orc",
-      "ability_modifiers": {
-        "Str": 2,
-        "Con": 2,
-        "Int": -2,
-        "Wis": -2,
-        "Cha": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "orc",
-      "speed": 30,
-      "languages": ["Common", "Orc"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Ferocity",
-          "description": "Orcs are known for their brutal aggression, gaining bonuses on Intimidate checks and combat maneuvers."
-        },
-        {
-          "name": "Natural Attack",
-          "description": "Orcs possess a natural bite attack that can be used in combat."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Orcs are powerful, brutish warriors with an imposing presence. Their raw strength and fierce combat style make them excellent frontline fighters."
-    },
-    "oread": {
-      "name": "Oread",
-      "ability_modifiers": {
-        "Str": 2,
-        "Con": 2,
-        "Cha": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "oread",
-      "speed": 30,
-      "languages": ["Common", "Terran"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Stone Affinity",
-          "description": "Oreads have an innate bond with stone, granting them bonuses on natural armor and skill checks in rocky or underground environments."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Oreads are earth-touched humanoids with natural resilience and a strong connection to rocky environments, which aids them in survival and combat."
-    },
-    "ratfolk": {
-      "name": "Ratfolk",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Int": 2,
-        "Str": -2
-      },
-      "size": "Small",
-      "type": "Humanoid",
-      "subtype": "ratfolk",
-      "speed": 20,
-      "languages": ["Common", "Ratfolk"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Trapfinding",
-          "description": "Ratfolk have a keen ability to detect traps and hidden dangers in urban or underground environments."
-        },
-        {
-          "name": "Cunning and Stealth",
-          "description": "Their clever nature grants bonuses on Stealth and other Dexterity-based skills."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Ratfolk are small, clever, and resourceful, excelling in stealth and trapfinding. Their agility and sharp senses help them survive in urban and subterranean settings."
-    },
-    "skinwalker": {
-      "name": "Skinwalker",
-      "ability_modifiers": {
-        "Str": 2,
-        "Con": 2,
-        "Int": -2,
-        "Cha": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "skinwalker",
-      "speed": 30,
-      "languages": ["Common"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Limited Shapechanging",
-          "description": "Skinwalkers possess the innate ability to change into an animal form a limited number of times per day."
-        },
-        {
-          "name": "Natural Attack Adaptation",
-          "description": "In their animal form, they gain natural attacks (such as claws or bite) appropriate to that form."
-        },
-        {
-          "name": "Resilient Physique",
-          "description": "They trade mental acuity for physical prowess, reflecting their bestial nature."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Skinwalkers are humanoids with the mystical ability to shift into animal forms. Their hybrid nature grants them physical strength and natural attacks, although they sacrifice some mental finesse."
-    },
-    "sylph": {
-      "name": "Sylph",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Cha": 2,
-        "Con": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "sylph",
-      "speed": 30,
-      "languages": ["Common", "Sylph"],
-      "senses": {
-        "low_light_vision": true
-      },
-      "racial_traits": [
-        {
-          "name": "Air Affinity",
-          "description": "Sylphs have a natural connection to the elemental plane of air, granting them bonuses on Acrobatics and Stealth checks."
-        },
-        {
-          "name": "Graceful Movement",
-          "description": "Their light frame allows for exceptional agility and ease of movement."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Sylphs are graceful and charismatic humanoids with an inherent connection to air. Their agility and charm make them excellent scouts and diplomats."
-    },
-    "triaxian": {
-      "name": "Triaxian",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Int": 2,
-        "Con": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "triaxian",
-      "speed": 30,
-      "languages": ["Common", "Triaxian"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Exotic Physiology",
-          "description": "Triaxians have a unique, otherworldly physiology that grants them unusual resistances and occasionally bonus feats related to their alien heritage."
-        },
-        {
-          "name": "Adaptable Ability",
-          "description": "They allow for customization of ability score modifiers during character creation."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Triaxians are mysterious, alien-like humanoids with adaptable ability modifiers and unique racial traits that offer versatile options in character creation."
-    },
-    "undine": {
-      "name": "Undine",
-      "ability_modifiers": {
-        "Con": 2,
-        "Cha": 2,
-        "Wis": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "undine",
-      "speed": 30,
-      "languages": ["Common", "Aquan"],
-      "senses": {
-        "darkvision": 60
-      },
-      "racial_traits": [
-        {
-          "name": "Amphibious",
-          "description": "Undines can breathe both air and water and gain a swim speed."
-        },
-        {
-          "name": "Water Affinity",
-          "description": "They excel in aquatic environments with bonuses on Swim checks and resistance to water-based effects."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Undines are water-dwelling humanoids with a natural affinity for aquatic environments. Their amphibious nature makes them adept in maritime or coastal adventures."
-    },
-    "vanara": {
-      "name": "Vanara",
-      "ability_modifiers": {
-        "Dex": 2,
-        "Wis": 2,
-        "Str": -2
-      },
-      "size": "Medium",
-      "type": "Humanoid",
-      "subtype": "vanara",
-      "speed": 40,
-      "languages": ["Common", "Vanaran"],
-      "senses": {
-        "low_light_vision": true
-      },
-      "racial_traits": [
-        {
-          "name": "Natural Climber",
-          "description": "Vanaras are adept at climbing and receive bonuses on Climb and Acrobatics checks."
-        },
-        {
-          "name": "Enhanced Agility",
-          "description": "Their simian nature grants them exceptional speed and acrobatic prowess."
-        },
-        {
-          "name": "Prehensile Tail",
-          "description": "They possess a tail that can be used for minor manipulation or balance."
-        }
-      ],
-      "bonus_feats": [],
-      "description": "Vanaras are simian humanoids celebrated for their remarkable agility, climbing ability, and swift movement. Their natural athleticism makes them excellent scouts and combatants in rugged terrain."
-    }
+      {
+        "name": "Keen Senses",
+        "description": "Catfolk have heightened senses, giving them a bonus on Perception checks."
+      }
+    ],
+    "bonus_feats": [],
+    "description": "Catfolk are agile, curious, and charismatic small humanoids with feline grace. They excel in acrobatics and stealth, and their natural claws make them formidable in unarmed combat."
   },
-  "classes": {
-    "barbarian": {
-      "name": "Barbarian",
-      "hit_die": 12,
-      "skill_per_level": 4,
-      "class_skills": ["Climb", "Intimidate", "Perception", "Survival"],
-      "description": "Barbarians are fierce warriors who rely on raw physical power and rage to overcome foes. Their high hit points and strong melee capabilities make them effective front-line combatants."
+  "duergar": {
+    "name": "Duergar",
+    "ability_modifiers": {
+      "Con": 2,
+      "Int": 2,
+      "Cha": -2
     },
-    "bard": {
-      "name": "Bard",
-      "hit_die": 8,
-      "skill_per_level": 6,
-      "class_skills": ["Acrobatics", "Diplomacy", "Disguise", "Perform", "Sense Motive", "Stealth"],
-      "description": "Bards blend music, magic, and social skills to inspire allies and confound enemies. Their versatility allows them to support the party in multiple ways."
+    "size": "Medium",
+    "type": "Humanoid",
+    "subtype": "duergar",
+    "speed": 20,
+    "languages": ["Common", "Dwarven", "Duergar"],
+    "senses": {
+      "darkvision": 60
     },
-    "cleric": {
-      "name": "Cleric",
-      "hit_die": 8,
-      "skill_per_level": 2,
-      "class_skills": ["Heal", "Knowledge (religion)", "Profession", "Sense Motive"],
-      "description": "Clerics are divine spellcasters who combine healing and combat prowess. Their strong connection to their deity provides them with powerful miracles and healing abilities."
+    "racial_traits": [
+      {
+        "name": "Psionic Resilience",
+        "description": "Duergar have inherent psionic abilities and resist magic that would induce sleep."
+      },
+      {
+        "name": "Invisibility",
+        "description": "They can turn nearly invisible for brief periods, especially in darkness."
+      },
+      {
+        "name": "Stonecunning",
+        "description": "Duergar detect unusual stonework and hidden doors in stone with uncanny accuracy."
+      }
+    ],
+    "bonus_feats": [],
+    "description": "Duergar are grim, dour dark dwarves of the Underdark known for their psionic abilities, stealth, and relentless survival in hostile underground environments."
+  },
+  "gnoll": {
+    "name": "Gnoll",
+    "ability_modifiers": {
+      "Str": 2,
+      "Con": 2,
+      "Int": -2,
+      "Cha": -2
     },
-    "druid": {
-      "name": "Druid",
-      "hit_die": 8,
-      "skill_per_level": 4,
-      "class_skills": ["Survival", "Perception", "Knowledge (nature)", "Handle Animal"],
-      "description": "Druids are nature-based spellcasters with the ability to transform into animals. They draw their power from the natural world and excel in wilderness survival."
+    "size": "Medium",
+    "type": "Humanoid",
+    "subtype": "gnoll",
+    "speed": 30,
+    "languages": ["Common", "Gnoll"],
+    "senses": {
+      "darkvision": 60
     },
-    "fighter": {
-      "name": "Fighter",
-      "hit_die": 10,
-      "skill_per_level": 2,
-      "class_skills": ["Climb", "Intimidate", "Ride", "Survival"],
-      "description": "Fighters are masterful warriors who excel in combat tactics, weapon proficiency, and brute strength. Their versatility and durability make them reliable in any battle."
+    "racial_traits": [
+      {
+        "name": "Ferocity",
+        "description": "Gnolls are naturally savage, gaining bonuses on Intimidate checks and combat maneuvers that rely on sheer aggression."
+      },
+      {
+        "name": "Bite Attack",
+        "description": "Gnolls have a natural bite attack that deals damage based on their size."
+      }
+    ],
+    "bonus_feats": [],
+    "description": "Gnolls are bestial, hyena-like humanoids renowned for their physical prowess, savage nature, and intimidating presence in battle."
+  },
+  "grippli": {
+    "name": "Grippli",
+    "ability_modifiers": {
+      "Dex": 2,
+      "Con": 2,
+      "Cha": -2
     },
-    "monk": {
-      "name": "Monk",
-      "hit_die": 8,
-      "skill_per_level": 4,
-      "class_skills": ["Acrobatics", "Climb", "Knowledge (religion)", "Stealth"],
-      "description": "Monks combine martial arts with inner spiritual power. Their unarmed strikes, fast movement, and ability to deflect attacks make them formidable opponents."
+    "size": "Small",
+    "type": "Humanoid",
+    "subtype": "grippli",
+    "speed": 20,
+    "languages": ["Common", "Grippli"],
+    "senses": {
+      "low_light_vision": true
     },
-    "paladin": {
-      "name": "Paladin",
-      "hit_die": 10,
-      "skill_per_level": 2,
-      "class_skills": ["Diplomacy", "Heal", "Intimidate", "Knowledge (religion)"],
-      "description": "Paladins are holy warriors dedicated to justice and righteousness. Their divine powers allow them to heal allies and smite evil foes."
+    "racial_traits": [
+      {
+        "name": "Amphibious",
+        "description": "Grippli can breathe both air and water, and they gain a swim speed."
+      },
+      {
+        "name": "Natural Acrobatics",
+        "description": "Their frog-like bodies grant them bonuses on Jump and Acrobatics checks."
+      }
+    ],
+    "bonus_feats": [],
+    "description": "Grippli are small, frog-like humanoids adept at navigating swampy terrain. Their amphibious nature and agility make them excellent climbers and swimmers."
+  },
+  "goblin": {
+    "name": "Goblin",
+    "ability_modifiers": {
+      "Dex": 2,
+      "Str": -2,
+      "Cha": -2
     },
-    "ranger": {
-      "name": "Ranger",
-      "hit_die": 10,
-      "skill_per_level": 6,
-      "class_skills": ["Survival", "Perception", "Stealth", "Handle Animal"],
-      "description": "Rangers are skilled hunters and trackers with a close bond to nature. They excel at ranged combat, wilderness survival, and adapting to different environments."
+    "size": "Small",
+    "type": "Humanoid",
+    "subtype": "goblin",
+    "speed": 30,
+    "languages": ["Common", "Goblin"],
+    "senses": {
+      "darkvision": 60
     },
-    "rogue": {
-      "name": "Rogue",
-      "hit_die": 8,
-      "skill_per_level": 8,
-      "class_skills": ["Stealth", "Disable Device", "Perception", "Acrobatics"],
-      "description": "Rogues are cunning and stealthy characters who rely on skill and precision to outmaneuver their foes. They excel in trapfinding, lockpicking, and delivering devastating sneak attacks."
-    },
-    "sorcerer": {
-      "name": "Sorcerer",
-      "hit_die": 6,
-      "skill_per_level": 2,
-      "class_skills": ["Spellcraft", "Knowledge (arcana)", "Diplomacy"],
-      "description": "Sorcerers are innate spellcasters whose magical power flows from their bloodline. They cast spells spontaneously and rely on raw magical ability rather than study."
-    },
-    "wizard": {
-      "name": "Wizard",
-      "hit_die": 6,
-      "skill_per_level": 2,
-      "class_skills": ["Spellcraft", "Knowledge (arcana)", "History"],
-      "description": "Wizards are scholarly spellcasters who learn magic through study and careful preparation. They have access to a vast repertoire of spells and a deep understanding of arcane lore."
-    }
+    "racial_traits": [
+      {
+        "name": "Trapfinding",
+        "description": "Goblin characters gain bonuses on Perception checks to find traps and on saving throws against trap effects."
+      },
+      {
+        "name": "Feral Agility",
+        "description": "Their natural quickness gives them bonuses on Acrobatics and Stealth checks."
+      }
+    ],
+    "bonus_feats": [],
+    "description": "Goblins are small, quick, and chaotic humanoids known for their ingenuity in setting and disarming traps, as well as their unpredictable, explosive nature."
   }
 }
