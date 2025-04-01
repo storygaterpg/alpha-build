@@ -13,27 +13,27 @@ from character import Character
 from actions import AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction, GameAction
 from action_types import ActionType  # Import ActionType enum
 
-
 class Turn:
     def __init__(self, turn_number: int):
         self.turn_number = turn_number
-        # For each character, record the following:
-        # "actor": the Character instance,
+        # For each character, record actions in a dictionary with keys:
         # "immediate": list of immediate actions,
-        # "standard": one standard action (or None),
+        # "readied": list of readied actions,
+        # "delayed": single delayed action (or None),
+        # "standard": one standard action,
         # "move": list of move actions,
-        # "swift": one swift action (or None),
-        # "full_round": one full-round action (or None),
+        # "swift": one swift action,
+        # "full_round": one full-round action,
         # "free": list of free actions.
         self.character_actions: Dict[str, Dict[str, Any]] = {}
 
     def add_action(self, action) -> None:
         actor_name = action.actor.name
-        # If the actor is not already present, initialize their action record.
         if actor_name not in self.character_actions:
             self.character_actions[actor_name] = {
-                "actor": action.actor,
                 "immediate": [],
+                "readied": [],
+                "delayed": None,
                 "standard": None,
                 "move": [],
                 "swift": None,
@@ -41,7 +41,7 @@ class Turn:
                 "free": []
             }
         records = self.character_actions[actor_name]
-        # Enforce action limits based on action type.
+        # Enforce limits based on action type.
         if action.action_type == ActionType.FULL_ROUND:
             if records["standard"] or records["move"]:
                 raise Exception(f"{actor_name} cannot combine a full-round action with standard or move actions.")
@@ -70,48 +70,70 @@ class Turn:
         elif action.action_type == ActionType.FREE:
             records["free"].append(action)
         elif action.action_type == ActionType.IMMEDIATE:
-            # Immediate actions are stored separately.
             records["immediate"].append(action)
+        elif action.action_type == ActionType.READIED:
+            records["readied"].append(action)
+        elif action.action_type == ActionType.DELAYED:
+            if records["delayed"] is not None:
+                raise Exception(f"{actor_name} has already delayed an action this turn.")
+            records["delayed"] = action
         else:
             raise Exception(f"Unsupported action type: {action.action_type}")
 
     def get_ordered_actions(self, rules_engine) -> List:
         """
-        Compute initiative order and return a list of actions ordered by initiative.
-        For each actor in the turn, compute an initiative score (d20 + DEX modifier),
-        sort actors in descending order (with tie-breakers on DEX modifier and name),
-        and then for each actor, append their actions in the following priority:
-          1. Immediate actions (if any)
-          2. Full-round action (if present; else Standard action, then Move actions)
-          3. Swift action
-          4. Free actions
-        """
-        # Build a mapping from actor name to (actor instance, initiative score).
-        initiative_map = {}
-        for actor_name, record in self.character_actions.items():
-            actor = record["actor"]
-            # Compute initiative: d20 roll (deterministic via rules_engine's dice) plus DEX modifier.
-            # Using the same RNG for consistency; ensure the RNG is seeded appropriately per turn.
-            initiative_roll = rules_engine.dice.roll_d20()
-            dex_mod = actor.get_modifier("DEX")
-            initiative_score = initiative_roll + dex_mod
-            # Tie-breaker: store the DEX modifier and actor name.
-            initiative_map[actor_name] = (actor, initiative_score, dex_mod)
+        Compute initiative order and return a list of actions in the order they will be processed.
         
-        # Sort the actor names by initiative_score (descending), then dex_mod (descending), then name (alphabetically).
-        sorted_actor_names = sorted(
-            initiative_map.keys(),
-            key=lambda name: (initiative_map[name][1], initiative_map[name][2], name),
+        For each actor not delaying, compute an initiative score (d20 roll + DEX modifier) using the rules engine's RNG.
+        Sort these actors in descending order (tie-break: higher DEX modifier, then alphabetical order).
+        
+        Then, for each actor:
+         - Process immediate actions first.
+         - If the actor has a delayed action, skip processing them now.
+         - Otherwise, if a full-round action exists, process it; else process standard and move actions.
+         - Then process swift actions.
+         - Finally, process free actions.
+        
+        After processing non-delayed actions, append delayed actions (sorted by their original initiative score
+        in ascending order, so those delaying longer act later).
+        """
+        non_delayed = {}
+        delayed = {}
+        # First, compute initiative for actors who are not delaying.
+        for actor_name, record in self.character_actions.items():
+            if record["delayed"] is None:
+                actor = record["actor"]
+                # Deterministic initiative: d20 roll plus DEX modifier.
+                init_roll = rules_engine.dice.roll_d20()
+                dex_mod = actor.get_modifier("DEX")
+                initiative_score = init_roll + dex_mod
+                non_delayed[actor_name] = (record, initiative_score, dex_mod)
+            else:
+                # For delayed actions, we still compute initiative for ordering.
+                actor = record["actor"]
+                init_roll = rules_engine.dice.roll_d20()
+                dex_mod = actor.get_modifier("DEX")
+                initiative_score = init_roll + dex_mod
+                delayed[actor_name] = (record, initiative_score, dex_mod)
+        
+        # Sort non-delayed actors: descending initiative, then dex mod, then name.
+        sorted_non_delayed = sorted(
+            non_delayed.keys(),
+            key=lambda name: (non_delayed[name][1], non_delayed[name][2], name),
             reverse=True
+        )
+        # Sort delayed actors: ascending initiative so they act later.
+        sorted_delayed = sorted(
+            delayed.keys(),
+            key=lambda name: (delayed[name][1], delayed[name][2], name)
         )
         
         ordered_actions = []
-        # Process actions in initiative order.
-        for actor_name in sorted_actor_names:
-            record = self.character_actions[actor_name]
-            # Process immediate actions first (they may be interrupts or reactions).
+        # Process actions for non-delayed actors in initiative order.
+        for actor_name in sorted_non_delayed:
+            record = non_delayed[actor_name][0]
             ordered_actions.extend(record["immediate"])
-            # If a full-round action exists, it replaces standard and move actions.
+            # If a full-round action exists, it replaces standard and move.
             if record["full_round"]:
                 ordered_actions.append(record["full_round"])
             else:
@@ -123,8 +145,21 @@ class Turn:
                 ordered_actions.append(record["swift"])
             # Finally, free actions.
             ordered_actions.extend(record["free"])
+            # Also include any readied actions (assumed to be processed at the actor’s turn)
+            ordered_actions.extend(record["readied"])
+        
+        # Append delayed actions after non-delayed actions.
+        for actor_name in sorted_delayed:
+            record = delayed[actor_name][0]
+            # For delayed actions, process them as the sole action for the actor.
+            if record["delayed"]:
+                ordered_actions.append(record["delayed"])
+            # You may choose to also process readied actions if applicable (if allowed alongside delay).
+            ordered_actions.extend(record["immediate"])
+            ordered_actions.extend(record["readied"])
+            # Note: Standard/move/swift/free actions are assumed to be skipped if delayed.
+        
         return ordered_actions
-
 
 class TurnManager:
     def __init__(self, rules_engine, game_map):
@@ -144,9 +179,9 @@ class TurnManager:
 
     def process_turn(self, turn: Turn) -> List[Any]:
         results = []
-        # Compute the ordered list of actions based on initiative.
+        # Get actions ordered by initiative, including handling for delayed actions.
         ordered_actions = turn.get_ordered_actions(self.rules_engine)
-        # Process each action in the computed order.
+        # Process each action in order.
         for action in ordered_actions:
             self.assign_action_id(action)
             action.rules_engine = self.rules_engine
@@ -157,10 +192,9 @@ class TurnManager:
             result["turn_number"] = turn.turn_number
             result["action_id"] = action.action_id
             results.append(result)
-        # After processing, update each actor’s state.
+        # After processing, update the state of each actor.
         for actor_name, record in turn.character_actions.items():
-            actor = record["actor"]
-            actor.update_state()
+            record["actor"].update_state()
         return results
 
     def parse_json_actions(self, json_input: str, characters: Dict[str, Character]) -> Turn:
@@ -177,6 +211,7 @@ class TurnManager:
                 action_type = ActionType(action_type_str.lower())
             except ValueError:
                 raise ValueError(f"Invalid action type: {action_type_str}")
+            # Create the corresponding action object based on type.
             if action_type == ActionType.STANDARD:
                 if "defender" in params:
                     defender_name = params.get("defender")
@@ -216,6 +251,13 @@ class TurnManager:
                                           skill_name=params.get("skill_name"),
                                           dc=params.get("dc", 15),
                                           action_type="immediate")
+            elif action_type == ActionType.READIED:
+                # For simplicity, create a readied action as a generic free-like action.
+                action = GameAction(actor=actor, action_type="readied", parameters=params)
+                action.execute = lambda: {"action": "readied", "actor": actor.name, "justification": "Readied action executed."}
+            elif action_type == ActionType.DELAYED:
+                action = GameAction(actor=actor, action_type="delayed", parameters=params)
+                action.execute = lambda: {"action": "delayed", "actor": actor.name, "justification": "Delayed action executed."}
             else:
                 raise ValueError(f"Unsupported action type: {action_type_str}")
             turn.add_action(action)
