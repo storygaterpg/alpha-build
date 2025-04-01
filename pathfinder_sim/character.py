@@ -7,6 +7,7 @@ It manages attributes such as position, abilities, combat statistics, conditions
 and narrative elements. This version includes methods to serialize to and reconstruct from a dictionary.
 Enhanced for CD-01 and CD-02: now includes dynamic calculation of saving throws, CMB/CMD, HP,
 spell slots, and racial modifier application.
+Enhanced for CD-03: Resource Management methods for spending and regenerating resources.
 """
 
 from typing import List, Dict, Any
@@ -18,7 +19,7 @@ from rpg_class import RPGClass  # For type annotations
 class Character:
     """
     A simplified character class.
-
+    
     Attributes:
       - name: Character's name.
       - position: Grid coordinates (x, y).
@@ -145,7 +146,10 @@ class Character:
         return resources
 
     def update_resources(self) -> None:
-        """Regenerate resources based on configuration."""
+        """
+        Regenerate resources based on configuration.
+        For each resource, increase by the regen_rate without exceeding the default maximum.
+        """
         config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
         with open(config_path, "r") as f:
             resource_config = json.load(f)
@@ -153,6 +157,37 @@ class Character:
             regen_rate = data.get("regen_rate", 0)
             max_value = data.get("default_max", 0)
             self.resources[key] = min(self.resources.get(key, 0) + regen_rate, max_value)
+
+    def long_rest(self) -> None:
+        """
+        Perform a long rest to fully restore resources that reset "per long rest" or "per day".
+        This method resets the value of each applicable resource to its default maximum.
+        """
+        config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
+        with open(config_path, "r") as f:
+            resource_config = json.load(f)
+        for key, data in resource_config.items():
+            reset_period = data.get("reset_period", "")
+            # For resources that are fully restored on a long rest or daily, reset them.
+            if reset_period in ["per long rest", "per day"]:
+                self.resources[key] = data.get("default_max", self.resources.get(key, 0))
+
+    def can_spend_resource(self, resource_name: str, amount: int = 1) -> bool:
+        """
+        Check if the character has at least 'amount' of the specified resource.
+        """
+        return self.resources.get(resource_name, 0) >= amount
+
+    def spend_resource(self, resource_name: str, amount: int = 1) -> bool:
+        """
+        Deduct the specified amount of the given resource if available.
+        Returns True if the resource was successfully spent, otherwise False.
+        """
+        if self.can_spend_resource(resource_name, amount):
+            self.resources[resource_name] -= amount
+            return True
+        else:
+            return False
 
     def update_state(self) -> None:
         """Update character state by ticking conditions and regenerating resources."""
@@ -428,3 +463,4 @@ class Character:
                 f"Flat-footed AC: {self.get_flatfooted_ac()}, Touch AC: {self.get_touch_ac()}, "
                 f"CMB: {self.cmb}, CMD: {self.cmd}, "
                 f"Conditions: {self.get_condition_status()}, Resources: {self.resources}, Reach: {self.reach}")
+
