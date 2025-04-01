@@ -1,35 +1,64 @@
 """
 actions.py
 ----------
-
 This module defines all GameAction classes for our Pathfinder simulation.
-It now uses a data-driven logging system via logger.py.
+All actions now adhere to the standardized IAction interface, ensuring that each action can be executed
+in a deterministic, auditable manner. It uses a data-driven logging system via logger.py.
 """
 
 from typing import Dict, Any, Tuple
+from abc import ABC, abstractmethod
 from character import Character
 import os
 import json
 from logger import format_log  # Import logging helper
 from action_types import ActionType  # Import ActionType enum
 
-class GameAction:
+# Define the IAction interface for all game actions.
+class IAction(ABC):
+    """
+    IAction is the interface that all game actions must implement.
+    It guarantees that every action has an execute() method that returns an ActionResult
+    in the form of a dictionary, containing outcome details and audit metadata.
+    """
+    @abstractmethod
+    def execute(self) -> Dict[str, Any]:
+        """
+        Execute the action and return a dictionary containing the outcome and audit data.
+        """
+        pass
+
+class GameAction(IAction):
+    """
+    GameAction is the base class for all actions in the simulation.
+    It implements the IAction interface and provides common properties such as the actor,
+    action type, parameters, and placeholders for the rules engine and game map.
+    """
     def __init__(self, actor: Character, action_type, parameters: Dict[str, Any] = None):
         self.actor = actor
-        # If action_type is already an instance of ActionType, use it; otherwise, convert from string.
+        # Convert action_type to an ActionType enum if necessary.
         if isinstance(action_type, ActionType):
             self.action_type = action_type
         else:
             self.action_type = ActionType(action_type.lower())
         self.action_id: int = 0
         self.parameters = parameters if parameters is not None else {}
-        self.rules_engine = None  # To be injected by TurnManager.
+        self.rules_engine = None  # Will be injected by TurnManager.
         self.game_map = None      # For movement actions.
 
+    @abstractmethod
     def execute(self) -> Dict[str, Any]:
-        raise NotImplementedError("Subclasses must implement execute()")
+        """
+        Execute the action. Must be implemented by subclasses.
+        Returns a dictionary containing the action result and audit data.
+        """
+        pass
 
 class AttackAction(GameAction):
+    """
+    Represents an attack action where the actor attempts to hit a defender.
+    Uses the combat resolver from the rules engine to compute the outcome.
+    """
     def __init__(self, actor: Character, defender: Character, weapon_bonus: int = 0,
                  weapon: Any = None, is_touch_attack: bool = False, target_flat_footed: bool = False,
                  action_type: str = "attack"):
@@ -56,6 +85,10 @@ class AttackAction(GameAction):
         return result
 
 class SpellAction(GameAction):
+    """
+    Represents a spellcasting action where the actor casts a spell on a target.
+    Verifies that the actor knows the spell and has sufficient spell resources.
+    """
     def __init__(self, actor: Character, target: Character, spell_name: str,
                  action_type: str = "spell"):
         super().__init__(actor, action_type)
@@ -63,10 +96,10 @@ class SpellAction(GameAction):
         self.spell_name = spell_name
 
     def execute(self) -> Dict[str, Any]:
-        # Check that the actor knows the spell.
+        # Validate that the spell is known.
         if self.spell_name.lower() not in [spell.lower() for spell in self.actor.spells]:
             raise ValueError(f"{self.actor.name} does not know '{self.spell_name}'.")
-        # Before casting, ensure that the actor has enough spell slots.
+        # Ensure sufficient spell slots.
         if not self.actor.spend_resource("spell_slots", 1):
             raise ValueError(f"{self.actor.name} does not have enough spell slots to cast '{self.spell_name}'.")
         result = self.rules_engine.spell_resolver.resolve_spell(self)
@@ -80,6 +113,10 @@ class SpellAction(GameAction):
         return result
 
 class SkillCheckAction(GameAction):
+    """
+    Represents a skill check action where the actor attempts to perform a skill-based task.
+    The outcome is determined by the skill resolver in the rules engine.
+    """
     def __init__(self, actor: Character, skill_name: str, dc: int,
                  action_type: str = "skill_check"):
         super().__init__(actor, action_type)
@@ -92,6 +129,10 @@ class SkillCheckAction(GameAction):
         return result
 
 class MoveAction(GameAction):
+    """
+    Represents a movement action where the actor moves from its current position to a target cell.
+    Delegates pathfinding to the MovementAction class in movement.py.
+    """
     def __init__(self, actor: Character, target: Tuple[int, int],
                  action_type: str = "move"):
         super().__init__(actor, action_type, parameters={"target": target})
@@ -99,10 +140,9 @@ class MoveAction(GameAction):
 
     def execute(self) -> Dict[str, Any]:
         from movement import MovementAction
-        # Create a MovementAction with game_map, actor, start position, and target.
         movement_action = MovementAction(self.game_map, self.actor, self.actor.position, self.target)
         start_pos = self.actor.position
-        movement_result = movement_action.execute()  # This returns a dict.
+        movement_result = movement_action.execute()  # Returns a dictionary.
         path = movement_result.get("path", [])
         if path:
             self.actor.position = path[-1]
@@ -124,6 +164,9 @@ class MoveAction(GameAction):
         return result
 
 class FullRoundAction(GameAction):
+    """
+    Represents a full-round action, such as a charge, that combines movement and an attack.
+    """
     def __init__(self, actor: Character, parameters: Dict[str, Any],
                  action_type: str = "full_round"):
         super().__init__(actor, action_type, parameters)
