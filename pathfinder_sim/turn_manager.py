@@ -3,7 +3,7 @@ turn_manager.py
 ---------------
 
 This module implements our advanced turn management and action economy system for the Pathfinder simulation.
-It handles action sequencing, turn numbering, and parsing JSON orders into actions.
+It handles action sequencing, initiative ordering, turn numbering, and parsing JSON orders into actions.
 All core action classes are imported from actions.py.
 """
 
@@ -13,16 +13,27 @@ from character import Character
 from actions import AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction, GameAction
 from action_types import ActionType  # Import ActionType enum
 
+
 class Turn:
     def __init__(self, turn_number: int):
         self.turn_number = turn_number
-        # For each character, record actions: "standard", "move" (list), "swift", "full_round", "free" (list).
+        # For each character, record the following:
+        # "actor": the Character instance,
+        # "immediate": list of immediate actions,
+        # "standard": one standard action (or None),
+        # "move": list of move actions,
+        # "swift": one swift action (or None),
+        # "full_round": one full-round action (or None),
+        # "free": list of free actions.
         self.character_actions: Dict[str, Dict[str, Any]] = {}
 
     def add_action(self, action) -> None:
         actor_name = action.actor.name
+        # If the actor is not already present, initialize their action record.
         if actor_name not in self.character_actions:
             self.character_actions[actor_name] = {
+                "actor": action.actor,
+                "immediate": [],
                 "standard": None,
                 "move": [],
                 "swift": None,
@@ -30,6 +41,7 @@ class Turn:
                 "free": []
             }
         records = self.character_actions[actor_name]
+        # Enforce action limits based on action type.
         if action.action_type == ActionType.FULL_ROUND:
             if records["standard"] or records["move"]:
                 raise Exception(f"{actor_name} cannot combine a full-round action with standard or move actions.")
@@ -39,12 +51,15 @@ class Turn:
         elif action.action_type == ActionType.STANDARD:
             if records["standard"] is not None:
                 raise Exception(f"{actor_name} has already taken a standard action this turn.")
+            # If any move actions have been taken (more than one), standard actions are not allowed.
             if len(records["move"]) > 1:
                 raise Exception(f"{actor_name} cannot take a standard action after taking 2 move actions.")
             records["standard"] = action
         elif action.action_type == ActionType.MOVE:
+            # If a standard action is taken, only one move action is allowed.
             if records["standard"] and len(records["move"]) >= 1:
                 raise Exception(f"{actor_name} cannot take more than 1 move action when a standard action is used.")
+            # Otherwise, allow up to two move actions.
             elif not records["standard"] and len(records["move"]) >= 2:
                 raise Exception(f"{actor_name} cannot take more than 2 move actions in a turn.")
             records["move"].append(action)
@@ -54,22 +69,62 @@ class Turn:
             records["swift"] = action
         elif action.action_type == ActionType.FREE:
             records["free"].append(action)
+        elif action.action_type == ActionType.IMMEDIATE:
+            # Immediate actions are stored separately.
+            records["immediate"].append(action)
         else:
             raise Exception(f"Unsupported action type: {action.action_type}")
 
-    def get_all_actions(self) -> List:
-        actions = []
-        for rec in self.character_actions.values():
-            if rec["full_round"]:
-                actions.append(rec["full_round"])
+    def get_ordered_actions(self, rules_engine) -> List:
+        """
+        Compute initiative order and return a list of actions ordered by initiative.
+        For each actor in the turn, compute an initiative score (d20 + DEX modifier),
+        sort actors in descending order (with tie-breakers on DEX modifier and name),
+        and then for each actor, append their actions in the following priority:
+          1. Immediate actions (if any)
+          2. Full-round action (if present; else Standard action, then Move actions)
+          3. Swift action
+          4. Free actions
+        """
+        # Build a mapping from actor name to (actor instance, initiative score).
+        initiative_map = {}
+        for actor_name, record in self.character_actions.items():
+            actor = record["actor"]
+            # Compute initiative: d20 roll (deterministic via rules_engine's dice) plus DEX modifier.
+            # Using the same RNG for consistency; ensure the RNG is seeded appropriately per turn.
+            initiative_roll = rules_engine.dice.roll_d20()
+            dex_mod = actor.get_modifier("DEX")
+            initiative_score = initiative_roll + dex_mod
+            # Tie-breaker: store the DEX modifier and actor name.
+            initiative_map[actor_name] = (actor, initiative_score, dex_mod)
+        
+        # Sort the actor names by initiative_score (descending), then dex_mod (descending), then name (alphabetically).
+        sorted_actor_names = sorted(
+            initiative_map.keys(),
+            key=lambda name: (initiative_map[name][1], initiative_map[name][2], name),
+            reverse=True
+        )
+        
+        ordered_actions = []
+        # Process actions in initiative order.
+        for actor_name in sorted_actor_names:
+            record = self.character_actions[actor_name]
+            # Process immediate actions first (they may be interrupts or reactions).
+            ordered_actions.extend(record["immediate"])
+            # If a full-round action exists, it replaces standard and move actions.
+            if record["full_round"]:
+                ordered_actions.append(record["full_round"])
             else:
-                if rec["standard"]:
-                    actions.append(rec["standard"])
-                actions.extend(rec["move"])
-            if rec["swift"]:
-                actions.append(rec["swift"])
-            actions.extend(rec["free"])
-        return actions
+                if record["standard"]:
+                    ordered_actions.append(record["standard"])
+                ordered_actions.extend(record["move"])
+            # Then process swift actions.
+            if record["swift"]:
+                ordered_actions.append(record["swift"])
+            # Finally, free actions.
+            ordered_actions.extend(record["free"])
+        return ordered_actions
+
 
 class TurnManager:
     def __init__(self, rules_engine, game_map):
@@ -89,27 +144,23 @@ class TurnManager:
 
     def process_turn(self, turn: Turn) -> List[Any]:
         results = []
-        # Process each action.
-        for action in turn.get_all_actions():
+        # Compute the ordered list of actions based on initiative.
+        ordered_actions = turn.get_ordered_actions(self.rules_engine)
+        # Process each action in the computed order.
+        for action in ordered_actions:
             self.assign_action_id(action)
             action.rules_engine = self.rules_engine
+            # For movement and full-round actions, inject the current game map.
             if action.action_type in [ActionType.MOVE, ActionType.FULL_ROUND]:
                 action.game_map = self.game_map
             result = action.execute()
             result["turn_number"] = turn.turn_number
             result["action_id"] = action.action_id
             results.append(result)
-        # After processing actions, update the state of each actor involved.
-        for actor_name in turn.character_actions:
-            # Assuming each actor is a Character instance.
-            # You might need to retrieve the Character instance from your game state.
-            # Here we assume actor reference is stored in the action.
-            actor = turn.character_actions[actor_name].get("standard") or \
-                    (turn.character_actions[actor_name]["move"][0] if turn.character_actions[actor_name]["move"] else None) or \
-                    turn.character_actions[actor_name].get("swift") or \
-                    (turn.character_actions[actor_name]["free"][0] if turn.character_actions[actor_name]["free"] else None)
-            if actor:
-                actor.actor.update_state() if hasattr(actor, "actor") else actor.update_state()
+        # After processing, update each actor’s state.
+        for actor_name, record in turn.character_actions.items():
+            actor = record["actor"]
+            actor.update_state()
         return results
 
     def parse_json_actions(self, json_input: str, characters: Dict[str, Character]) -> Turn:
@@ -158,7 +209,13 @@ class TurnManager:
                 action = FullRoundAction(actor=actor, parameters=params, action_type="full_round")
             elif action_type == ActionType.FREE:
                 action = GameAction(actor=actor, action_type="free", parameters=params)
+                # For free actions, we define a simple lambda for execution.
                 action.execute = lambda: {"action": "free", "actor": actor.name, "justification": "Free action executed."}
+            elif action_type == ActionType.IMMEDIATE:
+                action = SkillCheckAction(actor=actor,
+                                          skill_name=params.get("skill_name"),
+                                          dc=params.get("dc", 15),
+                                          action_type="immediate")
             else:
                 raise ValueError(f"Unsupported action type: {action_type_str}")
             turn.add_action(action)
