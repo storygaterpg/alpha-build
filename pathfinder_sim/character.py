@@ -7,7 +7,8 @@ It manages attributes such as position, abilities, combat statistics, conditions
 and narrative elements. This version includes methods to serialize to and reconstruct from a dictionary.
 Enhanced for CD-01 and CD-02: now includes dynamic calculation of saving throws, CMB/CMD, HP,
 spell slots, and racial modifier application.
-Enhanced for CD-03: Resource Management methods for spending and regenerating resources.
+Enhanced for CD-03: Implements resource management with caching, resource consumption,
+and full restoration on a long rest.
 """
 
 from typing import List, Dict, Any
@@ -15,6 +16,9 @@ import json
 import os
 import conditions
 from rpg_class import RPGClass  # For type annotations
+
+# Global cache for resource configuration to avoid repeated disk I/O.
+_RESOURCE_CONFIG_CACHE = None
 
 class Character:
     """
@@ -136,12 +140,15 @@ class Character:
                 print(f"{self.name} loses condition: {condition.name}")
 
     def load_resources(self) -> Dict[str, Any]:
-        """Load resource configuration from file."""
-        config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
-        with open(config_path, "r") as f:
-            resource_config = json.load(f)
+        """Load resource configuration from file with caching."""
+        global _RESOURCE_CONFIG_CACHE
+        if _RESOURCE_CONFIG_CACHE is None:
+            config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
+            with open(config_path, "r") as f:
+                _RESOURCE_CONFIG_CACHE = json.load(f)
         resources = {}
-        for key, data in resource_config.items():
+        # Initialize each resource to its default maximum.
+        for key, data in _RESOURCE_CONFIG_CACHE.items():
             resources[key] = data.get("default_max", 0)
         return resources
 
@@ -150,10 +157,10 @@ class Character:
         Regenerate resources based on configuration.
         For each resource, increase by the regen_rate without exceeding the default maximum.
         """
-        config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
-        with open(config_path, "r") as f:
-            resource_config = json.load(f)
-        for key, data in resource_config.items():
+        global _RESOURCE_CONFIG_CACHE
+        if _RESOURCE_CONFIG_CACHE is None:
+            self.load_resources()
+        for key, data in _RESOURCE_CONFIG_CACHE.items():
             regen_rate = data.get("regen_rate", 0)
             max_value = data.get("default_max", 0)
             self.resources[key] = min(self.resources.get(key, 0) + regen_rate, max_value)
@@ -163,12 +170,11 @@ class Character:
         Perform a long rest to fully restore resources that reset "per long rest" or "per day".
         This method resets the value of each applicable resource to its default maximum.
         """
-        config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
-        with open(config_path, "r") as f:
-            resource_config = json.load(f)
-        for key, data in resource_config.items():
+        global _RESOURCE_CONFIG_CACHE
+        if _RESOURCE_CONFIG_CACHE is None:
+            self.load_resources()
+        for key, data in _RESOURCE_CONFIG_CACHE.items():
             reset_period = data.get("reset_period", "")
-            # For resources that are fully restored on a long rest or daily, reset them.
             if reset_period in ["per long rest", "per day"]:
                 self.resources[key] = data.get("default_max", self.resources.get(key, 0))
 
@@ -221,8 +227,6 @@ class Character:
           - Saves: Fortitude, Reflex, Will (base save from classes plus ability modifiers).
           - CMB and CMD: Calculated from BAB and ability modifiers.
           - Optionally, compute hit points.
-        Raises:
-            ValueError: If progression data for a class or a specific level is not found.
         """
         total_bab = 0
         base_fort = 0
@@ -258,9 +262,8 @@ class Character:
     def compute_cmb_cmd(self) -> None:
         """
         Compute the Combat Maneuver Bonus (CMB) and Combat Maneuver Defense (CMD).
-        Formulas:
-          - CMB = BAB + Strength modifier
-          - CMD = 10 + BAB + Strength modifier + Dexterity modifier + size modifier
+        CMB = BAB + Strength modifier
+        CMD = 10 + BAB + Strength modifier + Dexterity modifier + size modifier
         """
         self.cmb = self.BAB + self.get_modifier("STR")
         self.cmd = 10 + self.BAB + self.get_modifier("STR") + self.get_modifier("DEX") + self.size_modifier
@@ -309,8 +312,7 @@ class Character:
 
     def initialize_race(self, race_obj: Any) -> None:
         """
-        Initialize the character's race.
-        This sets the race name and applies racial modifiers.
+        Initialize the character's race by setting the race name and applying racial modifiers.
         """
         self.race = race_obj.name
         self.apply_racial_modifiers(race_obj)
@@ -319,8 +321,8 @@ class Character:
         """
         Compute the character's Armor Class (AC).
         Base AC = 10 + armor_bonus + shield_bonus + natural_armor + deflection_bonus + size_modifier.
-        Adds Dexterity mod and dodge_bonus if not affected by conditions that remove them.
-        Then adds additional modifiers from active conditions.
+        Adds Dexterity mod and dodge_bonus if not affected by conditions.
+        Additional modifiers from active conditions are added.
         """
         base_ac = 10 + self.armor_bonus + self.shield_bonus + self.natural_armor + self.deflection_bonus + self.size_modifier
         if not self.has_condition(["blinded", "flatfooted", "paralyzed", "unconscious"]):
@@ -463,4 +465,3 @@ class Character:
                 f"Flat-footed AC: {self.get_flatfooted_ac()}, Touch AC: {self.get_touch_ac()}, "
                 f"CMB: {self.cmb}, CMD: {self.cmd}, "
                 f"Conditions: {self.get_condition_status()}, Resources: {self.resources}, Reach: {self.reach}")
-

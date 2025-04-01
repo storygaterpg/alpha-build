@@ -10,8 +10,8 @@ from typing import Dict, Any, Tuple
 from character import Character
 import os
 import json
-from logger import format_log  # Import our logging helper
-from action_types import ActionType  # Import the ActionType enum from our new module
+from logger import format_log  # Import logging helper
+from action_types import ActionType  # Import ActionType enum
 
 class GameAction:
     def __init__(self, actor: Character, action_type, parameters: Dict[str, Any] = None):
@@ -63,8 +63,12 @@ class SpellAction(GameAction):
         self.spell_name = spell_name
 
     def execute(self) -> Dict[str, Any]:
+        # Check that the actor knows the spell.
         if self.spell_name.lower() not in [spell.lower() for spell in self.actor.spells]:
             raise ValueError(f"{self.actor.name} does not know '{self.spell_name}'.")
+        # Before casting, ensure that the actor has enough spell slots.
+        if not self.actor.spend_resource("spell_slots", 1):
+            raise ValueError(f"{self.actor.name} does not have enough spell slots to cast '{self.spell_name}'.")
         result = self.rules_engine.spell_resolver.resolve_spell(self)
         log_data = {
             "spell_name": result.get("spell_name", ""),
@@ -151,4 +155,4 @@ class FullRoundAction(GameAction):
             result["log"] = f"Full-round charge by {self.actor.name} to {target}. Attack result: {attack_result}."
             return result
         else:
-            return {"action": "full_round", "result": "unknown", "justification": "Full-round action type not implemented."}
+            return {"action": "full_round", "result": "unknown", "justification": "Full-round action type not recognized."}

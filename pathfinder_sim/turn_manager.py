@@ -4,14 +4,14 @@ turn_manager.py
 
 This module implements our advanced turn management and action economy system for the Pathfinder simulation.
 It handles action sequencing, turn numbering, and parsing JSON orders into actions.
-All core action classes are now imported from actions.py.
+All core action classes are imported from actions.py.
 """
 
 import json
 from typing import List, Dict, Any
 from character import Character
 from actions import AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction, GameAction
-from action_types import ActionType  # Import ActionType from the new module
+from action_types import ActionType  # Import ActionType enum
 
 class Turn:
     def __init__(self, turn_number: int):
@@ -89,6 +89,7 @@ class TurnManager:
 
     def process_turn(self, turn: Turn) -> List[Any]:
         results = []
+        # Process each action.
         for action in turn.get_all_actions():
             self.assign_action_id(action)
             action.rules_engine = self.rules_engine
@@ -98,6 +99,17 @@ class TurnManager:
             result["turn_number"] = turn.turn_number
             result["action_id"] = action.action_id
             results.append(result)
+        # After processing actions, update the state of each actor involved.
+        for actor_name in turn.character_actions:
+            # Assuming each actor is a Character instance.
+            # You might need to retrieve the Character instance from your game state.
+            # Here we assume actor reference is stored in the action.
+            actor = turn.character_actions[actor_name].get("standard") or \
+                    (turn.character_actions[actor_name]["move"][0] if turn.character_actions[actor_name]["move"] else None) or \
+                    turn.character_actions[actor_name].get("swift") or \
+                    (turn.character_actions[actor_name]["free"][0] if turn.character_actions[actor_name]["free"] else None)
+            if actor:
+                actor.actor.update_state() if hasattr(actor, "actor") else actor.update_state()
         return results
 
     def parse_json_actions(self, json_input: str, characters: Dict[str, Character]) -> Turn:
