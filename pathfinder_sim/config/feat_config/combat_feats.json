@@ -355,7 +355,7 @@
       "prerequisites": {
         "BAB": 1
       },
-      "benefit": "You can use any armor tricks related to the chosen armor option if you meet the trick’s prerequisites and are proficient with any armor that you use as part of the trick."
+      "benefit": "You can use any armor tricks related to the chosen armor option if you meet the trick prerequisites and are proficient with any armor that you use as part of the trick."
     },
     "Armored Athlete": {
       "prerequisites": {
@@ -367,7 +367,7 @@
           "Any Dex/Str-based skill": 3
         }
       },
-      "benefit": "Choose one Dexterity – or Strength-based skill in which you possess at least 3 ranks. When you attempt a check for the chosen skill, your armor check penalty on that check for wearing light or medium armor is reduced by 3 (to a minimum of 0). If you have 10 or more ranks in the skill, the penalty is instead reduced by 6 (to a minimum of 0). If you have armor training 2 and are proficient with heavy armor, this benefit also applies to armor check penalties for wearing heavy armor."
+      "benefit": "Choose one Dexterity or Strength-based skill in which you possess at least 3 ranks. When you attempt a check for the chosen skill, your armor check penalty on that check for wearing light or medium armor is reduced by 3 (to a minimum of 0). If you have 10 or more ranks in the skill, the penalty is instead reduced by 6 (to a minimum of 0). If you have armor training 2 and are proficient with heavy armor, this benefit also applies to armor check penalties for wearing heavy armor."
     },
     "Artful Dodge": {
       "prerequisites": {
@@ -3544,19 +3544,6 @@
         },
         "benefit": "Impaled opponent must succeed at a grapple maneuver to pull your weapon out"
     },
-    "Improved Awesome Blow": {
-        "prerequisites": {
-        "Stat": {"STR": 13},
-        "Prerequisite Options": {
-            "or": [
-            "Awesome Blow",
-            "awesome blow class feature"
-            ]
-        },
-        "Feat": "Power Attack"
-        },
-        "benefit": "+2 on awesome blow combat maneuver checks and to CMD against such attacks, and movement due to awesome blow provokes from allies"
-    },
     "Improved Critical": {
         "prerequisites": {
         "Special": "Proficient with weapon",
@@ -3564,9 +3551,9 @@
         },
         "benefit": "When using the weapon you selected, your threat range is doubled."
     },
-    "Improved Hunter’s Bond": {
+    "Improved Hunters Bond": {
         "prerequisites": {
-        "Special": "Hunter’s bond (companions) class feature",
+        "Special": "Hunters bond (companions) class feature",
         "Class": {"ranger": 9}
         },
         "benefit": "Grant your allies full favored enemy bonus"
@@ -3588,7 +3575,7 @@
         "Stat": {"INT": 13},
         "Feat": "Combat Expertise"
         },
-        "benefit": "When you successfully parry a foe’s melee attack (with a dueling parry or the parry class feature), your next melee attack against the target does not allow the enemy to apply its Dexterity bonus to AC (if any). This attack must be made before the end of your next turn."
+        "benefit": "When you successfully parry a foes melee attack (with a dueling parry or the parry class feature), your next melee attack against the target does not allow the enemy to apply its Dexterity bonus to AC (if any). This attack must be made before the end of your next turn."
     },
     "Improved Surprise Follow-Through": {
         "prerequisites": {
