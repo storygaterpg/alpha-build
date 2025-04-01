@@ -5,6 +5,8 @@ character.py
 This module defines the Character class for our Pathfinder simulation.
 It manages attributes such as position, abilities, combat statistics, conditions, resources,
 and narrative elements. This version includes methods to serialize to and reconstruct from a dictionary.
+Enhanced for CD-01: now includes dynamic calculation of saving throws, CMB/CMD, HP (optional),
+spell slots, and racial modifier application.
 """
 
 from typing import List, Dict, Any
@@ -21,18 +23,26 @@ class Character:
       - name: Character's name.
       - position: Grid coordinates (x, y).
       - dexterity: Used to compute ability modifiers.
-      - Defensive bonuses (armor, shield, etc.).
+      - Other ability scores: strength, constitution, intelligence, wisdom, charisma.
+      - Defensive stats: armor_bonus, shield_bonus, natural_armor, deflection_bonus, dodge_bonus, size_modifier.
       - BAB: Base Attack Bonus (calculated from multiclass levels).
+      - cmb: Combat Maneuver Bonus.
+      - cmd: Combat Maneuver Defense.
       - spells: List of known spells.
+      - spell_slots: Dictionary for spell slot data.
       - conditions: List of active conditions.
       - resources: Dictionary tracking limited-use resources.
       - reach: The number of squares this character threatens.
       - class_levels: Dictionary mapping RPG class names to levels (for multiclassing).
+      - Saves: fortitude_save, reflex_save, will_save.
+      - hit_points: Current hit points.
+      - experience: Experience points.
+      - Identity and narrative fields: race, alignment, deity, feats, inventory, background, goals, relationships.
     """
     def __init__(self, name: str, x: int, y: int, dexterity: int, reach: int = 1):
         self.name = name
         self.position = (x, y)
-        self.climb_state = None  # New attribute to track vertical movement progress (e.g., when climbing a ladder)
+        self.climb_state = None  # Track vertical movement progress (e.g., when climbing a ladder)
         self.dexterity = dexterity
         
         # Defensive stats.
@@ -46,7 +56,13 @@ class Character:
         # Base Attack Bonus (derived from class levels).
         self.BAB = 0
 
+        # New: Combat Maneuver Bonus and Defense.
+        self.cmb = 0
+        self.cmd = 10  # Base value before adding modifiers
+
         self.spells: List[str] = []
+        self.spell_slots: Dict[str, Any] = {}  # Will store spell slot data per class/day
+
         self.conditions: List[conditions.Condition] = []
         self.resources: Dict[str, Any] = self.load_resources()
         self.reach = reach
@@ -54,7 +70,7 @@ class Character:
         # Multiclass: dictionary mapping RPG class names to levels.
         self.class_levels: Dict[str, int] = {}
 
-        # Additional ability scores (default 10 if not provided)
+        # Ability scores (default 10 if not provided)
         self.strength = 10
         self.constitution = 10
         self.intelligence = 10
@@ -79,6 +95,7 @@ class Character:
         self.relationships: List[Dict[str, str]] = []
 
     def get_modifier(self, ability: str) -> int:
+        """Return the ability modifier for a given ability score (e.g., DEX, STR)."""
         ability = ability.upper()
         if ability == "DEX":
             return (self.dexterity - 10) // 2
@@ -99,10 +116,20 @@ class Character:
         return any(cond.name.lower() in [name.lower() for name in condition_names] for cond in self.conditions)
 
     def add_condition(self, condition: conditions.Condition) -> None:
+        """Add a condition to the character."""
         self.conditions.append(condition)
         print(f"{self.name} gains condition: {condition.name} (Duration: {condition.duration} rounds)")
 
+    def remove_condition(self, condition: conditions.Condition) -> None:
+        """
+        Remove a specific condition from the character if present.
+        """
+        if condition in self.conditions:
+            self.conditions.remove(condition)
+            print(f"{self.name} loses condition: {condition.name}")
+
     def update_conditions(self) -> None:
+        """Tick down all conditions; remove expired conditions."""
         for condition in self.conditions[:]:
             condition.tick()
             if condition.is_expired():
@@ -110,6 +137,7 @@ class Character:
                 print(f"{self.name} loses condition: {condition.name}")
 
     def load_resources(self) -> Dict[str, Any]:
+        """Load resource configuration from file."""
         config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
         with open(config_path, "r") as f:
             resource_config = json.load(f)
@@ -119,6 +147,7 @@ class Character:
         return resources
 
     def update_resources(self) -> None:
+        """Regenerate resources based on configuration."""
         config_path = os.path.join(os.path.dirname(__file__), "config", "resource_config.json")
         with open(config_path, "r") as f:
             resource_config = json.load(f)
@@ -128,78 +157,129 @@ class Character:
             self.resources[key] = min(self.resources.get(key, 0) + regen_rate, max_value)
 
     def update_state(self) -> None:
+        """Update character state by ticking conditions and regenerating resources."""
         self.update_conditions()
         self.update_resources()
 
     def get_condition_status(self) -> List[Dict[str, Any]]:
+        """Return a summary of all active conditions."""
         return [cond.get_status() for cond in self.conditions]
     
     def level_up(self, rpg_class: RPGClass) -> None:
         """
         Increase the character's level in the given RPG class.
-        Supports multiclassing: if the character already has levels in that class,
-        increment the level; otherwise, initialize it to 1.
-        After leveling up, recalculate derived statistics.
-        """
-        class_name = rpg_class.name.lower()
-        if class_name in self.class_levels:
-            self.class_levels[class_name] += 1
-        else:
-            self.class_levels[class_name] = 1
-        self.recalc_stats()
-        print(f"{self.name} levels up as {rpg_class.name} to level {self.class_levels[class_name]}.")
-
-
-    def recalc_stats(self) -> None:
-        """
-        Recalculate derived attributes based on multiclass levels using the new progression data.
-        For each class in self.class_levels, load the corresponding level data from the progression JSONs
-        and sum the BAB (Base Attack Bonus) from the first value in the "BAB" list.
-        
-        Raises:
-            ValueError: If progression data for a class or a specific level is not found.
-        """
-        total_bab = 0
-        from rpg_class import load_rpg_class_progression
-        all_progressions = load_rpg_class_progression()
-        # Iterate over each class that the character has levels in.
-        for class_name, level in self.class_levels.items():
-            # Normalize the class name: strip any whitespace and convert to lowercase.
-            key = class_name.strip().lower()
-            class_progression = all_progressions.get(key)
-            if not class_progression:
-                raise ValueError(f"No progression data found for class '{class_name}'.")
-            # Levels in the progression data are stored as string keys.
-            level_data = class_progression.get(str(level))
-            if not level_data:
-                raise ValueError(f"No progression data for {class_name} at level {level}.")
-            bab_list = level_data.get("BAB")
-            if bab_list and isinstance(bab_list, list) and len(bab_list) > 0:
-                # Use the first element as the BAB contribution for this level.
-                total_bab += bab_list[0]
-            else:
-                # Fallback: simply add the level if BAB data is missing.
-                total_bab += level
-        self.BAB = total_bab
-
-    def level_up(self, rpg_class: RPGClass) -> None:
-        """
-        Increase the character's level in the given RPG class.
         Supports multiclassing: if the character already has levels in that class, increment the level;
         otherwise, initialize it to 1. After leveling up, recalculate derived statistics.
-        
-        Args:
-            rpg_class (RPGClass): The RPG class instance representing the class the character is leveling up in.
         """
-        # Normalize the class name from the RPGClass instance.
         class_name = rpg_class.name.strip().lower()
         if class_name in self.class_levels:
             self.class_levels[class_name] += 1
         else:
             self.class_levels[class_name] = 1
-        # Recalculate derived stats using the new progression data.
+        # Recalculate derived stats using progression data.
         self.recalc_stats()
         print(f"{self.name} levels up as {rpg_class.name} to level {self.class_levels[class_name]}.")
+
+    def recalc_stats(self) -> None:
+        """
+        Recalculate derived attributes based on multiclass levels using the progression data.
+        Updates:
+          - BAB: Base Attack Bonus.
+          - Saves: Fortitude, Reflex, Will (base save from classes plus ability modifiers).
+          - CMB and CMD: Calculated from BAB and ability modifiers.
+          - Optionally, compute hit points.
+        
+        Raises:
+            ValueError: If progression data for a class or a specific level is not found.
+        """
+        total_bab = 0
+        base_fort = 0
+        base_ref = 0
+        base_will = 0
+        from rpg_class import load_rpg_class_progression
+        all_progressions = load_rpg_class_progression()
+        # Iterate over each class that the character has levels in.
+        for class_name, level in self.class_levels.items():
+            key = class_name.strip().lower()
+            class_progression = all_progressions.get(key)
+            if not class_progression:
+                raise ValueError(f"No progression data found for class '{class_name}'.")
+            level_data = class_progression.get(str(level))
+            if not level_data:
+                raise ValueError(f"No progression data for {class_name} at level {level}.")
+            bab_list = level_data.get("BAB")
+            if bab_list and isinstance(bab_list, list) and len(bab_list) > 0:
+                total_bab += bab_list[0]
+            else:
+                total_bab += level
+            # Accumulate base saves from progression data.
+            base_fort += level_data.get("Fort", 0)
+            base_ref += level_data.get("Ref", 0)
+            base_will += level_data.get("Will", 0)
+        self.BAB = total_bab
+
+        # Calculate saves by adding ability modifiers.
+        self.fortitude_save = base_fort + self.get_modifier("CON")
+        self.reflex_save = base_ref + self.get_modifier("DEX")
+        self.will_save = base_will + self.get_modifier("WIS")
+
+        # Calculate Combat Maneuver Bonus and Defense.
+        self.compute_cmb_cmd()
+
+        # Compute hit points based on classes and Constitution modifier.
+        self.compute_hp()
+
+    def compute_cmb_cmd(self) -> None:
+        """
+        Compute the Combat Maneuver Bonus (CMB) and Combat Maneuver Defense (CMD).
+        Basic formulas:
+          - CMB = BAB + Strength modifier
+          - CMD = 10 + BAB + Strength modifier + Dexterity modifier + size modifier
+        """
+        self.cmb = self.BAB + self.get_modifier("STR")
+        self.cmd = 10 + self.BAB + self.get_modifier("STR") + self.get_modifier("DEX") + self.size_modifier
+
+    def compute_hp(self) -> None:
+        """
+        Compute hit points based on class hit dice and Constitution modifier.
+        For each class level, add the average of the hit die (rounded down) plus CON modifier.
+        This is a simplified version; adjustments for first-level maximum or fractional dice can be added later.
+        """
+        total_hp = 0
+        from rpg_class import load_rpg_classes_config
+        classes_config = load_rpg_classes_config()
+        # For each class, get the hit die value and compute HP contribution.
+        for class_name, level in self.class_levels.items():
+            key = class_name.strip().lower()
+            base_data = classes_config.get(key, {})
+            hit_die = base_data.get("hit_die", 8)
+            # Average hit points per level: (hit_die // 2) + 1
+            avg_hp = (hit_die // 2) + 1
+            total_hp += level * (avg_hp + self.get_modifier("CON"))
+        if self.hit_points == 0:
+            self.hit_points = total_hp
+
+    def apply_racial_modifiers(self, race_obj: Any) -> None:
+        """
+        Apply racial ability modifiers from a Race object to this character's ability scores.
+        """
+        modifiers = getattr(race_obj, "ability_modifiers", {})
+        for ability, mod in modifiers.items():
+            ability_upper = ability.upper()
+            if ability_upper == "STR":
+                self.strength += mod
+            elif ability_upper == "DEX":
+                self.dexterity += mod
+            elif ability_upper == "CON":
+                self.constitution += mod
+            elif ability_upper == "INT":
+                self.intelligence += mod
+            elif ability_upper == "WIS":
+                self.wisdom += mod
+            elif ability_upper == "CHA":
+                self.charisma += mod
+        # Update derived stats after applying racial modifiers.
+        self.recalc_stats()
 
     def get_ac(self) -> int:
         """
@@ -207,7 +287,7 @@ class Character:
         Base AC = 10 + armor_bonus + shield_bonus + natural_armor + deflection_bonus + size_modifier.
         Adds Dexterity mod and dodge_bonus only if the character is not affected by conditions
         that remove them (e.g., blinded, flatfooted, paralyzed, unconscious).
-        Then adds any additional modifiers from active conditions.
+        Then adds additional modifiers from active conditions.
         """
         base_ac = 10 + self.armor_bonus + self.shield_bonus + self.natural_armor + self.deflection_bonus + self.size_modifier
         if not self.has_condition(["blinded", "flatfooted", "paralyzed", "unconscious"]):
@@ -242,8 +322,8 @@ class Character:
 
     def get_effective_skill_modifier(self, ability: str) -> int:
         """
-        Returns the effective modifier for a given ability (e.g., 'DEX' or 'STR') for skill checks,
-        factoring in the base ability modifier plus cumulative skill penalties from active conditions.
+        Returns the effective modifier for a given ability for skill checks,
+        factoring in base ability modifier plus cumulative penalties from conditions.
         """
         base = self.get_modifier(ability)
         penalty = 0
@@ -255,6 +335,7 @@ class Character:
     def to_dict(self) -> dict:
         """
         Serialize the Character object into a dictionary.
+        Includes derived stats: cmb, cmd, and spell_slots.
         """
         return {
             "name": self.name,
@@ -272,7 +353,10 @@ class Character:
             "dodge_bonus": self.dodge_bonus,
             "size_modifier": self.size_modifier,
             "BAB": self.BAB,
+            "cmb": self.cmb,
+            "cmd": self.cmd,
             "spells": self.spells,
+            "spell_slots": self.spell_slots,
             "conditions": [cond.get_status() for cond in self.conditions],
             "resources": self.resources,
             "reach": self.reach,
@@ -315,8 +399,10 @@ class Character:
         char.dodge_bonus = data.get("dodge_bonus", 0)
         char.size_modifier = data.get("size_modifier", 0)
         char.BAB = data.get("BAB", 0)
+        char.cmb = data.get("cmb", 0)
+        char.cmd = data.get("cmd", 10)
         char.spells = data.get("spells", [])
-        # Reconstruct conditions using our helper function from conditions.py.
+        char.spell_slots = data.get("spell_slots", {})
         from conditions import condition_from_status_list
         char.conditions = condition_from_status_list(data.get("conditions", []))
         char.resources = data.get("resources", {})
@@ -342,4 +428,5 @@ class Character:
         class_str = f", RPG Classes: {class_info}" if class_info else ""
         return (f"Character: {self.name}{class_str}, Position: {self.position}, AC: {self.get_ac()}, "
                 f"Flat-footed AC: {self.get_flatfooted_ac()}, Touch AC: {self.get_touch_ac()}, "
+                f"CMB: {self.cmb}, CMD: {self.cmd}, "
                 f"Conditions: {self.get_condition_status()}, Resources: {self.resources}, Reach: {self.reach}")
