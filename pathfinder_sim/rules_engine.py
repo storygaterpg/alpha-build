@@ -1,15 +1,10 @@
 """
 rules_engine.py
 ---------------
-
 This module implements the core rules engine for our simulation.
-It includes:
-  - Dice: A class for dice rolls with standard dice notation.
-  - CombatResolver, SpellResolver, SkillResolver: Resolvers for processing actions.
-  - RulesEngine: Integrates these resolvers.
-  
-Note: Critical hit parameters are now read from the weapons configuration file 
-(config/weapons_config.json) rather than from a separate critical_config.
+It provides the Dice class for rolling dice (with standard notation),
+and resolvers for combat, spellcasting, and skill checks.
+All critical hit parameters and bonus stacking are data‑driven via external configurations.
 """
 
 from typing import List, Dict, Any
@@ -20,13 +15,18 @@ from skill_utils import get_skill_modifier
 
 class Dice:
     """
-    A simple Dice class for rolling dice with notations like '1d20+5'.
+    A Dice class for rolling dice using standard notation (e.g., '1d20+5').
+    Supports seeding for deterministic results.
     """
     def __init__(self, seed: int = None):
         import random
         self.rng = random.Random(seed)
     
     def roll(self, notation: str) -> int:
+        """
+        Roll dice based on the given notation.
+        Example: "2d6+3" rolls two 6-sided dice and adds 3.
+        """
         parts = notation.lower().split("d")
         num_dice = int(parts[0])
         remainder = parts[1]
@@ -44,14 +44,19 @@ class Dice:
         return total + mod
     
     def roll_d20(self) -> int:
+        """Roll a 20-sided die."""
         return self.rng.randint(1, 20)
 
 # --------------------------
-# Bonus Configuration (remains unchanged)
+# Bonus Configuration Handling
 # --------------------------
 _BONUS_CONFIG = None
 
 def load_bonus_config() -> Dict[str, Any]:
+    """
+    Load bonus configuration from 'config/bonus_config.json'.
+    Determines which bonus types stack.
+    """
     global _BONUS_CONFIG
     if _BONUS_CONFIG is None:
         config_path = os.path.join(os.path.dirname(__file__), "config", "bonus_config.json")
@@ -60,6 +65,9 @@ def load_bonus_config() -> Dict[str, Any]:
     return _BONUS_CONFIG
 
 def stack_bonuses(bonus_list: List[tuple]) -> int:
+    """
+    Calculate the total bonus from a list of (value, type) tuples using stacking rules.
+    """
     config = load_bonus_config()
     bonus_rules = config.get("bonus_types", {})
     
@@ -82,14 +90,14 @@ def stack_bonuses(bonus_list: List[tuple]) -> int:
     return stacking_total + sum(non_stacking.values())
 
 # --------------------------
-# New: Weapons Configuration Loader
+# Weapons Configuration Loader
 # --------------------------
 _WEAPONS_CONFIG = None
 
 def load_weapons_config() -> Dict[str, Any]:
     """
-    Loads the weapons configuration from 'config/weapons_config.json'.
-    Caches the configuration for efficiency.
+    Load the weapons configuration from 'config/weapons_config.json'.
+    Contains damage dice, critical hit parameters, etc.
     """
     global _WEAPONS_CONFIG
     if _WEAPONS_CONFIG is None:
@@ -100,8 +108,8 @@ def load_weapons_config() -> Dict[str, Any]:
 
 def get_weapon_critical_parameters(weapon: Any) -> Dict[str, Any]:
     """
-    Retrieves the critical parameters for a given weapon by looking it up in the weapons configuration.
-    If the weapon is not found, returns default values.
+    Retrieve critical hit parameters for the given weapon from configuration.
+    Returns default values if the weapon is not found.
     """
     if weapon is not None and hasattr(weapon, "name"):
         wname = weapon.name.lower()
@@ -111,13 +119,20 @@ def get_weapon_critical_parameters(weapon: Any) -> Dict[str, Any]:
     return {"threat_range": 19, "multiplier": 2}
 
 # --------------------------
-# CombatResolver and Other Resolvers
+# Resolvers
 # --------------------------
 class CombatResolver:
+    """
+    Resolves combat (attack) actions.
+    Calculates total attack value, applies concealment, and resolves critical hits.
+    """
     def __init__(self, dice):
         self.dice = dice
 
     def compute_effective_defense(self, defender, is_touch_attack: bool, target_flat_footed: bool) -> int:
+        """
+        Compute the defender's effective defense based on whether the attack is touch or if the defender is flat-footed.
+        """
         if is_touch_attack and target_flat_footed:
             return 10
         elif is_touch_attack:
@@ -128,6 +143,9 @@ class CombatResolver:
             return defender.get_ac()
 
     def apply_concealment(self, defender) -> bool:
+        """
+        Determine if the defender's concealment causes the attack to miss.
+        """
         concealment = getattr(defender, "concealment", 0)
         if concealment > 0:
             roll = self.dice.rng.randint(1, 100)
@@ -136,6 +154,10 @@ class CombatResolver:
         return False
 
     def resolve_attack(self, attack_action) -> Dict[str, Any]:
+        """
+        Resolve an attack action.
+        Calculates hit/miss, checks for critical threat and confirmation, and computes damage.
+        """
         natural_roll = self.dice.roll_d20()
         if attack_action.weapon is not None:
             if getattr(attack_action.weapon, "is_ranged", False):
@@ -216,6 +238,10 @@ class CombatResolver:
         return result
 
 class SpellResolver:
+    """
+    Resolves spellcasting actions.
+    Currently uses a simple damage roll to simulate a spell effect.
+    """
     def __init__(self, dice):
         self.dice = dice
 
@@ -232,6 +258,9 @@ class SpellResolver:
         return result
 
 class SkillResolver:
+    """
+    Resolves skill check actions using the character's effective modifiers.
+    """
     def __init__(self, dice):
         self.dice = dice
 
@@ -252,6 +281,9 @@ class SkillResolver:
         return result
 
 class RulesEngine:
+    """
+    Integrates the combat, spell, and skill resolvers into a unified engine.
+    """
     def __init__(self, dice):
         self.dice = dice
         self.combat_resolver = CombatResolver(dice)

@@ -1,10 +1,9 @@
 """
 turn_manager.py
 ---------------
-
-This module implements our advanced turn management and action economy system for the Pathfinder simulation.
-It handles action sequencing, initiative ordering, turn numbering, and parsing JSON orders into actions.
-All actions conform to the standardized IAction interface.
+This module implements advanced turn management and action sequencing for the Pathfinder simulation.
+It handles initiative ordering, turn numbering, and parsing JSON orders into IAction objects.
+All actions follow the standardized IAction interface.
 """
 
 import json
@@ -14,24 +13,24 @@ from actions import (
     AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction,
     GameAction, IAction
 )
-from action_types import ActionType  # Import ActionType enum
+from action_types import ActionType  # Enum for action types
 
 class Turn:
+    """
+    Represents a single turn in the simulation.
+    Maintains a dictionary of actions for each actor, categorized by action type.
+    """
     def __init__(self, turn_number: int):
         self.turn_number = turn_number
-        # For each character, record actions in a dictionary with keys:
-        #   "immediate": list of immediate actions,
-        #   "readied": list of readied actions,
-        #   "delayed": single delayed action (or None),
-        #   "standard": one standard action,
-        #   "move": list of move actions,
-        #   "swift": one swift action,
-        #   "full_round": one full-round action,
-        #   "free": list of free actions.
-        # Also, store the actor reference so that later updates can be applied.
+        # Each actor's actions are stored in a dict including the actor reference.
         self.character_actions: Dict[str, Dict[str, Any]] = {}
 
     def add_action(self, action: IAction) -> None:
+        """
+        Add an action to the turn for the corresponding actor.
+        Enforces action economy limits for standard, move, swift, full-round, immediate,
+        readied, and delayed actions.
+        """
         actor_name = action.actor.name
         if actor_name not in self.character_actions:
             self.character_actions[actor_name] = {
@@ -88,26 +87,14 @@ class Turn:
     def get_ordered_actions(self, rules_engine) -> List[IAction]:
         """
         Compute initiative order and return a list of actions in the order they will be processed.
-
-        For each actor not delaying, compute an initiative score (d20 roll + DEX modifier) using the rules engine's RNG.
-        Sort these actors in descending order (tie-break: higher DEX modifier, then alphabetical order).
-
-        Then, for each actor:
-          - Process immediate actions first.
-          - If the actor has a delayed action, skip processing their standard/move/swift/free actions now.
-          - Otherwise, if a full-round action exists, process it; else process standard and move actions.
-          - Then process swift actions.
-          - Finally, process free and readied actions.
-
-        After processing non-delayed actions, append delayed actions (sorted by their original initiative score in ascending order)
-        so that those delaying act later.
+        For non-delayed actors, initiative is computed as a d20 roll plus the actor's DEX modifier,
+        and actors are sorted in descending order (with tie-breakers).
+        Delayed actions are appended later in ascending order.
         """
         non_delayed = {}
         delayed = {}
-        # Compute initiative for each actor.
         for actor_name, record in self.character_actions.items():
             actor = record["actor"]
-            # Roll initiative: d20 roll + DEX modifier.
             init_roll = rules_engine.dice.roll_d20()
             dex_mod = actor.get_modifier("DEX")
             initiative_score = init_roll + dex_mod
@@ -127,9 +114,9 @@ class Turn:
             delayed.keys(),
             key=lambda name: (delayed[name][1], delayed[name][2], name)
         )
-
+        
         ordered_actions: List[IAction] = []
-        # Process actions for non-delayed actors.
+        # Process non-delayed actors first.
         for actor_name in sorted_non_delayed:
             record = non_delayed[actor_name][0]
             # Immediate actions always go first.
@@ -162,6 +149,11 @@ class Turn:
         return ordered_actions
 
 class TurnManager:
+    """
+    Manages the overall turn sequence and action processing.
+    Responsible for assigning unique action IDs, injecting the rules engine and game map into actions,
+    processing all actions in initiative order, and updating actor states after each turn.
+    """
     def __init__(self, rules_engine, game_map):
         self.rules_engine = rules_engine
         self.game_map = game_map
@@ -178,22 +170,16 @@ class TurnManager:
 
     def assign_action_id(self, action: IAction) -> None:
         """
-        Assign a unique action ID to the action.
+        Assign a unique action ID to an action.
         """
         action.action_id = self.action_id_counter
         self.action_id_counter += 1
 
     def process_turn(self, turn: Turn) -> List[Any]:
         """
-        Process all actions for a given turn in initiative order and update game state.
-
-        This method:
-          1. Retrieves ordered actions based on initiative.
-          2. Assigns unique IDs to actions.
-          3. Injects the game map for movement-related actions.
-          4. Executes each action, collecting their results.
-          5. Updates the state (conditions, resources, etc.) for each actor involved.
-          6. Returns a list of action result dictionaries.
+        Process a turn by executing actions in initiative order.
+        Injects required dependencies (rules engine, game map) into actions,
+        collects results, and updates each actor's state after the turn.
         """
         results = []
         ordered_actions = turn.get_ordered_actions(self.rules_engine)
@@ -207,21 +193,15 @@ class TurnManager:
             result["turn_number"] = turn.turn_number
             result["action_id"] = action.action_id
             results.append(result)
-        # After processing, update the state of each actor from the Turn's records.
+        # Update state (conditions, resources, etc.) for each actor.
         for actor_name, record in turn.character_actions.items():
             record["actor"].update_state()
         return results
 
     def parse_json_actions(self, json_input: str, characters: Dict[str, Character]) -> Turn:
         """
-        Parse JSON-formatted orders into a Turn object with appropriate action objects.
-
-        The JSON should be an array of orders, each with:
-          - "actor": The name of the actor.
-          - "action_type": The type of action (standard, move, swift, full_round, free, immediate, readied, delayed).
-          - "parameters": A dictionary with additional parameters (such as target, skill_name, DC, etc.)
-
-        Returns a Turn instance populated with actions.
+        Parse a JSON string of orders into a Turn instance populated with IAction objects.
+        Each order must include 'actor', 'action_type', and 'parameters'.
         """
         turn = Turn(self.current_turn)
         orders = json.loads(json_input)
@@ -275,12 +255,7 @@ class TurnManager:
                 action = FullRoundAction(actor=actor, parameters=params, action_type="full_round")
             elif action_type == ActionType.FREE:
                 action = GameAction(actor=actor, action_type="free", parameters=params)
-                # For free actions, define a simple execution lambda.
-                action.execute = lambda: {
-                    "action": "free",
-                    "actor": actor.name,
-                    "justification": "Free action executed."
-                }
+                action.execute = lambda: {"action": "free", "actor": actor.name, "justification": "Free action executed."}
             elif action_type == ActionType.IMMEDIATE:
                 action = SkillCheckAction(
                     actor=actor,
@@ -289,20 +264,11 @@ class TurnManager:
                     action_type="immediate"
                 )
             elif action_type == ActionType.READIED:
-                # For simplicity, create a readied action as a generic free-like action.
                 action = GameAction(actor=actor, action_type="readied", parameters=params)
-                action.execute = lambda: {
-                    "action": "readied",
-                    "actor": actor.name,
-                    "justification": "Readied action executed."
-                }
+                action.execute = lambda: {"action": "readied", "actor": actor.name, "justification": "Readied action executed."}
             elif action_type == ActionType.DELAYED:
                 action = GameAction(actor=actor, action_type="delayed", parameters=params)
-                action.execute = lambda: {
-                    "action": "delayed",
-                    "actor": actor.name,
-                    "justification": "Delayed action executed."
-                }
+                action.execute = lambda: {"action": "delayed", "actor": actor.name, "justification": "Delayed action executed."}
             else:
                 raise ValueError(f"Unsupported action type: {action_type_str}")
             turn.add_action(action)

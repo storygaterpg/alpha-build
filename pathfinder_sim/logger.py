@@ -1,8 +1,9 @@
 """
 logger.py
-
+---------
 This module provides a data-driven logging helper for our Pathfinder simulation.
-It loads log templates from the configuration file and formats log messages given an event type and data.
+It loads log templates from an external configuration file and formats log messages
+based on event type and provided data. This ensures standardized, professional audit logs.
 """
 
 import json
@@ -14,8 +15,8 @@ _LOGGING_CONFIG = None
 
 def load_logging_config() -> Dict[str, Any]:
     """
-    Loads the logging configuration from 'config/logging_config.json'.
-    Caches the configuration for efficiency.
+    Load the logging configuration from 'config/logging_config.json'.
+    The configuration is cached to avoid repeated disk I/O.
     """
     global _LOGGING_CONFIG
     if _LOGGING_CONFIG is None:
@@ -26,18 +27,18 @@ def load_logging_config() -> Dict[str, Any]:
 
 def format_log(event_type: str, data: Dict[str, Any]) -> str:
     """
-    Formats a log message for the given event type using the data provided.
+    Format a log message for a given event type using the provided data.
     
     Parameters:
       event_type: The type of event (e.g., "attack", "spell", "move", etc.)
-      data: A dictionary containing the keys referenced in the template.
+      data: A dictionary containing keys that match placeholders in the logging template.
     
     Returns:
       A formatted log message string.
     """
     config = load_logging_config()
-    template = config.get(event_type, config.get("default", ""))
-    # If a critical flag is present, prepare a string; otherwise, empty.
+    template = config.get(event_type, config.get("default", "Action executed: {action}"))
+    # Handle critical hit flag if present.
     if "critical" in data:
         crit_info = " with CRITICAL hit" if data["critical"] else ""
         data["critical_info"] = crit_info
