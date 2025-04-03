@@ -4,12 +4,12 @@ narrative_translator.py
 This module provides functionality to translate technical ActionResult objects into 
 plain language narrative text for DM justification and player communication. It converts 
 the outcome of each action into a descriptive narrative, integrating rule justifications 
-and audit details as appropriate.
+(and optional debug references) as appropriate.
 
 Classes:
     NarrativeTranslator: Contains methods to translate a single ActionResult or a list 
                           of ActionResults into human-readable narrative text.
-                          
+
 Usage Example:
     from narrative_translator import NarrativeTranslator
     from action_result import ActionResult
@@ -23,7 +23,12 @@ from action_result import ActionResult
 
 class NarrativeTranslator:
     def __init__(self):
-        # Mapping action types to their respective translator methods.
+        """
+        Initialize the NarrativeTranslator.
+        A mapping of action types (as lowercase strings) to dedicated translator functions
+        is established here. If an action type is not explicitly handled, a default translator
+        is used.
+        """
         self.templates = {
             "attack": self._translate_attack,
             "spell": self._translate_spell,
@@ -40,37 +45,50 @@ class NarrativeTranslator:
     
     def translate_result(self, result: ActionResult) -> str:
         """
-        Translate a single ActionResult into a narrative string.
-        
+        Translate a single ActionResult into a plain language narrative string.
+
         Args:
             result (ActionResult): The action result to translate.
-            
+
         Returns:
-            str: A plain language narrative describing the action outcome.
+            str: A human-readable narrative describing the outcome of the action.
         """
+        # Determine the appropriate translator function based on the action type.
         action_type = result.action.lower()
         translator = self.templates.get(action_type, self._translate_default)
         narrative = translator(result)
-        # Optionally, append debug info for audit (if desired; can be toggled via configuration)
+        
+        # If the debug dictionary contains a rule reference, append it to the narrative.
+        if result.debug and "rule_ref" in result.debug:
+            narrative += f" [Rule Reference: {result.debug['rule_ref']}]"
+        
+        # Optionally, include full debug information if needed (controlled by a flag in future).
+        # For now, if debug info exists, we append a summary.
         if result.debug:
-            narrative += f" [Debug Info: {result.debug}]"
+            narrative += f" [Debug: {result.debug}]"
         return narrative
 
     def translate_all(self, results: list) -> list:
         """
-        Translate a list of ActionResult objects into narrative strings.
-        
+        Translate a list of ActionResult objects into a list of narrative strings.
+
         Args:
             results (list): List of ActionResult objects.
-            
+
         Returns:
-            list: List of narrative strings.
+            list: List of human-readable narrative strings.
         """
         return [self.translate_result(result) for result in results]
 
     def _translate_attack(self, result: ActionResult) -> str:
         """
         Translate an attack action result into narrative text.
+
+        Args:
+            result (ActionResult): The attack action result.
+
+        Returns:
+            str: Narrative explanation of the attack.
         """
         data = result.result_data
         narrative = (f"In turn {result.turn_number}, {result.actor_name} attacked {result.target_name}. "
@@ -90,6 +108,12 @@ class NarrativeTranslator:
     def _translate_spell(self, result: ActionResult) -> str:
         """
         Translate a spellcasting action result into narrative text.
+
+        Args:
+            result (ActionResult): The spell action result.
+
+        Returns:
+            str: Narrative explanation of the spellcasting outcome.
         """
         data = result.result_data
         narrative = (f"In turn {result.turn_number}, {result.actor_name} cast the spell '{data.get('spell_name', '')}' "
@@ -101,6 +125,12 @@ class NarrativeTranslator:
     def _translate_move(self, result: ActionResult) -> str:
         """
         Translate a movement action result into narrative text.
+
+        Args:
+            result (ActionResult): The movement action result.
+
+        Returns:
+            str: Narrative explanation of the movement outcome.
         """
         data = result.result_data
         narrative = (f"In turn {result.turn_number}, {result.actor_name} moved from {data.get('start_position', 'unknown')} "
@@ -112,10 +142,16 @@ class NarrativeTranslator:
     def _translate_skill_check(self, result: ActionResult) -> str:
         """
         Translate a skill check action result into narrative text.
+
+        Args:
+            result (ActionResult): The skill check action result.
+
+        Returns:
+            str: Narrative explanation of the skill check outcome.
         """
         data = result.result_data
         narrative = (f"In turn {result.turn_number}, {result.actor_name} performed a skill check for {data.get('skill_name', '')}. "
-                     f"They rolled a {data.get('roll')} resulting in a total of {data.get('total')}, against a DC of {data.get('dc')}.")
+                     f"They rolled a {data.get('roll')} resulting in a total of {data.get('total')} against a DC of {data.get('dc')}.")
         if "justification" in data:
             narrative += f" ({data['justification']})"
         return narrative
@@ -123,6 +159,12 @@ class NarrativeTranslator:
     def _translate_full_round(self, result: ActionResult) -> str:
         """
         Translate a full-round action result into narrative text.
+
+        Args:
+            result (ActionResult): The full-round action result.
+
+        Returns:
+            str: Narrative explanation of the full-round action.
         """
         data = result.result_data
         narrative = (f"In turn {result.turn_number}, {result.actor_name} performed a full-round action. "
@@ -134,6 +176,12 @@ class NarrativeTranslator:
     def _translate_maneuver(self, result: ActionResult) -> str:
         """
         Translate a combat maneuver action result into narrative text.
+
+        Args:
+            result (ActionResult): The combat maneuver action result.
+
+        Returns:
+            str: Narrative explanation of the combat maneuver outcome.
         """
         data = result.result_data
         narrative = (f"In turn {result.turn_number}, {result.actor_name} executed a combat maneuver against {result.target_name}. "
@@ -145,6 +193,12 @@ class NarrativeTranslator:
     def _translate_default(self, result: ActionResult) -> str:
         """
         Fallback translation for any action types without a dedicated translator.
+
+        Args:
+            result (ActionResult): The action result.
+
+        Returns:
+            str: A default narrative message.
         """
         narrative = (f"In turn {result.turn_number}, {result.actor_name} executed an action of type '{result.action}'.")
         if result.log:
