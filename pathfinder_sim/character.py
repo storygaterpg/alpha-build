@@ -26,6 +26,7 @@ class Character:
     """
     def __init__(self, name: str, x: int, y: int, dexterity: int, reach: int = 1):
         self.id = id(self)  # Unique identifier for audit purposes.
+        self.name = name
         self.position = (x, y)
         self.climb_state = None  # For tracking vertical movement (e.g., ladder climbing)
         self.dexterity = dexterity
