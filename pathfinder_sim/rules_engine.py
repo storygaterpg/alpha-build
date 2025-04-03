@@ -3,8 +3,8 @@ rules_engine.py
 ---------------
 This module implements the core rules engine for our simulation.
 It provides the Dice class for rolling dice with standard notation,
-and resolvers for combat, spellcasting, skill checks, and now advanced maneuvers.
-All resolvers return an ActionResult (defined in action_result.py) that includes detailed debug information,
+and resolvers for combat, spellcasting, skill checks, and advanced maneuvers.
+All resolvers return an ActionResult that includes detailed debug information,
 enabling complete auditability and reproducibility of action outcomes.
 """
 
@@ -23,7 +23,8 @@ class Dice:
     def __init__(self, seed: int = None):
         import random
         self.rng = random.Random(seed)
-    
+        self.base_seed = seed if seed is not None else 42  # Default base seed
+
     def roll(self, notation: str) -> int:
         """
         Roll dice based on the given notation.
@@ -52,17 +53,13 @@ class Dice:
         """Roll a 20-sided die."""
         return self.rng.randint(1, 20)
 
-# --------------------------
-# Bonus Configuration Handling
-# --------------------------
-_BONUS_CONFIG = None
-
 def load_bonus_config() -> Dict[str, Any]:
     """
     Load bonus configuration from 'config/bonus_config.json'.
     Determines which bonus types stack.
     """
     global _BONUS_CONFIG
+    _BONUS_CONFIG = _BONUS_CONFIG if '_BONUS_CONFIG' in globals() else None
     if _BONUS_CONFIG is None:
         config_path = os.path.join(os.path.dirname(__file__), "config", "bonus_config.json")
         with open(config_path, "r") as f:
@@ -92,16 +89,9 @@ def stack_bonuses(bonus_list: List[tuple]) -> int:
                 non_stacking[btype_lower] = value
     return stacking_total + sum(non_stacking.values())
 
-# --------------------------
-# Weapons Configuration Loader
-# --------------------------
+# Weapons configuration loader
 _WEAPONS_CONFIG = None
-
 def load_weapons_config() -> Dict[str, Any]:
-    """
-    Load the weapons configuration from 'config/weapons_config.json'.
-    Contains damage dice, critical hit parameters, etc.
-    """
     global _WEAPONS_CONFIG
     if _WEAPONS_CONFIG is None:
         config_path = os.path.join(os.path.dirname(__file__), "config", "weapons_config.json")
@@ -122,7 +112,7 @@ def get_weapon_critical_parameters(weapon: Any) -> Dict[str, Any]:
     return {"threat_range": 19, "multiplier": 2}
 
 # --------------------------
-# Extended CombatResolver with Maneuver Debug Logging
+# CombatResolver with Extended Debug Logging
 # --------------------------
 class CombatResolver:
     """
@@ -167,6 +157,8 @@ class CombatResolver:
 
     def resolve_attack(self, attack_action) -> ActionResult:
         debug_info = {}
+        # Record current RNG seed from the rules engine.
+        debug_info["rng_seed"] = self.dice_seed if hasattr(self, "dice_seed") else None
         natural_roll = self.dice.roll_d20()
         debug_info["natural_roll"] = natural_roll
         if attack_action.weapon is not None:
@@ -190,12 +182,10 @@ class CombatResolver:
         debug_info["effective_bonus"] = effective_bonus
         total_attack = natural_roll + effective_bonus
         debug_info["total_attack"] = total_attack
-
         effective_defense = self.compute_effective_defense(attack_action.defender,
                                                            attack_action.is_touch_attack,
                                                            attack_action.target_flat_footed)
         debug_info["effective_defense"] = effective_defense
-
         hit = (total_attack >= effective_defense) or (natural_roll == 20)
         result_data = {
             "attacker_name": attack_action.actor.name,
@@ -280,7 +270,9 @@ class CombatResolver:
         defender_cmd = maneuver_action.defender.cmd
         debug_info = {
             "attacker_cmb": attacker_cmb,
-            "defender_cmd": defender_cmd
+            "defender_cmd": defender_cmd,
+            "rng_seed": self.dice_seed if hasattr(self, "dice_seed") else None,
+            "maneuver": "bull_rush"
         }
         success = attacker_cmb >= defender_cmd
         push_distance = bull_rush_conf.get("push_distance_default", 1) if success else 0
@@ -295,7 +287,6 @@ class CombatResolver:
             "push_distance": push_distance,
             "justification": justification
         }
-        debug_info["maneuver"] = "bull_rush"
         return ActionResult(
             action="maneuver",
             actor_name=maneuver_action.actor.name,
@@ -316,6 +307,7 @@ class CombatResolver:
         debug_info = {
             "attacker_cmb": attacker_cmb,
             "defender_cmd": defender_cmd,
+            "rng_seed": self.dice_seed if hasattr(self, "dice_seed") else None,
             "maneuver": "grapple"
         }
         success = attacker_cmb >= defender_cmd
@@ -402,12 +394,34 @@ class SkillResolver:
 class RulesEngine:
     """
     Integrates the combat, spell, and skill resolvers into a unified engine.
+    Also provides process_action for single action processing and supports deterministic RNG per turn.
     """
     def __init__(self, dice):
         self.dice = dice
         self.combat_resolver = CombatResolver(dice)
         self.spell_resolver = SpellResolver(dice)
         self.skill_resolver = SkillResolver(dice)
+        self.current_rng_seed = dice.base_seed  # Initialize with base seed
+
+    def set_turn_seed(self, turn_number: int) -> None:
+        """
+        Re-seed the RNG at the beginning of each turn using the base seed and the turn number.
+        Ensures deterministic behavior per turn.
+        """
+        new_seed = self.dice.base_seed + turn_number
+        self.dice.rng.seed(new_seed)
+        self.current_rng_seed = new_seed
+        # Also record this seed in combat resolver for debug purposes.
+        if hasattr(self.combat_resolver, "dice_seed"):
+            self.combat_resolver.dice_seed = new_seed
+        else:
+            self.combat_resolver.dice_seed = new_seed
+
+    def process_action(self, action) -> ActionResult:
+        """
+        Process a single action and return its ActionResult.
+        """
+        return action.execute()
 
     def process_turn(self, actions: List[Any]) -> List[Dict[str, Any]]:
         results = []

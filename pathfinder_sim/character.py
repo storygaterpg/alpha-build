@@ -25,7 +25,7 @@ class Character:
     resources, and narrative information.
     """
     def __init__(self, name: str, x: int, y: int, dexterity: int, reach: int = 1):
-        self.name = name
+        self.id = id(self)  # Unique identifier for audit purposes.
         self.position = (x, y)
         self.climb_state = None  # For tracking vertical movement (e.g., ladder climbing)
         self.dexterity = dexterity

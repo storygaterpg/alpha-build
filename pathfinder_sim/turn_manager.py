@@ -120,7 +120,7 @@ class Turn:
             delayed.keys(),
             key=lambda name: (delayed[name][1], delayed[name][2], name)
         )
-        
+
         ordered_actions: List[IAction] = []
         # Process non-delayed actors first.
         for actor_name in sorted_non_delayed:
@@ -171,6 +171,8 @@ class TurnManager:
         Create and return a new Turn instance with a unique turn number.
         """
         turn = Turn(self.current_turn)
+        # Set the per-turn RNG seed for deterministic behavior.
+        self.rules_engine.set_turn_seed(self.current_turn)
         self.current_turn += 1
         return turn
 
@@ -194,18 +196,12 @@ class TurnManager:
             action.rules_engine = self.rules_engine
             if action.action_type in [ActionType.MOVE, ActionType.FULL_ROUND]:
                 action.game_map = self.game_map
-            action_result = action.execute()
-            # Inject turn number and action ID into the result.
-            action_result = type(action_result)(
-                action=action_result.action,
-                actor_name=action_result.actor_name,
-                target_name=action_result.target_name,
-                result_data=action_result.result_data,
-                log=action_result.log,
-                turn_number=turn.turn_number,
-                action_id=action.action_id
-            )
-            results.append(action_result.to_dict())
+            # Execute action and inject audit metadata if not already injected.
+            result = action.execute()
+            result.turn_number = turn.turn_number
+            result.action_id = action.action_id
+            # (Audit metadata like actor_id, target_id, rng_seed are set in the action implementations.)
+            results.append(result.to_dict())
         for actor_name, record in turn.character_actions.items():
             record["actor"].update_state()
         return results
