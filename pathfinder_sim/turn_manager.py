@@ -3,7 +3,9 @@ turn_manager.py
 ---------------
 This module implements advanced turn management and action sequencing.
 Actions now return structured ActionResult objects.
-We've extended the JSON parser to support the new 'maneuver' action type.
+JSON orders are parsed into IAction objects using the new configuration
+and data management standards. Note: All configuration files are managed
+via the centralized config_manager module.
 """
 
 import json
@@ -23,7 +25,7 @@ class Turn:
     """
     def __init__(self, turn_number: int):
         self.turn_number = turn_number
-        # Each actor's actions are stored in a dict including the actor reference.
+        # Each actor's actions are stored in a dictionary.
         self.character_actions: Dict[str, Dict[str, Any]] = {}
 
     def add_action(self, action: IAction) -> None:
@@ -93,9 +95,8 @@ class Turn:
     def get_ordered_actions(self, rules_engine) -> List[IAction]:
         """
         Compute initiative order and return a list of actions in the order they will be processed.
-        For non-delayed actors, initiative is computed as a d20 roll plus the actor's DEX modifier,
-        and actors are sorted in descending order (with tie-breakers).
-        Delayed actions are appended later in ascending order.
+        Non-delayed actors are sorted in descending order of initiative,
+        while delayed actions are processed later.
         """
         non_delayed = {}
         delayed = {}
@@ -157,8 +158,8 @@ class Turn:
 class TurnManager:
     """
     Manages the overall turn sequence and action processing.
-    Responsible for assigning unique action IDs, injecting the rules engine and game map into actions,
-    processing all actions in initiative order, and updating actor states after each turn.
+    Assigns unique action IDs, injects dependencies (rules engine, game map),
+    processes actions in initiative order, and updates actor states after each turn.
     """
     def __init__(self, rules_engine, game_map):
         self.rules_engine = rules_engine
@@ -169,9 +170,9 @@ class TurnManager:
     def new_turn(self) -> Turn:
         """
         Create and return a new Turn instance with a unique turn number.
+        Sets the RNG seed for deterministic turn behavior.
         """
         turn = Turn(self.current_turn)
-        # Set the per-turn RNG seed for deterministic behavior.
         self.rules_engine.set_turn_seed(self.current_turn)
         self.current_turn += 1
         return turn
@@ -186,7 +187,7 @@ class TurnManager:
     def process_turn(self, turn: Turn) -> List[Dict[str, Any]]:
         """
         Process a turn by executing actions in initiative order.
-        Inject required dependencies, and update each actor's state after the turn.
+        Injects required dependencies and updates each actor's state after the turn.
         Returns a list of action result dictionaries.
         """
         results = []
@@ -202,7 +203,7 @@ class TurnManager:
             result.action_id = action.action_id
             # (Audit metadata like actor_id, target_id, rng_seed are set in the action implementations.)
             results.append(result.to_dict())
-        for actor_name, record in turn.character_actions.items():
+        for actor_name, record in self.character_actions.items():
             record["actor"].update_state()
         return results
 
@@ -286,7 +287,9 @@ class TurnManager:
                 action.execute = lambda: ActionResult(
                     action="free",
                     actor_name=actor.name,
-                    result_data={"justification": "Free action executed."}
+                    result_data={"justification": "Free action executed."},
+                    log="",
+                    debug={}
                 )
             elif action_type == ActionType.IMMEDIATE:
                 action = SkillCheckAction(
@@ -300,14 +303,18 @@ class TurnManager:
                 action.execute = lambda: ActionResult(
                     action="readied",
                     actor_name=actor.name,
-                    result_data={"justification": "Readied action executed."}
+                    result_data={"justification": "Readied action executed."},
+                    log="",
+                    debug={}
                 )
             elif action_type == ActionType.DELAYED:
                 action = GameAction(actor=actor, action_type="delayed", parameters=params)
                 action.execute = lambda: ActionResult(
                     action="delayed",
                     actor_name=actor.name,
-                    result_data={"justification": "Delayed action executed."}
+                    result_data={"justification": "Delayed action executed."},
+                    log="",
+                    debug={}
                 )
             else:
                 raise ValueError(f"Unsupported action type: {action_type_str}")
