@@ -1,3 +1,4 @@
+# action_types.py
 from enum import Enum
 
 class ActionType(Enum):
@@ -6,6 +7,7 @@ class ActionType(Enum):
     SWIFT = "swift"
     FREE = "free"
     FULL_ROUND = "full_round"
-    IMMEDIATE = "immediate"  # Previously added for immediate actions
-    READIED = "readied"      # New: for actions readied to be triggered later
-    DELAYED = "delayed"      # New: for delaying a character's turn
+    IMMEDIATE = "immediate"
+    READIED = "readied"
+    DELAYED = "delayed"
+    MANEUVER = "maneuver"  # New: Represents advanced combat maneuvers (bull rush, grapple, etc.)

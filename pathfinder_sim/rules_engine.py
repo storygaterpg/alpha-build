@@ -2,13 +2,10 @@
 rules_engine.py
 ---------------
 This module implements the core rules engine for our simulation.
-It provides the Dice class for rolling dice (with standard notation) and
-resolvers for combat, spellcasting, and skill checks. All critical hit parameters
-and bonus stacking are data‑driven via external configurations.
-
-Changes for R04:
-  • Introduced the ActionResult class (imported from action_result.py) so that each resolver returns a structured result.
-  • Updated CombatResolver, SpellResolver, and SkillResolver to wrap their result data in an ActionResult.
+It provides the Dice class for rolling dice (with standard notation) and resolvers
+for combat, spellcasting, and skill checks. In R04 we standardized ActionResult.
+In R05, we extend the CombatResolver with methods to resolve advanced combat maneuvers
+(such as bull rush and grapple) using data-driven configuration.
 """
 
 from typing import List, Dict, Any
@@ -16,7 +13,7 @@ import math
 import json
 import os
 from skill_utils import get_skill_modifier
-from action_result import ActionResult  # New import for standardized result
+from action_result import ActionResult
 
 class Dice:
     """
@@ -75,10 +72,8 @@ def stack_bonuses(bonus_list: List[tuple]) -> int:
     """
     config = load_bonus_config()
     bonus_rules = config.get("bonus_types", {})
-    
     stacking_total = 0
     non_stacking = {}
-    
     for value, btype in bonus_list:
         btype_lower = btype.lower()
         rule = bonus_rules.get(btype_lower, {"stacks": False})
@@ -124,7 +119,7 @@ def get_weapon_critical_parameters(weapon: Any) -> Dict[str, Any]:
     return {"threat_range": 19, "multiplier": 2}
 
 # --------------------------
-# Resolvers
+# Extended CombatResolver with Maneuvers
 # --------------------------
 class CombatResolver:
     """
@@ -134,6 +129,15 @@ class CombatResolver:
     """
     def __init__(self, dice):
         self.dice = dice
+        # Load maneuvers configuration.
+        self._maneuvers_config = None
+
+    def load_maneuvers_config(self) -> Dict[str, Any]:
+        if self._maneuvers_config is None:
+            config_path = os.path.join(os.path.dirname(__file__), "config", "maneuvers_config.json")
+            with open(config_path, "r") as f:
+                self._maneuvers_config = json.load(f)
+        return self._maneuvers_config
 
     def compute_effective_defense(self, defender, is_touch_attack: bool, target_flat_footed: bool) -> int:
         """
@@ -175,7 +179,6 @@ class CombatResolver:
         bab = getattr(attack_action.actor, "BAB", 0)
         weapon_bonus = attack_action.weapon_bonus if attack_action.weapon is not None else 0
         check_penalty = attack_action.weapon.check_penalty if attack_action.weapon is not None else 0
-        
         bonus_list = [
             (bab, "BAB"),
             (ability_mod, "ability"),
@@ -184,7 +187,6 @@ class CombatResolver:
         ]
         effective_bonus = stack_bonuses(bonus_list)
         total_attack = natural_roll + effective_bonus
-
         effective_defense = self.compute_effective_defense(attack_action.defender,
                                                            attack_action.is_touch_attack,
                                                            attack_action.target_flat_footed)
@@ -243,10 +245,64 @@ class CombatResolver:
         else:
             result_data["damage"] = 0
             result_data["justification"] = "Attack missed; total attack did not meet effective defense."
-        
         return ActionResult(action="attack",
                             actor_name=attack_action.actor.name,
                             target_name=attack_action.defender.name,
+                            result_data=result_data)
+
+    # New: Resolve Bull Rush maneuver.
+    def resolve_bull_rush(self, maneuver_action) -> ActionResult:
+        """
+        Resolve a bull rush maneuver.
+        Compare the attacker's CMB to the defender's CMD (possibly modified by environment/maneuver rules).
+        Use data from maneuvers_config.json to determine default push distance.
+        """
+        maneuvers_config = self.load_maneuvers_config()
+        bull_rush_conf = maneuvers_config.get("bull_rush", {})
+        # Basic calculation: effective CMB vs. defender's CMD.
+        attacker_cmb = maneuver_action.actor.BAB + maneuver_action.actor.get_modifier("STR")
+        defender_cmd = maneuver_action.defender.cmd  # Already computed in Character.
+        # Optionally add modifiers from bull rush config.
+        push_distance = bull_rush_conf.get("push_distance_default", 1)
+        success = attacker_cmb >= defender_cmd
+        justification = (f"Bull Rush: {attacker_cmb} (CMB) vs {defender_cmd} (CMD). "
+                         f"Default push distance: {push_distance} square(s).")
+        result_data = {
+            "attacker_name": maneuver_action.actor.name,
+            "defender_name": maneuver_action.defender.name,
+            "attacker_cmb": attacker_cmb,
+            "defender_cmd": defender_cmd,
+            "success": success,
+            "push_distance": push_distance if success else 0,
+            "justification": justification
+        }
+        return ActionResult(action="maneuver",
+                            actor_name=maneuver_action.actor.name,
+                            target_name=maneuver_action.defender.name,
+                            result_data=result_data)
+
+    # New: Resolve Grapple maneuver.
+    def resolve_grapple(self, maneuver_action) -> ActionResult:
+        """
+        Resolve a grapple maneuver.
+        Compare the attacker's CMB to the defender's CMD.
+        On success, the defender becomes grappled.
+        """
+        attacker_cmb = maneuver_action.actor.BAB + maneuver_action.actor.get_modifier("STR")
+        defender_cmd = maneuver_action.defender.cmd
+        success = attacker_cmb >= defender_cmd
+        justification = f"Grapple: {attacker_cmb} (CMB) vs {defender_cmd} (CMD)."
+        result_data = {
+            "attacker_name": maneuver_action.actor.name,
+            "defender_name": maneuver_action.defender.name,
+            "attacker_cmb": attacker_cmb,
+            "defender_cmd": defender_cmd,
+            "success": success,
+            "justification": justification
+        }
+        return ActionResult(action="maneuver",
+                            actor_name=maneuver_action.actor.name,
+                            target_name=maneuver_action.defender.name,
                             result_data=result_data)
 
 class SpellResolver:
@@ -310,10 +366,7 @@ class RulesEngine:
     def process_turn(self, actions: List[Any]) -> List[Dict[str, Any]]:
         results = []
         for action in actions:
-            action_result = action.execute()
-            # Each action is expected to return an ActionResult.
-            # Convert to dict for backward compatibility.
-            results.append(action_result.to_dict())
+            results.append(action.execute().to_dict())
         return results
 
 rules_engine = None

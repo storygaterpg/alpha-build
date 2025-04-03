@@ -1,16 +1,20 @@
 """
 turn_manager.py
 ---------------
-This module implements advanced turn management and action sequencing for the Pathfinder simulation.
-It handles initiative ordering, turn numbering, and parsing JSON orders into IAction objects.
+This module implements advanced turn management and action sequencing.
 Actions now return structured ActionResult objects.
+We've extended the JSON parser to support the new 'maneuver' action type.
 """
 
 import json
 from typing import List, Dict, Any
 from character import Character
-from actions import AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction, GameAction, IAction
-from action_types import ActionType  # Enum for action types
+from actions import (AttackAction, SpellAction, SkillCheckAction, MoveAction,
+                     FullRoundAction, GameAction, IAction)
+from action_types import ActionType
+from action_result import ActionResult
+# Import new combat maneuver actions.
+from combat_maneuvers import BullRushAction, GrappleAction
 
 class Turn:
     """
@@ -77,6 +81,12 @@ class Turn:
             if records["delayed"] is not None:
                 raise Exception(f"{actor_name} has already delayed an action this turn.")
             records["delayed"] = action
+        elif action.action_type == ActionType.MANEUVER:
+            # Maneuver actions can be stored as standard actions or in their own category.
+            # For simplicity, we treat them like standard actions.
+            if records["standard"] is not None:
+                raise Exception(f"{actor_name} has already taken a standard action; cannot perform an additional maneuver.")
+            records["standard"] = action
         else:
             raise Exception(f"Unsupported action type: {action.action_type}")
 
@@ -186,7 +196,7 @@ class TurnManager:
                 action.game_map = self.game_map
             action_result = action.execute()
             # Inject turn number and action ID into the result.
-            action_result = ActionResult(
+            action_result = type(action_result)(
                 action=action_result.action,
                 actor_name=action_result.actor_name,
                 target_name=action_result.target_name,
@@ -255,6 +265,26 @@ class TurnManager:
                 )
             elif action_type == ActionType.FULL_ROUND:
                 action = FullRoundAction(actor=actor, parameters=params, action_type="full_round")
+            elif action_type == ActionType.MANEUVER:
+                # New: For maneuver actions, we expect a 'maneuver_type' field.
+                maneuver_type = params.get("maneuver_type")
+                if not maneuver_type:
+                    raise ValueError("Maneuver action must specify a 'maneuver_type'.")
+                # Instantiate the appropriate maneuver action based on the type.
+                if maneuver_type.lower() == "bull_rush":
+                    defender_name = params.get("defender")
+                    if defender_name not in characters:
+                        raise ValueError(f"Unknown defender: {defender_name}")
+                    defender = characters[defender_name]
+                    action = BullRushAction(actor=actor, defender=defender, parameters=params)
+                elif maneuver_type.lower() == "grapple":
+                    defender_name = params.get("defender")
+                    if defender_name not in characters:
+                        raise ValueError(f"Unknown defender: {defender_name}")
+                    defender = characters[defender_name]
+                    action = GrappleAction(actor=actor, defender=defender, parameters=params)
+                else:
+                    raise ValueError(f"Unsupported maneuver type: {maneuver_type}")
             elif action_type == ActionType.FREE:
                 action = GameAction(actor=actor, action_type="free", parameters=params)
                 action.execute = lambda: ActionResult(
