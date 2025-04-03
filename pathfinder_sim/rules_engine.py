@@ -2,9 +2,13 @@
 rules_engine.py
 ---------------
 This module implements the core rules engine for our simulation.
-It provides the Dice class for rolling dice (with standard notation),
-and resolvers for combat, spellcasting, and skill checks.
-All critical hit parameters and bonus stacking are data‑driven via external configurations.
+It provides the Dice class for rolling dice (with standard notation) and
+resolvers for combat, spellcasting, and skill checks. All critical hit parameters
+and bonus stacking are data‑driven via external configurations.
+
+Changes for R04:
+  • Introduced the ActionResult class (imported from action_result.py) so that each resolver returns a structured result.
+  • Updated CombatResolver, SpellResolver, and SkillResolver to wrap their result data in an ActionResult.
 """
 
 from typing import List, Dict, Any
@@ -12,6 +16,7 @@ import math
 import json
 import os
 from skill_utils import get_skill_modifier
+from action_result import ActionResult  # New import for standardized result
 
 class Dice:
     """
@@ -125,6 +130,7 @@ class CombatResolver:
     """
     Resolves combat (attack) actions.
     Calculates total attack value, applies concealment, and resolves critical hits.
+    Returns an ActionResult containing all relevant outcome details.
     """
     def __init__(self, dice):
         self.dice = dice
@@ -153,7 +159,7 @@ class CombatResolver:
                 return True
         return False
 
-    def resolve_attack(self, attack_action) -> Dict[str, Any]:
+    def resolve_attack(self, attack_action) -> ActionResult:
         """
         Resolve an attack action.
         Calculates hit/miss, checks for critical threat and confirmation, and computes damage.
@@ -183,8 +189,7 @@ class CombatResolver:
                                                            attack_action.is_touch_attack,
                                                            attack_action.target_flat_footed)
         hit = (total_attack >= effective_defense) or (natural_roll == 20)
-        result = {
-            "action": "attack",
+        result_data = {
             "attacker_name": attack_action.actor.name,
             "defender_name": attack_action.defender.name,
             "natural_roll": natural_roll,
@@ -197,10 +202,13 @@ class CombatResolver:
         }
         if hit:
             if self.apply_concealment(attack_action.defender):
-                result["hit"] = False
-                result["concealment_applied"] = True
-                result["justification"] = "Attack missed due to concealment."
-                return result
+                result_data["hit"] = False
+                result_data["concealment_applied"] = True
+                result_data["justification"] = "Attack missed due to concealment."
+                return ActionResult(action="attack",
+                                    actor_name=attack_action.actor.name,
+                                    target_name=attack_action.defender.name,
+                                    result_data=result_data)
         if hit:
             critical_confirmed = False
             if attack_action.weapon and not attack_action.is_touch_attack:
@@ -212,65 +220,72 @@ class CombatResolver:
                     confirm_total = confirm_roll + effective_bonus
                     if confirm_total >= effective_defense:
                         critical_confirmed = True
-                    result["critical_confirm_roll"] = confirm_roll
-                    result["confirm_total"] = confirm_total
-            result["critical"] = critical_confirmed
+                    result_data["critical_confirm_roll"] = confirm_roll
+                    result_data["confirm_total"] = confirm_total
+            result_data["critical"] = critical_confirmed
             if attack_action.weapon:
                 base_damage = self.dice.roll(attack_action.weapon.damage_dice)
                 if critical_confirmed:
                     total_damage = (base_damage * crit_multiplier) + ability_mod
-                    result["critical_multiplier"] = crit_multiplier
+                    result_data["critical_multiplier"] = crit_multiplier
                 else:
                     total_damage = base_damage + ability_mod
             else:
                 base_damage = self.dice.roll("1d8")
                 if critical_confirmed:
                     total_damage = (base_damage * 2) + ability_mod
-                    result["critical_multiplier"] = 2
+                    result_data["critical_multiplier"] = 2
                 else:
                     total_damage = base_damage + ability_mod
-            result["base_damage"] = base_damage
-            result["damage"] = total_damage
-            result["justification"] = "Attack hit" + (" with a confirmed critical." if critical_confirmed else ".")
+            result_data["base_damage"] = base_damage
+            result_data["damage"] = total_damage
+            result_data["justification"] = "Attack hit" + (" with a confirmed critical." if critical_confirmed else ".")
         else:
-            result["damage"] = 0
-            result["justification"] = "Attack missed; total attack did not meet effective defense."
-        return result
+            result_data["damage"] = 0
+            result_data["justification"] = "Attack missed; total attack did not meet effective defense."
+        
+        return ActionResult(action="attack",
+                            actor_name=attack_action.actor.name,
+                            target_name=attack_action.defender.name,
+                            result_data=result_data)
 
 class SpellResolver:
     """
     Resolves spellcasting actions.
-    Currently uses a simple damage roll to simulate a spell effect.
+    Uses a simple damage roll to simulate a spell effect.
+    Returns an ActionResult containing spell outcome data.
     """
     def __init__(self, dice):
         self.dice = dice
 
-    def resolve_spell(self, spell_action) -> Dict[str, Any]:
+    def resolve_spell(self, spell_action) -> ActionResult:
         damage = self.dice.roll("1d4") + 1
-        result = {
-            "action": "spell",
+        result_data = {
             "spell_name": spell_action.spell_name,
             "caster_name": spell_action.actor.name,
             "target_name": spell_action.target.name,
             "damage": damage,
             "justification": "Spell cast successfully."
         }
-        return result
+        return ActionResult(action="spell",
+                            actor_name=spell_action.actor.name,
+                            target_name=spell_action.target.name,
+                            result_data=result_data)
 
 class SkillResolver:
     """
     Resolves skill check actions using the character's effective modifiers.
+    Returns an ActionResult containing the outcome of the skill check.
     """
     def __init__(self, dice):
         self.dice = dice
 
-    def resolve_skill_check(self, skill_action) -> Dict[str, Any]:
+    def resolve_skill_check(self, skill_action) -> ActionResult:
         roll = self.dice.roll_d20()
         # Use the new skill_utils function to get the effective modifier.
         modifier = get_skill_modifier(skill_action.actor, skill_action.skill_name)
         total = roll + modifier
-        result = {
-            "action": "skill_check",
+        result_data = {
             "character_name": skill_action.actor.name,
             "skill_name": skill_action.skill_name,
             "roll": roll,
@@ -278,7 +293,9 @@ class SkillResolver:
             "dc": skill_action.dc,
             "justification": f"Skill check processed using base modifier {modifier} (roll {roll} + modifier = {total})."
         }
-        return result
+        return ActionResult(action="skill_check",
+                            actor_name=skill_action.actor.name,
+                            result_data=result_data)
 
 class RulesEngine:
     """
@@ -290,10 +307,13 @@ class RulesEngine:
         self.spell_resolver = SpellResolver(dice)
         self.skill_resolver = SkillResolver(dice)
 
-    def process_turn(self, actions: List[Any]) -> List[Any]:
+    def process_turn(self, actions: List[Any]) -> List[Dict[str, Any]]:
         results = []
         for action in actions:
-            results.append(action.execute())
+            action_result = action.execute()
+            # Each action is expected to return an ActionResult.
+            # Convert to dict for backward compatibility.
+            results.append(action_result.to_dict())
         return results
 
 rules_engine = None

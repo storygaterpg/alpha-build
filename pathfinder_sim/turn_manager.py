@@ -3,16 +3,13 @@ turn_manager.py
 ---------------
 This module implements advanced turn management and action sequencing for the Pathfinder simulation.
 It handles initiative ordering, turn numbering, and parsing JSON orders into IAction objects.
-All actions follow the standardized IAction interface.
+Actions now return structured ActionResult objects.
 """
 
 import json
 from typing import List, Dict, Any
 from character import Character
-from actions import (
-    AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction,
-    GameAction, IAction
-)
+from actions import AttackAction, SpellAction, SkillCheckAction, MoveAction, FullRoundAction, GameAction, IAction
 from action_types import ActionType  # Enum for action types
 
 class Turn:
@@ -28,8 +25,7 @@ class Turn:
     def add_action(self, action: IAction) -> None:
         """
         Add an action to the turn for the corresponding actor.
-        Enforces action economy limits for standard, move, swift, full-round, immediate,
-        readied, and delayed actions.
+        Enforces action economy limits.
         """
         actor_name = action.actor.name
         if actor_name not in self.character_actions:
@@ -175,25 +171,31 @@ class TurnManager:
         action.action_id = self.action_id_counter
         self.action_id_counter += 1
 
-    def process_turn(self, turn: Turn) -> List[Any]:
+    def process_turn(self, turn: Turn) -> List[Dict[str, Any]]:
         """
         Process a turn by executing actions in initiative order.
-        Injects required dependencies (rules engine, game map) into actions,
-        collects results, and updates each actor's state after the turn.
+        Inject required dependencies, and update each actor's state after the turn.
+        Returns a list of action result dictionaries.
         """
         results = []
         ordered_actions = turn.get_ordered_actions(self.rules_engine)
         for action in ordered_actions:
             self.assign_action_id(action)
             action.rules_engine = self.rules_engine
-            # Inject the current game map for movement and full-round actions.
             if action.action_type in [ActionType.MOVE, ActionType.FULL_ROUND]:
                 action.game_map = self.game_map
-            result = action.execute()
-            result["turn_number"] = turn.turn_number
-            result["action_id"] = action.action_id
-            results.append(result)
-        # Update state (conditions, resources, etc.) for each actor.
+            action_result = action.execute()
+            # Inject turn number and action ID into the result.
+            action_result = ActionResult(
+                action=action_result.action,
+                actor_name=action_result.actor_name,
+                target_name=action_result.target_name,
+                result_data=action_result.result_data,
+                log=action_result.log,
+                turn_number=turn.turn_number,
+                action_id=action.action_id
+            )
+            results.append(action_result.to_dict())
         for actor_name, record in turn.character_actions.items():
             record["actor"].update_state()
         return results
@@ -255,7 +257,11 @@ class TurnManager:
                 action = FullRoundAction(actor=actor, parameters=params, action_type="full_round")
             elif action_type == ActionType.FREE:
                 action = GameAction(actor=actor, action_type="free", parameters=params)
-                action.execute = lambda: {"action": "free", "actor": actor.name, "justification": "Free action executed."}
+                action.execute = lambda: ActionResult(
+                    action="free",
+                    actor_name=actor.name,
+                    result_data={"justification": "Free action executed."}
+                )
             elif action_type == ActionType.IMMEDIATE:
                 action = SkillCheckAction(
                     actor=actor,
@@ -265,10 +271,18 @@ class TurnManager:
                 )
             elif action_type == ActionType.READIED:
                 action = GameAction(actor=actor, action_type="readied", parameters=params)
-                action.execute = lambda: {"action": "readied", "actor": actor.name, "justification": "Readied action executed."}
+                action.execute = lambda: ActionResult(
+                    action="readied",
+                    actor_name=actor.name,
+                    result_data={"justification": "Readied action executed."}
+                )
             elif action_type == ActionType.DELAYED:
                 action = GameAction(actor=actor, action_type="delayed", parameters=params)
-                action.execute = lambda: {"action": "delayed", "actor": actor.name, "justification": "Delayed action executed."}
+                action.execute = lambda: ActionResult(
+                    action="delayed",
+                    actor_name=actor.name,
+                    result_data={"justification": "Delayed action executed."}
+                )
             else:
                 raise ValueError(f"Unsupported action type: {action_type_str}")
             turn.add_action(action)
