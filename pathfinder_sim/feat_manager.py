@@ -4,12 +4,13 @@ feat_manager.py
 This module manages feats for our Pathfinder simulation.
 Feats are stored as JSON files (one per category) in the config/feat_config/ directory.
 The module builds an index of available categories and supports lazy loading of feat definitions.
-It also provides helper functions to retrieve feats and check prerequisites.
+It also provides helper functions to retrieve feats and check prerequisites,
+including support for various prerequisite types such as Skill, Stat, BAB, Level, Caster Level, Feat, Race, Alignment, and Class.
 """
 
 import os
 import json
-from typing import Dict, Any, Optional, List
+from typing import Dict, Any, Optional, List, Union
 import glob
 
 # Global cache for feats: maps category (lowercase) to a dictionary mapping feat names to Feat objects.
@@ -59,7 +60,7 @@ class Feat:
     """
     def __init__(self, name: str, prerequisites: Dict[str, Any], benefit: str, category: str, version: Optional[str] = None):
         self.name = name
-        self.prerequisites = prerequisites  # Example: {"Special": "Spell recall class feature", "Skill": {"Spellcraft": 5}}
+        self.prerequisites = prerequisites  # e.g., {"Special": "Hex class feature", "Skill": {"Spellcraft": 5}, "Stat": {"CON": 13}}
         self.benefit = benefit
         self.category = category
         self.version = version
@@ -78,6 +79,16 @@ class Feat:
             "category": self.category,
             "version": self.version
         }
+    
+    # Optional stub for applying passive effects.
+    def apply_effects(self, character) -> None:
+        """
+        Apply the passive effects of the feat to the given character.
+        By default, this does nothing.
+        Override this method in subclasses or extend this function to support
+        active/passive effect integration.
+        """
+        pass
 
 def load_feats_for_category(category: str) -> Dict[str, Feat]:
     """
@@ -156,29 +167,139 @@ def get_all_feats(category: Optional[str] = None) -> List[Feat]:
 def check_prerequisites(character, feat: Feat) -> bool:
     """
     Check if the given character meets the prerequisites for the feat.
-    Currently supports:
-      - "Special": a string that should be in character.special_features.
-      - "Skill": a dictionary mapping skill names to required minimum values.
-    Additional prerequisite types (ability scores, other feats, class levels) can be added.
+    Supports multiple prerequisite types:
+      - "Special": Checks for required special features.
+      - "Skill": Checks required skill values using effective skill modifiers.
+      - "Stat": Checks that an ability score meets a minimum value.
+      - "BAB": Checks if the character’s Base Attack Bonus meets the requirement.
+      - "Level": Checks total character level.
+      - "Caster Level": Checks caster level (or approximates from spellcasting class levels).
+      - "Feat": Checks that the character already has a required feat (or feats).
+      - "Race": Checks that the character’s race matches.
+      - "Alignment": Checks that the character’s alignment matches.
+      - "Class": Checks that the character has a minimum level in a specified class.
+      - "Alternative": Supports an alternative prerequisite clause where at least one alternative set is satisfied.
+    
+    Returns True if all specified prerequisites are met; otherwise, returns False.
     """
     prerequisites = feat.prerequisites
-    # Check "Special" prerequisites.
-    special_req = prerequisites.get("Special")
-    if special_req:
-        if not hasattr(character, "special_features") or special_req not in character.special_features:
+
+    # Define helper functions for each prerequisite type.
+
+    def check_special(req: Union[str, List[str]]) -> bool:
+        # req may be a string or a list of strings.
+        if isinstance(req, str):
+            return hasattr(character, "special_features") and req in character.special_features
+        elif isinstance(req, list):
+            return all(check_special(item) for item in req)
+        return False
+
+    def check_skill(req: Dict[str, int]) -> bool:
+        # req is a dict mapping skill names to required values.
+        for skill, required in req.items():
+            if hasattr(character, "get_skill_value"):
+                current = character.get_skill_value(skill)
+            else:
+                current = character.get_effective_skill_modifier(skill)
+            if current < required:
+                return False
+        return True
+
+    def check_stat(req: Dict[str, int]) -> bool:
+        # req is a dict mapping ability names (e.g., "CON") to minimum values.
+        for stat, minimum in req.items():
+            # Assume character attributes are stored in lowercase (e.g., character.constitution).
+            value = getattr(character, stat.lower(), None)
+            if value is None or value < minimum:
+                return False
+        return True
+
+    def check_bab(required: int) -> bool:
+        return getattr(character, "BAB", 0) >= required
+
+    def check_level(required: int) -> bool:
+        # Total character level is the sum of levels in all classes.
+        total_level = sum(character.class_levels.values())
+        return total_level >= required
+
+    def check_caster_level(required: int) -> bool:
+        # If the character has a 'caster_level' attribute, use it; otherwise, approximate from spellcasting classes.
+        if hasattr(character, "caster_level"):
+            return character.caster_level >= required
+        # Approximate: use the highest level among common spellcasting classes.
+        spellcasting_classes = ["wizard", "sorcerer", "cleric", "druid", "bard"]
+        levels = [lvl for cls, lvl in character.class_levels.items() if cls.lower() in spellcasting_classes]
+        if levels:
+            return max(levels) >= required
+        return False
+
+    def check_feat(req: Union[str, List[str]]) -> bool:
+        # req may be a string or a list of feat names.
+        if isinstance(req, str):
+            return req in character.feats
+        elif isinstance(req, list):
+            return all(feat_name in character.feats for feat_name in req)
+        return False
+
+    def check_race(req: Union[str, List[str]]) -> bool:
+        if isinstance(req, str):
+            return character.race.lower() == req.lower()
+        elif isinstance(req, list):
+            return character.race.lower() in [r.lower() for r in req]
+        return False
+
+    def check_alignment(req: Union[str, List[str]]) -> bool:
+        if isinstance(req, str):
+            return character.alignment.lower() == req.lower()
+        elif isinstance(req, list):
+            return character.alignment.lower() in [a.lower() for a in req]
+        return False
+
+    def check_class(req: Dict[str, int]) -> bool:
+        # req is a dict mapping class names to minimum levels.
+        for cls, minimum in req.items():
+            if character.class_levels.get(cls.lower(), 0) < minimum:
+                return False
+        return True
+
+    # Mapping of prerequisite keys to their corresponding check functions.
+    prerequisite_checks = {
+        "Special": check_special,
+        "Skill": check_skill,
+        "Stat": check_stat,
+        "BAB": check_bab,
+        "Level": check_level,
+        "Caster Level": check_caster_level,
+        "Feat": check_feat,
+        "Race": check_race,
+        "Alignment": check_alignment,
+        "Class": check_class,
+    }
+
+    # First, handle the "Alternative" key if present.
+    if "Alternative" in prerequisites:
+        alternatives = prerequisites["Alternative"]
+        # alternatives should be a list of alternative prerequisite sets.
+        alternative_passed = False
+        if isinstance(alternatives, list):
+            for alt_req in alternatives:
+                # For each alternative set, all keys in that set must be satisfied.
+                if all(prerequisite_checks.get(key, lambda x: True)(alt_req.get(key)) for key in alt_req):
+                    alternative_passed = True
+                    break
+        elif isinstance(alternatives, dict):
+            # Single alternative set.
+            alternative_passed = all(prerequisite_checks.get(key, lambda x: True)(alternatives.get(key)) for key in alternatives)
+        if not alternative_passed:
             return False
 
-    # Check "Skill" prerequisites.
-    skill_reqs = prerequisites.get("Skill", {})
-    for skill, required in skill_reqs.items():
-        # Assume character has a method get_skill_value(skill) or use effective_skill_modifier.
-        if hasattr(character, "get_skill_value"):
-            current_value = character.get_skill_value(skill)
-        else:
-            current_value = character.get_effective_skill_modifier(skill)
-        if current_value < required:
+    # Now, check all other prerequisites.
+    for key, req in prerequisites.items():
+        if key == "Alternative":
+            continue
+        check_func = prerequisite_checks.get(key)
+        if check_func and not check_func(req):
             return False
-
     return True
 
 if __name__ == "__main__":
