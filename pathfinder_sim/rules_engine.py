@@ -2,10 +2,10 @@
 rules_engine.py
 ---------------
 This module implements the core rules engine for our simulation.
-It provides the Dice class for rolling dice (with standard notation) and resolvers
-for combat, spellcasting, and skill checks. In R04 we standardized ActionResult.
-In R05, we extend the CombatResolver with methods to resolve advanced combat maneuvers
-(such as bull rush and grapple) using data-driven configuration.
+It provides the Dice class for rolling dice with standard notation,
+and resolvers for combat, spellcasting, skill checks, and now advanced maneuvers.
+All resolvers return an ActionResult (defined in action_result.py) that includes detailed debug information,
+enabling complete auditability and reproducibility of action outcomes.
 """
 
 from typing import List, Dict, Any
@@ -17,7 +17,7 @@ from action_result import ActionResult
 
 class Dice:
     """
-    A Dice class for rolling dice using standard notation (e.g., '1d20+5').
+    A Dice class for rolling dice using standard notation (e.g., "1d20+5").
     Supports seeding for deterministic results.
     """
     def __init__(self, seed: int = None):
@@ -28,6 +28,7 @@ class Dice:
         """
         Roll dice based on the given notation.
         Example: "2d6+3" rolls two 6-sided dice and adds 3.
+        Returns the total.
         """
         parts = notation.lower().split("d")
         num_dice = int(parts[0])
@@ -42,9 +43,11 @@ class Dice:
         else:
             die = remainder
         die = int(die)
-        total = sum(self.rng.randint(1, die) for _ in range(num_dice))
-        return total + mod
-    
+        rolls = [self.rng.randint(1, die) for _ in range(num_dice)]
+        total = sum(rolls) + mod
+        # For debugging, we could log individual rolls if needed.
+        return total
+
     def roll_d20(self) -> int:
         """Roll a 20-sided die."""
         return self.rng.randint(1, 20)
@@ -119,13 +122,12 @@ def get_weapon_critical_parameters(weapon: Any) -> Dict[str, Any]:
     return {"threat_range": 19, "multiplier": 2}
 
 # --------------------------
-# Extended CombatResolver with Maneuvers
+# Extended CombatResolver with Maneuver Debug Logging
 # --------------------------
 class CombatResolver:
     """
-    Resolves combat (attack) actions.
-    Calculates total attack value, applies concealment, and resolves critical hits.
-    Returns an ActionResult containing all relevant outcome details.
+    Resolves combat (attack) actions and advanced combat maneuvers.
+    Provides detailed debug information to ensure auditability.
     """
     def __init__(self, dice):
         self.dice = dice
@@ -164,11 +166,9 @@ class CombatResolver:
         return False
 
     def resolve_attack(self, attack_action) -> ActionResult:
-        """
-        Resolve an attack action.
-        Calculates hit/miss, checks for critical threat and confirmation, and computes damage.
-        """
+        debug_info = {}
         natural_roll = self.dice.roll_d20()
+        debug_info["natural_roll"] = natural_roll
         if attack_action.weapon is not None:
             if getattr(attack_action.weapon, "is_ranged", False):
                 ability_mod = attack_action.actor.get_modifier("DEX")
@@ -176,6 +176,7 @@ class CombatResolver:
                 ability_mod = attack_action.actor.get_modifier("STR")
         else:
             ability_mod = attack_action.actor.get_modifier("DEX")
+        debug_info["ability_mod"] = ability_mod
         bab = getattr(attack_action.actor, "BAB", 0)
         weapon_bonus = attack_action.weapon_bonus if attack_action.weapon is not None else 0
         check_penalty = attack_action.weapon.check_penalty if attack_action.weapon is not None else 0
@@ -186,10 +187,15 @@ class CombatResolver:
             (-check_penalty, "penalty")
         ]
         effective_bonus = stack_bonuses(bonus_list)
+        debug_info["effective_bonus"] = effective_bonus
         total_attack = natural_roll + effective_bonus
+        debug_info["total_attack"] = total_attack
+
         effective_defense = self.compute_effective_defense(attack_action.defender,
                                                            attack_action.is_touch_attack,
                                                            attack_action.target_flat_footed)
+        debug_info["effective_defense"] = effective_defense
+
         hit = (total_attack >= effective_defense) or (natural_roll == 20)
         result_data = {
             "attacker_name": attack_action.actor.name,
@@ -202,15 +208,21 @@ class CombatResolver:
             "critical": False,
             "concealment_applied": False
         }
+        # Check concealment.
         if hit:
             if self.apply_concealment(attack_action.defender):
                 result_data["hit"] = False
                 result_data["concealment_applied"] = True
                 result_data["justification"] = "Attack missed due to concealment."
-                return ActionResult(action="attack",
-                                    actor_name=attack_action.actor.name,
-                                    target_name=attack_action.defender.name,
-                                    result_data=result_data)
+                return ActionResult(
+                    action="attack",
+                    actor_name=attack_action.actor.name,
+                    target_name=attack_action.defender.name,
+                    result_data=result_data,
+                    log="",
+                    debug=debug_info
+                )
+        # Proceed with hit resolution.
         if hit:
             critical_confirmed = False
             if attack_action.weapon and not attack_action.is_touch_attack:
@@ -219,14 +231,15 @@ class CombatResolver:
                 crit_multiplier = crit_params.get("multiplier", 2)
                 if natural_roll >= threat_range:
                     confirm_roll = self.dice.roll_d20()
+                    debug_info["critical_confirm_roll"] = confirm_roll
                     confirm_total = confirm_roll + effective_bonus
+                    debug_info["confirm_total"] = confirm_total
                     if confirm_total >= effective_defense:
                         critical_confirmed = True
-                    result_data["critical_confirm_roll"] = confirm_roll
-                    result_data["confirm_total"] = confirm_total
             result_data["critical"] = critical_confirmed
             if attack_action.weapon:
                 base_damage = self.dice.roll(attack_action.weapon.damage_dice)
+                debug_info["base_damage"] = base_damage
                 if critical_confirmed:
                     total_damage = (base_damage * crit_multiplier) + ability_mod
                     result_data["critical_multiplier"] = crit_multiplier
@@ -234,38 +247,44 @@ class CombatResolver:
                     total_damage = base_damage + ability_mod
             else:
                 base_damage = self.dice.roll("1d8")
+                debug_info["base_damage"] = base_damage
                 if critical_confirmed:
                     total_damage = (base_damage * 2) + ability_mod
                     result_data["critical_multiplier"] = 2
                 else:
                     total_damage = base_damage + ability_mod
-            result_data["base_damage"] = base_damage
             result_data["damage"] = total_damage
             result_data["justification"] = "Attack hit" + (" with a confirmed critical." if critical_confirmed else ".")
         else:
             result_data["damage"] = 0
             result_data["justification"] = "Attack missed; total attack did not meet effective defense."
-        return ActionResult(action="attack",
-                            actor_name=attack_action.actor.name,
-                            target_name=attack_action.defender.name,
-                            result_data=result_data)
+        return ActionResult(
+            action="attack",
+            actor_name=attack_action.actor.name,
+            target_name=attack_action.defender.name,
+            result_data=result_data,
+            log="",  # The log will be formatted by the logger module.
+            debug=debug_info
+        )
 
-    # New: Resolve Bull Rush maneuver.
     def resolve_bull_rush(self, maneuver_action) -> ActionResult:
         """
         Resolve a bull rush maneuver.
-        Compare the attacker's CMB to the defender's CMD (possibly modified by environment/maneuver rules).
-        Use data from maneuvers_config.json to determine default push distance.
+        Compare attacker's CMB with defender's CMD using data from maneuvers_config.json.
+        Record debug details for audit.
         """
         maneuvers_config = self.load_maneuvers_config()
         bull_rush_conf = maneuvers_config.get("bull_rush", {})
         # Basic calculation: effective CMB vs. defender's CMD.
         attacker_cmb = maneuver_action.actor.BAB + maneuver_action.actor.get_modifier("STR")
-        defender_cmd = maneuver_action.defender.cmd  # Already computed in Character.
-        # Optionally add modifiers from bull rush config.
-        push_distance = bull_rush_conf.get("push_distance_default", 1)
+        defender_cmd = maneuver_action.defender.cmd
+        debug_info = {
+            "attacker_cmb": attacker_cmb,
+            "defender_cmd": defender_cmd
+        }
         success = attacker_cmb >= defender_cmd
-        justification = (f"Bull Rush: {attacker_cmb} (CMB) vs {defender_cmd} (CMD). "
+        push_distance = bull_rush_conf.get("push_distance_default", 1) if success else 0
+        justification = (f"Bull Rush: Attacker's CMB {attacker_cmb} vs Defender's CMD {defender_cmd}. "
                          f"Default push distance: {push_distance} square(s).")
         result_data = {
             "attacker_name": maneuver_action.actor.name,
@@ -273,25 +292,34 @@ class CombatResolver:
             "attacker_cmb": attacker_cmb,
             "defender_cmd": defender_cmd,
             "success": success,
-            "push_distance": push_distance if success else 0,
+            "push_distance": push_distance,
             "justification": justification
         }
-        return ActionResult(action="maneuver",
-                            actor_name=maneuver_action.actor.name,
-                            target_name=maneuver_action.defender.name,
-                            result_data=result_data)
+        debug_info["maneuver"] = "bull_rush"
+        return ActionResult(
+            action="maneuver",
+            actor_name=maneuver_action.actor.name,
+            target_name=maneuver_action.defender.name,
+            result_data=result_data,
+            log="",
+            debug=debug_info
+        )
 
-    # New: Resolve Grapple maneuver.
     def resolve_grapple(self, maneuver_action) -> ActionResult:
         """
         Resolve a grapple maneuver.
-        Compare the attacker's CMB to the defender's CMD.
-        On success, the defender becomes grappled.
+        Compare attacker's CMB with defender's CMD.
+        Record debug details for audit.
         """
         attacker_cmb = maneuver_action.actor.BAB + maneuver_action.actor.get_modifier("STR")
         defender_cmd = maneuver_action.defender.cmd
+        debug_info = {
+            "attacker_cmb": attacker_cmb,
+            "defender_cmd": defender_cmd,
+            "maneuver": "grapple"
+        }
         success = attacker_cmb >= defender_cmd
-        justification = f"Grapple: {attacker_cmb} (CMB) vs {defender_cmd} (CMD)."
+        justification = f"Grapple: Attacker's CMB {attacker_cmb} vs Defender's CMD {defender_cmd}."
         result_data = {
             "attacker_name": maneuver_action.actor.name,
             "defender_name": maneuver_action.defender.name,
@@ -300,10 +328,14 @@ class CombatResolver:
             "success": success,
             "justification": justification
         }
-        return ActionResult(action="maneuver",
-                            actor_name=maneuver_action.actor.name,
-                            target_name=maneuver_action.defender.name,
-                            result_data=result_data)
+        return ActionResult(
+            action="maneuver",
+            actor_name=maneuver_action.actor.name,
+            target_name=maneuver_action.defender.name,
+            result_data=result_data,
+            log="",
+            debug=debug_info
+        )
 
 class SpellResolver:
     """
@@ -315,7 +347,9 @@ class SpellResolver:
         self.dice = dice
 
     def resolve_spell(self, spell_action) -> ActionResult:
+        debug_info = {}
         damage = self.dice.roll("1d4") + 1
+        debug_info["damage_roll"] = damage
         result_data = {
             "spell_name": spell_action.spell_name,
             "caster_name": spell_action.actor.name,
@@ -323,10 +357,14 @@ class SpellResolver:
             "damage": damage,
             "justification": "Spell cast successfully."
         }
-        return ActionResult(action="spell",
-                            actor_name=spell_action.actor.name,
-                            target_name=spell_action.target.name,
-                            result_data=result_data)
+        return ActionResult(
+            action="spell",
+            actor_name=spell_action.actor.name,
+            target_name=spell_action.target.name,
+            result_data=result_data,
+            log="",
+            debug=debug_info
+        )
 
 class SkillResolver:
     """
@@ -337,21 +375,29 @@ class SkillResolver:
         self.dice = dice
 
     def resolve_skill_check(self, skill_action) -> ActionResult:
+        debug_info = {}
         roll = self.dice.roll_d20()
         # Use the new skill_utils function to get the effective modifier.
+        debug_info["roll"] = roll
         modifier = get_skill_modifier(skill_action.actor, skill_action.skill_name)
+        debug_info["modifier"] = modifier
         total = roll + modifier
+        debug_info["total"] = total
         result_data = {
             "character_name": skill_action.actor.name,
             "skill_name": skill_action.skill_name,
             "roll": roll,
             "total": total,
             "dc": skill_action.dc,
-            "justification": f"Skill check processed using base modifier {modifier} (roll {roll} + modifier = {total})."
+            "justification": f"Skill check: base modifier {modifier} (roll {roll} + modifier = {total})."
         }
-        return ActionResult(action="skill_check",
-                            actor_name=skill_action.actor.name,
-                            result_data=result_data)
+        return ActionResult(
+            action="skill_check",
+            actor_name=skill_action.actor.name,
+            result_data=result_data,
+            log="",
+            debug=debug_info
+        )
 
 class RulesEngine:
     """
@@ -366,6 +412,7 @@ class RulesEngine:
     def process_turn(self, actions: List[Any]) -> List[Dict[str, Any]]:
         results = []
         for action in actions:
+            # Each action returns an ActionResult; we convert it to a dict.
             results.append(action.execute().to_dict())
         return results
 
