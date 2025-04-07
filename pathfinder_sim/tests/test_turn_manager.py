@@ -1,9 +1,12 @@
 """
 tests/test_turn_manager.py
 
-This file contains tests for the TurnManager, ensuring that actions are correctly
-categorized, that JSON orders are parsed into proper actions, and that action limits
-and sequencing are enforced according to Pathfinder 1e rules.
+Tests for the TurnManager component.
+These tests ensure that:
+ - Actions are categorized and ordered correctly.
+ - JSON orders are parsed into appropriate IAction objects.
+ - Action economy limits are enforced.
+ - Global state updates occur after processing a turn.
 """
 
 import pytest
@@ -34,25 +37,23 @@ def setup_turn_manager():
 
 def test_turn_manager_action_limits(setup_characters, setup_turn_manager):
     """
-    Test that the TurnManager enforces action limits.
-    Adding a standard action after the allowed move actions should raise an exception.
+    Verify that the TurnManager enforces action limits.
+    For example, adding a standard action after two move actions should raise an exception.
     """
     turn_manager, game_map = setup_turn_manager
     turn = turn_manager.new_turn()
     alice = setup_characters["Alice"]
-    # Add two move actions for Alice.
     move1 = MoveAction(actor=alice, target=(1, 0))
     move2 = MoveAction(actor=alice, target=(2, 0))
     turn.add_action(move1)
     turn.add_action(move2)
-    # Adding a standard action now should raise an exception.
     standard_action = SkillCheckAction(actor=alice, skill_name="Tumble", dc=15, action_type=ActionType.STANDARD)
     with pytest.raises(Exception):
         turn.add_action(standard_action)
 
 def test_turn_manager_json_parsing(setup_characters, setup_turn_manager):
     """
-    Test that the TurnManager correctly parses JSON orders into actions.
+    Test that JSON orders are correctly parsed into a Turn with the appropriate IAction objects.
     """
     turn_manager, _ = setup_turn_manager
     json_orders = json.dumps([
@@ -68,7 +69,7 @@ def test_turn_manager_json_parsing(setup_characters, setup_turn_manager):
 
 def test_turn_manager_swift_and_free(setup_characters, setup_turn_manager):
     """
-    Test that swift and free actions are correctly recorded.
+    Verify that swift and free actions are recorded correctly.
     """
     turn_manager, _ = setup_turn_manager
     turn = turn_manager.new_turn()
@@ -85,7 +86,7 @@ def test_turn_manager_swift_and_free(setup_characters, setup_turn_manager):
 
 def test_process_turn_integration(setup_characters, setup_turn_manager):
     """
-    Test that processing a turn updates the game state and returns appropriate action results.
+    Verify that processing a turn updates global state and returns action result dictionaries.
     """
     turn_manager, game_map = setup_turn_manager
     turn = turn_manager.new_turn()
@@ -103,3 +104,37 @@ def test_process_turn_integration(setup_characters, setup_turn_manager):
     turn.add_action(attack)
     results = turn_manager.process_turn(turn)
     assert any(res["action"] == "attack" for res in results), "Attack action should be processed."
+
+def test_turn_manager_swift_and_free_integration(setup_characters, setup_turn_manager):
+    """
+    Additional test to verify swift and free actions processing in a turn.
+    """
+    turn_manager, _ = setup_turn_manager
+    turn = turn_manager.new_turn()
+    bob = setup_characters["Bob"]
+    swift_action = SkillCheckAction(actor=bob, skill_name="Quick Reflexes", dc=15, action_type=ActionType.SWIFT)
+    free_action1 = SkillCheckAction(actor=bob, skill_name="Brag", dc=10, action_type=ActionType.FREE)
+    free_action2 = SkillCheckAction(actor=bob, skill_name="Taunt", dc=10, action_type=ActionType.FREE)
+    turn.add_action(swift_action)
+    turn.add_action(free_action1)
+    turn.add_action(free_action2)
+    results = turn_manager.process_turn(turn)
+    swift_results = [res for res in results if res["action"] == "skill_check" and res.get("skill_name") == "Quick Reflexes"]
+    free_results = [res for res in results if res["action"] == "free"]
+    assert swift_results, "Swift action should be processed."
+    assert len(free_results) == 2, "Two free actions should be processed."
+
+def test_turn_manager_json_parsing_with_maneuver(setup_characters, setup_turn_manager):
+    """
+    Verify that JSON orders including maneuver actions are correctly parsed.
+    """
+    turn_manager, _ = setup_turn_manager
+    json_orders = json.dumps([
+        {"actor": "Alice", "action_type": "move", "parameters": {"target": [1, 0]}},
+        {"actor": "Bob", "action_type": "standard", "parameters": {"maneuver_type": "bull_rush", "defender": "Alice"}}
+    ])
+    turn = turn_manager.parse_json_actions(json_orders, setup_characters)
+    alice_actions = turn.character_actions["Alice"]
+    bob_actions = turn.character_actions["Bob"]
+    assert len(alice_actions["move"]) == 1, "Alice should have 1 move action."
+    assert bob_actions["standard"] is not None, "Bob should have a standard action representing a maneuver."

@@ -1,8 +1,9 @@
 """
 tests/test_logging.py
 
-This file contains tests for the logging system, ensuring that log messages are
-formatted according to the templates defined in logging_config.json.
+Tests for the Logging System.
+This file verifies that log messages are formatted correctly according to the templates
+defined in logging_config.json. The tests check that essential information is included in the logs.
 """
 
 import json
@@ -12,7 +13,9 @@ from logger import format_log
 
 def test_attack_log_format():
     """
-    Test that an attack log is formatted correctly according to the logging configuration.
+    Test that an attack log is formatted correctly.
+    The log message should include the attacker's and defender's names, the dice roll,
+    effective bonus, and other key values.
     """
     log_data = {
         "attacker_name": "Alice",
@@ -25,11 +28,10 @@ def test_attack_log_format():
         "critical": False
     }
     log_message = format_log("attack", log_data)
-    # Basic assertions: ensure key parts of the message are present.
+    # Check for key substrings.
     assert "Alice" in log_message, "Log should include the attacker's name."
     assert "Bob" in log_message, "Log should include the defender's name."
     assert "17" in log_message, "Log should include the natural roll."
-    # Additional assertions can be added based on your logging template.
 
 def test_default_log_format():
     """

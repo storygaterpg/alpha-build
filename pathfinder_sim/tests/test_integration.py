@@ -1,16 +1,17 @@
 """
 tests/test_integration.py
 
-This file contains integration tests that simulate complete turns, verifying that
-movement, combat, spellcasting, condition updates, and JSON order parsing are correctly processed.
-It ensures that global state updates (like character positions and condition durations)
-are consistent with Pathfinder 1e rules.
+Integration Tests for the Pathfinder Simulation Engine.
+These tests simulate full turns and verify that movement, combat, spellcasting,
+condition updates, and JSON order parsing work end-to-end. Global state (e.g., character
+positions and condition durations) must update consistently as per Pathfinder 1e rules.
 """
 
 import json
 import pytest
 import math
 import sys, os
+
 # Ensure the parent directory is in sys.path.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
@@ -22,7 +23,7 @@ from turn_manager import TurnManager, ActionType, AttackAction, SpellAction, Ski
 from rules_engine import Dice, RulesEngine, rules_engine
 
 # --------------------------
-# Dummy actor for movement tests
+# Dummy Actor for Testing Movement
 # --------------------------
 class DummyActor:
     def __init__(self, name, position):
@@ -30,35 +31,35 @@ class DummyActor:
         self.position = position
 
     def get_effective_skill_modifier(self, skill: str) -> int:
+        # For integration tests, return 0 unless testing vertical movement.
         return 0
 
 # --------------------------
 # Fixtures for Integration Tests
 # --------------------------
-
 @pytest.fixture
 def game_environment():
     """
-    Set up a basic game environment:
-      - A 10x10 map with defined terrain.
-      - A global TurnManager using the RulesEngine and the map.
+    Sets up a basic game environment:
+      - A 10x10 map with some terrain modifications.
+      - A global TurnManager using a RulesEngine and the map.
       - Two characters: Alice and Bob.
     """
-    # Create a 10x10 map and modify terrain:
+    # Create a 10x10 map.
     test_map = Map(10, 10)
-    # Set column 3 (rows 3-5) as difficult terrain.
+    # Mark column 3 (rows 3–5) as difficult terrain.
     for y in range(3, 6):
         test_map.set_terrain(3, y, "difficult")
-    # Set one impassable cell.
+    # Mark cell (5,5) as impassable.
     test_map.set_terrain(5, 5, "impassable")
     
-    # Create dice, rules engine, and TurnManager.
+    # Initialize dice, rules engine, and TurnManager.
     dice = Dice(seed=42)
     global rules_engine
     rules_engine = RulesEngine(dice)
     tm = TurnManager(rules_engine, test_map)
     
-    # Create characters.
+    # Create two characters.
     alice = Character("Alice", x=0, y=0, dexterity=14)
     bob = Character("Bob", x=9, y=9, dexterity=12)
     bob.spells.append("Magic Missile")
@@ -78,23 +79,19 @@ def game_environment():
 # --------------------------
 # Integration Test Scenarios
 # --------------------------
-
 def test_full_turn_simulation_move_and_attack(game_environment):
     """
-    Simulate a full turn where Alice first moves and then attacks Bob.
+    Simulate a turn where Alice moves and then attacks Bob.
     Verify that:
-      - Alice's position is updated correctly.
-      - An attack action is processed and returns an appropriate result.
+      - Alice’s final position is updated correctly after moving.
+      - An attack action produces a valid outcome.
     """
     env = game_environment
     tm = env["turn_manager"]
     characters = env["characters"]
     
     turn = tm.new_turn()
-    
-    # Create a move action for Alice from (0,0) to (2,0)
     move_action = MoveAction(actor=characters["Alice"], target=(2, 0), action_type=ActionType.MOVE)
-    # Then create an attack action from Alice to Bob.
     attack_action = AttackAction(
         actor=characters["Alice"],
         defender=characters["Bob"],
@@ -109,26 +106,23 @@ def test_full_turn_simulation_move_and_attack(game_environment):
     turn.add_action(attack_action)
     
     results = tm.process_turn(turn)
-    # Verify move action result.
     move_results = [res for res in results if res["action"] == "move"]
     assert move_results, "Move action should be processed."
-    final_pos = move_results[0]["final_position"]
+    final_pos = move_results[0].get("final_position")
     assert final_pos == (2, 0), f"Expected final position (2,0), got {final_pos}"
     
-    # Verify attack action result.
     attack_results = [res for res in results if res["action"] == "attack"]
     assert attack_results, "Attack action should be processed."
 
 def test_obstacle_movement_interaction():
     """
-    Test a scenario where the path is completely blocked.
-    The movement action should return an empty path.
+    Test movement in a scenario where the path is completely blocked.
+    Expect the MovementAction to return an empty path.
     """
     from movement import Map, MovementAction
     m = Map(3, 3)
     for x in range(3):
         m.set_terrain(x, 1, "impassable")
-    # Create a dummy actor for movement.
     dummy = DummyActor("TestActor", (0, 0))
     action = MovementAction(m, dummy, (0, 0), (2, 2))
     result = action.execute()
@@ -139,7 +133,7 @@ def test_full_turn_simulation_spell_and_swift(game_environment):
     """
     Simulate a turn where Bob casts a spell and takes a swift action.
     Verify that:
-      - The spell action returns a valid result.
+      - The spell action returns a valid outcome.
       - The swift action is processed.
     """
     env = game_environment
@@ -147,7 +141,6 @@ def test_full_turn_simulation_spell_and_swift(game_environment):
     characters = env["characters"]
     
     turn = tm.new_turn()
-    
     spell_action = SpellAction(
         actor=characters["Bob"],
         target=characters["Alice"],
@@ -172,8 +165,8 @@ def test_full_turn_simulation_spell_and_swift(game_environment):
 
 def test_multi_turn_condition_update(game_environment):
     """
-    Simulate multiple turns to verify that conditions tick down and eventually expire.
-    For example, Bob's Blinded condition should expire after 2 turns.
+    Simulate multiple turns to verify that conditions tick down and expire as expected.
+    For example, Bob's Blinded condition (duration 2) should expire after 2 turns.
     """
     env = game_environment
     tm = env["turn_manager"]
@@ -183,9 +176,8 @@ def test_multi_turn_condition_update(game_environment):
     initial_conditions = bob.get_condition_status()
     blinded = next((cond for cond in initial_conditions if cond["name"] == "Blinded"), None)
     assert blinded is not None, "Bob should start with Blinded condition."
-    assert blinded["duration"] == 2
+    assert blinded["duration"] == 2, "Initial Blinded condition duration should be 2."
     
-    # Process two turns and update conditions.
     for _ in range(2):
         turn = tm.new_turn()
         tm.process_turn(turn)
@@ -197,8 +189,8 @@ def test_multi_turn_condition_update(game_environment):
 
 def test_json_order_parsing_integration(game_environment):
     """
-    Provide a well-formed JSON order representing a full turn for multiple characters,
-    then verify that TurnManager parses the orders correctly into appropriate actions.
+    Verify that a JSON string representing orders is correctly parsed into a Turn.
+    Ensures that each actor's actions are correctly categorized.
     """
     env = game_environment
     tm = env["turn_manager"]
@@ -221,8 +213,8 @@ def test_json_order_parsing_integration(game_environment):
 
 def test_action_limit_enforcement(game_environment):
     """
-    Test that exceeding allowed action limits raises an exception.
-    For example, adding a standard action after two move actions should fail.
+    Verify that the TurnManager enforces action limits.
+    For example, adding a standard action after two move actions should raise an exception.
     """
     env = game_environment
     tm = env["turn_manager"]
@@ -239,9 +231,9 @@ def test_action_limit_enforcement(game_environment):
 
 def test_full_round_action_charge(game_environment):
     """
-    Test a full-round action simulating a charge.
-    Verify that the charge correctly combines movement and attack,
-    updating the character's position and returning a valid result.
+    Simulate a full-round charge action.
+    Verify that the charge combines movement and an attack,
+    updating Alice's position and returning a valid result.
     """
     env = game_environment
     tm = env["turn_manager"]
@@ -262,10 +254,8 @@ def test_full_round_action_charge(game_environment):
 
 def test_integration_spell_and_movement(game_environment):
     """
-    Simulate a scenario where a character moves and then is targeted by a spell.
-    Verify that:
-      - Movement updates the character's position.
-      - The spell resolver processes the spell correctly using the updated position.
+    Simulate a scenario where Alice moves and then Bob casts a spell on her.
+    Verify that movement updates her position and the spell action processes correctly.
     """
     env = game_environment
     tm = env["turn_manager"]
@@ -282,16 +272,17 @@ def test_integration_spell_and_movement(game_environment):
     
     results = tm.process_turn(turn)
     move_result = next((res for res in results if res["action"] == "move"), None)
-    assert move_result is not None
-    assert move_result["final_position"] == (4, 0), f"Expected final position (4,0), got {move_result['final_position']}"
+    assert move_result is not None, "Move action should be processed."
+    assert move_result.get("final_position") == (4, 0), f"Expected final position (4,0), got {move_result.get('final_position')}"
     
     spell_results = [res for res in results if res["action"] == "spell"]
     assert spell_results, "Expected spell action result."
 
 def test_global_state_consistency(game_environment):
     """
-    After processing a turn with multiple actions, verify that global state
-    (character positions, condition durations, etc.) is updated correctly.
+    After processing a turn with multiple actions, verify that:
+      - Character positions are updated.
+      - Condition durations are decremented.
     """
     env = game_environment
     tm = env["turn_manager"]
@@ -316,10 +307,10 @@ def test_global_state_consistency(game_environment):
     turn.add_action(spell_action)
     
     tm.process_turn(turn)
-    # Verify that Alice's position has been updated.
+    # Verify that Alice's position is updated.
     assert alice.position == (2, 0), f"Expected Alice's position to be (2,0), got {alice.position}"
     
-    # Process an empty turn to tick conditions and update global state.
+    # Process an empty turn to tick conditions.
     empty_turn = tm.new_turn()
     tm.process_turn(empty_turn)
     bob.update_conditions()
