@@ -33,14 +33,14 @@ def test_spell_resolution(spell_engine):
     caster.spells.append("Magic Missile")
     # Ensure that the caster has at least one spell slot available.
     caster.resources["spell_slots"] = 1
-    
+
     spell_action = SpellAction(actor=caster, target=target, spell_name="Magic Missile", action_type="standard")
     spell_action.rules_engine = spell_engine
     result = spell_action.execute()
-    
-    # Verify that the action is correctly identified as a spell and that damage is present.
-    assert result.get("action") == "spell", "Expected action type 'spell'."
-    assert "damage" in result, "Spell result should include damage."
+    result_dict = result.to_dict()
+
+    assert result_dict.get("action") == "spell", "Expected action type 'spell'."
+    assert "damage" in result_dict.get("result_data", {}), "Spell result should include damage."
 
 def test_spell_resource_consumption_success(spell_engine):
     """
@@ -56,11 +56,12 @@ def test_spell_resource_consumption_success(spell_engine):
     spell_action = SpellAction(actor=caster, target=target, spell_name="Magic Missile", action_type="standard")
     spell_action.rules_engine = spell_engine
     result = spell_action.execute()
-    
+
     # Check that the spell action succeeded and a spell slot was consumed.
-    assert result.get("action") == "spell", "Expected action type 'spell'."
-    assert "damage" in result, "Spell result should include damage."
-    assert caster.resources["spell_slots"] == 0, "Spell slot should be consumed after casting."
+    assert result.action == "spell", "Expected action type 'spell'."
+    assert "damage" in result.result_data, "Spell result should include damage."
+    assert caster.resources["spell_slots"] == 0, "Expected spell slot to be consumed after casting."
+
 
 def test_spell_resource_consumption_failure(spell_engine):
     """

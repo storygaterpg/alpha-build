@@ -20,43 +20,75 @@ from config_manager import load_config  # Centralized configuration loading
 # --------------------------
 # Dice Class
 # --------------------------
+# In your Dice class (e.g., in rules_engine.py or a separate dice.py file)
 class Dice:
     """
     A Dice class for rolling dice using standard notation (e.g., "1d20+5").
-    Supports seeding for deterministic results.
+    Supports seeding for deterministic results and logs every dice roll.
     """
     def __init__(self, seed: int = None):
         import random
         self.rng = random.Random(seed)
         self.base_seed = seed if seed is not None else 42  # Default base seed
+        self.roll_log = []  # Initialize an empty list to store roll details
 
     def roll(self, notation: str) -> int:
         """
         Roll dice based on the given notation.
-        Example: "2d6+3" rolls two 6-sided dice and adds 3.
-        Returns the total.
+        Example: "2d6+3" will roll two 6-sided dice and add 3.
+        Returns the total and logs the details.
         """
+        # Parse the notation.
         parts = notation.lower().split("d")
         num_dice = int(parts[0])
         remainder = parts[1]
         mod = 0
         if '+' in remainder:
-            die, mod_str = remainder.split('+')
+            die_str, mod_str = remainder.split('+')
             mod = int(mod_str)
         elif '-' in remainder:
-            die, mod_str = remainder.split('-')
+            die_str, mod_str = remainder.split('-')
             mod = -int(mod_str)
         else:
-            die = remainder
-        die = int(die)
-        rolls = [self.rng.randint(1, die) for _ in range(num_dice)]
-        total = sum(rolls) + mod
-        # Debug: Log individual rolls if needed.
+            die_str = remainder
+        die = int(die_str)
+        
+        # Roll the dice.
+        individual_rolls = [self.rng.randint(1, die) for _ in range(num_dice)]
+        total = sum(individual_rolls) + mod
+        
+        # Log the roll details.
+        self.roll_log.append({
+            "notation": notation,
+            "individual_rolls": individual_rolls,
+            "modifier": mod,
+            "total": total
+        })
         return total
 
     def roll_d20(self) -> int:
-        """Roll a 20-sided die."""
-        return self.rng.randint(1, 20)
+        """
+        Roll a 20-sided die and log the result.
+        """
+        result = self.rng.randint(1, 20)
+        self.roll_log.append({
+            "notation": "1d20",
+            "total": result
+        })
+        return result
+
+    def get_roll_log(self) -> list:
+        """
+        Return the list of dice roll logs.
+        """
+        return self.roll_log
+
+    def clear_roll_log(self) -> None:
+        """
+        Clear the dice roll log.
+        """
+        self.roll_log.clear()
+
 
 # --------------------------
 # Bonus and Weapon Config Loading Using Config Manager
@@ -147,13 +179,12 @@ class CombatResolver:
         else:
             return defender.get_ac()
 
-    def apply_concealment(self, defender) -> bool:
-        """
-        Determine if the defender's concealment causes the attack to miss.
-        """
+    def apply_concealment(self, defender, debug_info: dict) -> bool:
         concealment = getattr(defender, "concealment", 0)
         if concealment > 0:
-            roll = self.dice.rng.randint(1, 100)
+            # Roll a d100 using the Dice API so that every roll is logged.
+            roll = self.dice.roll("1d100")
+            debug_info["concealment_roll"] = roll
             if roll <= concealment:
                 return True
         return False
@@ -217,7 +248,7 @@ class CombatResolver:
         }
 
         # Check for concealment effects.
-        if hit and self.apply_concealment(attack_action.defender):
+        if hit and self.apply_concealment(attack_action.defender, debug_info):
             result_data["hit"] = False
             result_data["concealment_applied"] = True
             result_data["justification"] = "Attack missed due to concealment."

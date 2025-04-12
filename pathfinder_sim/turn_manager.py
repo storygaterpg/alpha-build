@@ -143,14 +143,16 @@ class Turn:
             # And readied actions.
             ordered_actions.extend(record["readied"])
 
-        # Append delayed actions after non-delayed actions.
+        # Append delayed actors after non-delayed actors.
         for actor_name in sorted_delayed:
             record = delayed[actor_name][0]
-            if record["delayed"]:
-                ordered_actions.append(record["delayed"])
-            # Optionally, process immediate and readied actions for delayed actors as well.
+            # Process immediate and readied actions first.
             ordered_actions.extend(record["immediate"])
             ordered_actions.extend(record["readied"])
+            # Then append the delayed action.
+            if record["delayed"]:
+                ordered_actions.append(record["delayed"])
+
             # Note: Standard/move/swift/free actions are skipped if the actor has delayed an action.
 
         return ordered_actions
@@ -203,8 +205,9 @@ class TurnManager:
             result.action_id = action.action_id
             # (Audit metadata like actor_id, target_id, rng_seed are set in the action implementations.)
             results.append(result.to_dict())
-        for actor_name, record in self.character_actions.items():
+        for actor_name, record in turn.character_actions.items():
             record["actor"].update_state()
+
         return results
 
     def parse_json_actions(self, json_input: str, characters: Dict[str, Character]) -> Turn:

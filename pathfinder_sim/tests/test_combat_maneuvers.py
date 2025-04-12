@@ -18,7 +18,9 @@ class DummyCharacter(Character):
         super().__init__(name, x, y, dexterity)
         self.strength = strength
         self.BAB = bab
-        self.cmd = cmd  # For testing, we can manually set CMD.
+        # For testing, we manually set CMD.
+        self.cmd = cmd
+
 
 @pytest.fixture
 def combat_engine():
@@ -26,13 +28,16 @@ def combat_engine():
     return RulesEngine(dice)
 
 def test_bull_rush_success(combat_engine):
-    # Setup attacker with high CMB and defender with lower CMD.
-    attacker = DummyCharacter("Attacker", 0, 0, dexterity=14, strength=16, bab=5, cmd=0)
-    defender = DummyCharacter("Defender", 1, 0, dexterity=12, strength=12, bab=0, cmd=15)
+    # Setup attacker with higher CMB and defender with a lower CMD.
+    # Attacker: BAB=5 and strength=20 -> STR mod = 5, so CMB = 5 + 5 = 10.
+    # Defender: set CMD = 9.
+    attacker = DummyCharacter("Attacker", x=0, y=0, dexterity=14, strength=20, bab=5, cmd=0)
+    defender = DummyCharacter("Defender", x=1, y=0, dexterity=12, strength=12, bab=0, cmd=9)
     action = BullRushAction(actor=attacker, defender=defender)
     action.rules_engine = combat_engine
     result = action.execute()
     assert result.result_data.get("success") is True, "Bull Rush should succeed if attacker's CMB >= defender's CMD."
+
 
 def test_grapple_failure(combat_engine):
     # Setup attacker with low strength; expect grapple to fail.

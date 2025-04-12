@@ -1587,33 +1587,19 @@
         },
         "benefit": "+4 bonus on attack rolls made to confirm critical hits"
     },
-    "Critical, Banishing": [
-        {
+    "Critical, Banishing": {
         "prerequisites": {
-            "Feat": "Critical Focus",
-            "Special": "ability to cast dismissal or banishment",
-            "CL": 9
+        "Alternative": [
+            { "Feat": "Arcane Strike" },
+            { "Feat": "Disruptive" }
+        ],
+        "Skill": { "Spellcraft": 8 },
+        "Special": "arcane pool class feature"
         },
-        "benefit": "When you confirm a critical hit with a slashing or bludgeoning weapon, you may cast dismissal or banishment on that target as an immediate action, and the target takes a –4 penalty on its Will save to resist the spell’s effect. You must have dismissal or banishment prepared or otherwise available to cast, and using this ability casts the corresponding spell."
-        },
-        {
-        "prerequisites": {
-            "Alternative": [
-            {
-                "Feat": "Arcane Strike"
-            },
-            {
-                "Feat": "Disruptive"
-            }
-            ],
-            "Skill": {
-            "Spellcraft": 8
-            },
-            "Special": "arcane pool class feature"
-        },
-        "benefit": "When you confirm a critical hit against a target while using Arcane Strike or with a weapon enhanced by your arcane pool, if the target was summoned by a spell you identified using a Spellcraft check, it must succeed at a Will save (DC = 10 + 1/2 your character level + your Intelligence modifier) or be sent back to its home plane as per the dismissal spell."
-        }
-    ],
+        "benefit": "When you confirm a critical hit against a target while using Arcane Strike or with a weapon enhanced by your arcane pool, if the target was summoned by a spell you identified using a Spellcraft check, it must succeed at a Will save (DC = 10 + 1/2 your character level + your Intelligence modifier) or be sent back to its home plane as per the dismissal spell.",
+        "source": "PPC:MSH",
+        "description": "Your familiarity with summoning creatures has taught you how to send them away with a well-timed strike."
+    },      
     "Critical, Bleeding": {
         "prerequisites": {
         "Feat": "Critical Focus",

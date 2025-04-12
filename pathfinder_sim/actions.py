@@ -4,7 +4,7 @@ actions.py
 This module defines all GameAction classes for our Pathfinder simulation.
 Each action implements the standardized IAction interface so that it can be executed
 deterministically and logged using a data-driven logging system.
-All actions now return an ActionResult for consistent auditability, including additional audit metadata.
+All actions return an ActionResult for consistent auditability, including additional audit metadata.
 """
 
 from typing import Dict, Any, Tuple
@@ -12,8 +12,8 @@ from abc import ABC, abstractmethod
 from character import Character
 import os
 import json
-from logger import format_log  # Logging helper to format audit messages
-from action_types import ActionType  # Enum defining allowed action types
+from logger import format_log  # Import our logging helper
+from action_types import ActionType  # Import the ActionType enum from our module
 from action_result import ActionResult  # Standardized result object
 
 # --- IAction Interface ---
@@ -109,20 +109,42 @@ class SkillCheckAction(GameAction):
     Represents a skill check action.
     Uses the skill resolver to determine the outcome of a skill check.
     """
-    def __init__(self, actor: Character, skill_name: str, dc: int,
-                 action_type: str = "skill_check"):
+    def __init__(self, actor: Character, skill_name: str, dc: int, action_type: str = "skill_check"):
         super().__init__(actor, action_type)
         self.skill_name = skill_name
         self.dc = dc
 
     def execute(self) -> ActionResult:
-        result = self.rules_engine.skill_resolver.resolve_skill_check(self)
+        # Call the skill resolver; it returns an ActionResult.
+        resolver_result = self.rules_engine.skill_resolver.resolve_skill_check(self)
+        # If resolver_result is an ActionResult, get its result_data dictionary.
+        if isinstance(resolver_result, ActionResult):
+            result_data = resolver_result.result_data.copy()  # Make a copy so we can safely modify it.
+        else:
+            result_data = resolver_result  # Fallback in case it's already a dict.
+        # Insert the skill name explicitly.
+        result_data["skill_name"] = self.skill_name
+
+        # Create a new ActionResult with the updated dictionary.
+        result = ActionResult(
+            action="skill_check",
+            actor_name=self.actor.name,
+            target_name="",
+            result_data=result_data,
+            log="",
+            debug={}
+        )
+        # Optionally set the action type to "skill_check" (or "free" if this action is of FREE type).
+        if self.action_type != ActionType.FREE:
+            result.action = "skill_check"
+        else:
+            result.action = "free"
         result.actor_id = id(self.actor)
-        # No target for general skill checks.
         result.rng_seed = self.rules_engine.current_rng_seed
         return result
 
-# --- MovementAction ---
+    
+# --- MoveAction ---
 class MoveAction(GameAction):
     """
     Represents a movement action that moves the actor from its current position to a target cell.
@@ -134,31 +156,20 @@ class MoveAction(GameAction):
         self.target = target
 
     def execute(self) -> ActionResult:
-        from movement import MovementAction as MA
-        # Instantiate the movement action with current actor position and target.
-        movement_action = MA(self.game_map, self.actor, self.actor.position, self.target)
-        start_pos = self.actor.position
-        movement_result = movement_action.execute()
-        path = movement_result.get("path", [])
-        # Update actor's position if a valid path is found.
-        if path:
-            self.actor.position = path[-1]
-        else:
-            self.actor.position = start_pos
-        result_data = {
-            "actor": self.actor.name,
-            "path": path,
-            "final_position": self.actor.position,
-            "justification": "Movement action executed." if path else "No valid path found."
-        }
-        # Format log message.
-        result_data["log"] = format_log("move", {
-            "actor_name": self.actor.name,
-            "start_position": start_pos,
-            "end_position": self.actor.position,
-            "path": path
-        })
-        result = ActionResult(action="move", actor_name=self.actor.name, result_data=result_data)
+        from movement import MovementAction  # Import the movement action from movement module.
+        # Create a movement action using the game map.
+        movement_action = MovementAction(self.game_map, self.actor, self.actor.position, self.target)
+        # Execute the movement to calculate the path.
+        movement_result = movement_action.execute()  # This returns a dictionary.
+        
+        # Create an ActionResult wrapping the movement result.
+        result = ActionResult(
+            action="move",
+            actor_name=self.actor.name,
+            target_name="",
+            result_data=movement_result,
+            log=""
+        )
         result.actor_id = id(self.actor)
         result.rng_seed = self.rules_engine.current_rng_seed
         return result
@@ -176,8 +187,8 @@ class FullRoundAction(GameAction):
     def execute(self) -> ActionResult:
         if self.parameters.get("type") == "charge":
             target = self.parameters.get("target")
-            from movement import MovementAction as MA
-            movement_action = MA(self.game_map, self.actor, self.actor.position, target)
+            from movement import MovementAction as MovementActionModule
+            movement_action = MovementActionModule(self.game_map, self.actor, self.actor.position, target)
             movement_result = movement_action.execute()
             path = movement_result.get("path", [])
             if not path:
@@ -185,13 +196,9 @@ class FullRoundAction(GameAction):
                 return ActionResult(action="full_round", actor_name=self.actor.name, result_data=result_data)
             self.actor.position = target
             from rules_engine import rules_engine
-            temp_attack = AttackAction(
-                actor=self.actor,
-                defender=self.parameters.get("defender"),
-                weapon_bonus=0,
-                weapon=self.parameters.get("weapon"),
-                action_type="full_round"
-            )
+            temp_attack = AttackAction(actor=self.actor, defender=self.parameters.get("defender"),
+                                       weapon_bonus=0, weapon=self.parameters.get("weapon"),
+                                       action_type="full_round")
             temp_attack.rules_engine = self.rules_engine
             attack_result = self.rules_engine.combat_resolver.resolve_attack(temp_attack)
             result_data = {
@@ -203,8 +210,8 @@ class FullRoundAction(GameAction):
             }
             result_data["log"] = f"Full-round charge by {self.actor.name} to {target}. Attack result: {attack_result.result_data}."
             result = ActionResult(action="full_round", actor_name=self.actor.name,
-                                target_name=getattr(self.parameters.get("defender"), "name", ""),
-                                result_data=result_data)
+                                  target_name=getattr(self.parameters.get("defender"), "name", ""),
+                                  result_data=result_data)
             result.actor_id = id(self.actor)
             result.target_id = id(self.parameters.get("defender")) if self.parameters.get("defender") else None
             result.rng_seed = self.rules_engine.current_rng_seed

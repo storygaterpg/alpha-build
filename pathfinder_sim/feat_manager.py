@@ -116,17 +116,29 @@ def load_feats_for_category(category: str) -> Dict[str, Feat]:
         return _FEATS_CACHE[category]
     
     # Optionally, if the file includes a version, extract it.
-    version = data.get("version")
+    version = data.get("version") if isinstance(data, dict) else None
     
     feats: Dict[str, Feat] = {}
-    # Each key in the JSON (except "version") corresponds to a feat.
-    for feat_name, feat_data in data.items():
-        # Skip the version key if present.
-        if feat_name.lower() == "version":
-            continue
-        feat = Feat.from_dict(feat_name, feat_data, category, version)
-        feats[feat_name.lower()] = feat
-
+    if isinstance(data, dict):
+        # Each key in the JSON (except "version") corresponds to a feat.
+        for feat_name, feat_data in data.items():
+            if feat_name.lower() == "version":
+                continue
+            feat = Feat.from_dict(feat_name, feat_data, category, version)
+            feats[feat_name.lower()] = feat
+    elif isinstance(data, list):
+        # If data is a list, each element is a feat definition.
+        for feat_obj in data:
+            # Assume the feat name is provided under a key "Feat" (adjust if your JSON uses a different key).
+            feat_name = feat_obj.get("Feat")
+            if not feat_name:
+                print("Warning: A feat entry in the list is missing a 'Feat' key.")
+                continue
+            feat = Feat.from_dict(feat_name, feat_obj, category, version)
+            feats[feat_name.lower()] = feat
+    else:
+        print(f"Unexpected data format in {filepath}.")
+    
     _FEATS_CACHE[category] = feats
     return feats
 
@@ -206,10 +218,19 @@ def check_prerequisites(character, feat: Feat) -> bool:
         return True
 
     def check_stat(req: Dict[str, int]) -> bool:
-        # req is a dict mapping ability names (e.g., "CON") to minimum values.
+        # Map common ability abbreviations to attribute names.
+        ability_mapping = {
+            "STR": "strength",
+            "DEX": "dexterity",
+            "CON": "constitution",
+            "INT": "intelligence",
+            "WIS": "wisdom",
+            "CHA": "charisma"
+        }
         for stat, minimum in req.items():
-            # Assume character attributes are stored in lowercase (e.g., character.constitution).
-            value = getattr(character, stat.lower(), None)
+            stat_upper = stat.upper()
+            attr_name = ability_mapping.get(stat_upper, stat.lower())
+            value = getattr(character, attr_name, None)
             if value is None or value < minimum:
                 return False
         return True
