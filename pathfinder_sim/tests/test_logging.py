@@ -5,14 +5,13 @@ This file contains tests for the logging system, ensuring that log messages are
 formatted according to the templates defined in logging_config.json.
 """
 
-import json
-import os
 import pytest
 from logger import format_log
 
-def test_attack_log_format():
+def test_attack_log_format() -> None:
     """
-    Test that an attack log is formatted correctly according to the logging configuration.
+    Test that an attack log is formatted correctly.
+    Checks that the key information (attacker name, defender name, roll, etc.) is included.
     """
     log_data = {
         "attacker_name": "Alice",
@@ -29,9 +28,9 @@ def test_attack_log_format():
     assert "Alice" in log_message, "Log should include the attacker's name."
     assert "Bob" in log_message, "Log should include the defender's name."
     assert "17" in log_message, "Log should include the natural roll."
-    # Additional assertions can be added based on your logging template.
+    # Additional assertions can be added based on the logging template.
 
-def test_default_log_format():
+def test_default_log_format() -> None:
     """
     Test that a default log message is produced when an unknown event type is used.
     """

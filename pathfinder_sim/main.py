@@ -3,14 +3,9 @@ main.py
 -------
 
 This is the main simulation engine for our Pathfinder 1st Edition game.
-This updated version creates a more complex simulation environment that tests multiple aspects:
-  - A larger game map with varied terrain and a height map for vertical differences.
-  - Multiple characters with multiclass progression and conditions affecting AC/skills.
-  - A multi-turn loop that processes diverse actions (movement, attack, spell, skill check).
-  - Integration of vertical movement mechanics: when an edge (cliff) is encountered, several
-    options (jump, climb, go around, climb up) are offered.
-  - Demonstration of the feat manager: loading and displaying a feat from configuration.
-  - Logging and state updates for DM justification.
+This version sets up the game environment, processes turns, and now integrates
+the Narrative & Logging Layer. Each action's detailed ActionResult is translated
+into plain language narrative text for DM justification and player communication.
 """
 
 import json
@@ -26,26 +21,31 @@ import conditions
 import feat_manager
 import spell_utils
 
-# Import rules_engine related modules.
+# Import rules engine components.
 from rules_engine import Dice, RulesEngine
 
+# Import our new NarrativeTranslator.
+from narrative_translator import NarrativeTranslator
+
 def setup_game_environment() -> Tuple[Map, Dict[str, Character], RulesEngine]:
-    # Create a larger map (15x15) with varied terrain and height data.
+    """
+    Sets up the game environment with a 15x15 map, characters, and the rules engine.
+    
+    Returns:
+        Tuple containing the game map, a dictionary of characters, and the rules engine.
+    """
+    # Create a 15x15 map with uniform terrain and height.
     game_map = Map(15, 15)
-    # For this example, we only use terrain types (height-related methods are in movement.py if updated)
     for y in range(15):
         for x in range(15):
             game_map.set_height(x, y, 0)
             game_map.set_terrain(x, y, "normal")
-    # Create a cliff edge: cells in column 6 at height 0 and in column 7 at height -15.
-    # (Assuming the Map class now has set_height and get_height methods.)
+    # Create a cliff edge: column 6 at height 0, column 7 at height -15.
     for y in range(15):
         game_map.set_height(6, y, 0)
         game_map.set_height(7, y, -15)
         game_map.set_terrain(6, y, "normal")
         game_map.set_terrain(7, y, "jumpable")
-    # (If set_height isn't available, ensure your Map implementation includes it.)
-    # For demonstration, we skip actual height setup.
     
     # Initialize dice and rules engine.
     dice = Dice(seed=42)
@@ -76,7 +76,7 @@ def setup_game_environment() -> Tuple[Map, Dict[str, Character], RulesEngine]:
     alice.add_condition(conditions.FatiguedCondition())
     charlie.add_condition(conditions.ConfusedCondition())
     
-    # Provide simple effective skill modifier functions for demonstration.
+    # Set effective skill modifier functions.
     alice.get_effective_skill_modifier = lambda skill: 2 if skill.lower() in ["acrobatics", "jump"] else 0
     bob.get_effective_skill_modifier = lambda skill: 0
     charlie.get_effective_skill_modifier = lambda skill: 1 if skill.lower() == "bluff" else 0
@@ -85,54 +85,82 @@ def setup_game_environment() -> Tuple[Map, Dict[str, Character], RulesEngine]:
     return game_map, characters, rules_engine
 
 def simulate_turns(game_map: Map, characters: Dict[str, Character], rules_engine: RulesEngine, num_turns: int = 3):
+    """
+    Simulate a series of turns. For each turn, process actions and then use the NarrativeTranslator
+    to output a human-readable summary of what occurred.
+    """
     tm = TurnManager(rules_engine, game_map)
+    translator = NarrativeTranslator()  # Instantiate our narrative translator.
+    
     for turn_number in range(1, num_turns + 1):
         print(f"\n--- Turn {turn_number} ---")
         turn = tm.new_turn()
         
         # Standard Actions:
-        # Alice moves normally towards (5,5).
+        # Alice moves towards (5,5).
         move_action_alice = MoveAction(actor=characters["Alice"], target=(5, 5), action_type="move")
         turn.add_action(move_action_alice)
         
-        attack_action_alice = AttackAction(actor=characters["Alice"], defender=characters["Bob"],
-                                           weapon_bonus=2, weapon=None,
-                                           is_touch_attack=False, target_flat_footed=False,
-                                           action_type="standard")
+        attack_action_alice = AttackAction(
+            actor=characters["Alice"], 
+            defender=characters["Bob"],
+            weapon_bonus=2, 
+            weapon=None,
+            is_touch_attack=False, 
+            target_flat_footed=False,
+            action_type="standard"
+        )
         turn.add_action(attack_action_alice)
         
-        spell_action_bob = SpellAction(actor=characters["Bob"], target=characters["Alice"],
-                                       spell_name="Magic Missile", action_type="standard")
+        spell_action_bob = SpellAction(
+            actor=characters["Bob"], 
+            target=characters["Alice"],
+            spell_name="Magic Missile", 
+            action_type="standard"
+        )
         turn.add_action(spell_action_bob)
         
-        swift_action_bob = SkillCheckAction(actor=characters["Bob"], skill_name="Use Magic Device", dc=15, action_type="swift")
+        swift_action_bob = SkillCheckAction(
+            actor=characters["Bob"], 
+            skill_name="Use Magic Device", 
+            dc=15, 
+            action_type="swift"
+        )
         turn.add_action(swift_action_bob)
         
-        skill_action_charlie = SkillCheckAction(actor=characters["Charlie"], skill_name="Bluff", dc=10, action_type="standard")
+        skill_action_charlie = SkillCheckAction(
+            actor=characters["Charlie"], 
+            skill_name="Bluff", 
+            dc=10, 
+            action_type="standard"
+        )
         turn.add_action(skill_action_charlie)
         
         # Process the turn.
         results = tm.process_turn(turn)
+        print("\n--- Raw Action Results (for audit) ---")
         for res in results:
-            print("Action Result:", res)
+            print(res.to_dict())
         
-        # Update each character's state.
+        # Generate and print narrative text.
+        print("\n--- Narrative Summary ---")
+        narratives = translator.translate_all(results)
+        for narrative in narratives:
+            print(narrative)
+        
+        # Update character states.
         for char in characters.values():
             char.update_state()
             print(char)
         
-        # Print effective skill modifiers.
-        print(f"Alice's effective DEX modifier for Acrobatics: {characters['Alice'].get_effective_skill_modifier('DEX')}")
-        print(f"Bob's effective DEX modifier for Disable Device: {characters['Bob'].get_effective_skill_modifier('DEX')}")
-        print(f"Charlie's effective CHA modifier for Bluff: {characters['Charlie'].get_effective_skill_modifier('CHA')}")
-        
-        # Vertical Movement Test on turn 2.
+        # Additional demonstration: Vertical Movement Test on turn 2.
         if turn_number == 2:
             print("\n--- Vertical Movement Test ---")
             vertical_action = CustomMoveAction(actor=characters["Alice"], target=(8, 7), game_map=game_map)
             vertical_result = vertical_action.execute()
-            print("Vertical Movement Option Result:")
-            print(json.dumps(vertical_result, indent=4))
+            vertical_narrative = translator.translate_result(vertical_result)
+            print("Vertical Movement Option Result (Narrative):")
+            print(vertical_narrative)
 
 def test_feat_manager():
     """

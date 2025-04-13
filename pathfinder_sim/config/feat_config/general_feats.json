@@ -2001,12 +2001,6 @@
         },
         "benefit": "Gain a +4 bonus on Craft checks for certain actions while foraging or salvaging"
     },
-    "Extended Animal Focus": {
-        "prerequisites": {
-            "Special": "Animal focus class feature"
-        },
-        "benefit": "Add Wisdom bonus to minutes usable per day for your animal focus ability"
-    },
     "Extended Aspects": {
         "prerequisites": {
             "Special": "Shifter aspect class feature"

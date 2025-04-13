@@ -14,6 +14,8 @@ import jsonschema
 from character import Character
 import character_sheet
 
+# Fixture: sample_character
+# Note: This fixture returns a fully configured Character object for testing.
 @pytest.fixture
 def sample_character():
     """
@@ -35,9 +37,7 @@ def sample_character():
     char.class_levels = {"fighter": 1}
     char.feats = ["Power Attack", "Cleave"]
     char.spells = ["Magic Missile"]
-    # Resources should be loaded from configuration (e.g., spell slots, etc.)
-    # For testing, we assume resources are pre-loaded.
-    # Set inventory and narrative elements.
+    # Inventory and narrative elements.
     char.inventory = [{"name": "Longsword", "quantity": 1}, {"name": "Potion of Healing", "quantity": 3}]
     char.race = "Human"
     char.alignment = "Lawful Good"
@@ -45,10 +45,12 @@ def sample_character():
     char.background = "TestHero grew up in a small village and has a troubled past."
     char.goals = "To become a renowned hero and protect the innocent."
     char.relationships = [{"name": "Alice", "relation": "Friend"}, {"name": "Bob", "relation": "Rival"}]
+    
     # Add some conditions.
     from conditions import BlindedCondition, FatiguedCondition
     char.add_condition(BlindedCondition())
     char.add_condition(FatiguedCondition())
+    
     return char
 
 def test_character_sheet_generation(sample_character):
@@ -89,6 +91,7 @@ def test_character_sheet_save_and_load(tmp_path, sample_character):
     Test that saving a character sheet to file and loading it back produces
     an equivalent valid sheet.
     """
+    # Create a file path using the tmp_path fixture (do not call sample_character as a function).
     filename = tmp_path / "test_character_sheet.json"
     narrative_text = "Saving and loading test narrative."
     

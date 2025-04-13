@@ -6,7 +6,6 @@ from typing import Optional
 import os
 import jsonschema
 
-# Load the JSON schema from file.
 def load_character_sheet_schema() -> dict:
     schema_path = os.path.join(os.path.dirname(__file__), "config", "character_sheet_schema.json")
     with open(schema_path, "r") as f:
@@ -86,6 +85,9 @@ def create_character_sheet(character, narrative: Optional[str] = None) -> dict:
             "hit_points": hit_points,
             "saves": saves,
             "combat_stats": combat_stats,
+            "cmb": getattr(character, "cmb", 0),
+            "cmd": getattr(character, "cmd", 10 + character.BAB),
+            "spell_slots": getattr(character, "spell_slots", {}),
             "ac": character.get_ac(),
             "flatfooted_ac": character.get_flatfooted_ac(),
             "touch_ac": character.get_touch_ac(),
