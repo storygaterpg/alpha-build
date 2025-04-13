@@ -143,7 +143,6 @@ class SkillCheckAction(GameAction):
         result.rng_seed = self.rules_engine.current_rng_seed
         return result
 
-    
 # --- MoveAction ---
 class MoveAction(GameAction):
     """
@@ -163,13 +162,8 @@ class MoveAction(GameAction):
         movement_result = movement_action.execute()  # This returns a dictionary.
         
         # Create an ActionResult wrapping the movement result.
-        result = ActionResult(
-            action="move",
-            actor_name=self.actor.name,
-            target_name="",
-            result_data=movement_result,
-            log=""
-        )
+        result = ActionResult(action="move", actor_name=self.actor.name, target_name="",
+                              result_data=movement_result, log="")
         result.actor_id = id(self.actor)
         result.rng_seed = self.rules_engine.current_rng_seed
         return result
@@ -226,31 +220,91 @@ class FullRoundAction(GameAction):
 # --- UseItemAction ---
 class UseItemAction(GameAction):
     """
-    Represents an action where the actor uses an item from their inventory.
-    Checks if the item exists and reduces its quantity.
+    Represents an action where the actor activates a magic item from their inventory.
+    
+    PF1e Rules for Magic Item Activation:
+      - Spell Completion: Activation as a standard action (or the spell's casting time if longer) that provokes attacks of opportunity.
+      - Spell Trigger: Activation is a standard action but does not provoke attacks of opportunity.
+      - Command Word: Activation is a free action.
+      - Use Activated: Activation is either a standard action or not an action at all (if subsumed in the item's use), and does not provoke attacks of opportunity 
+        (unless the use itself provokes).
+    
+    For example:
+      - Drinking a potion is a standard action.
+      - Retrieving an item from a backpack is a move action.
+      - Speaking a command word is a free action.
+    
+    This class now separates the PF1e 'activation_method' from the underlying spent action type.
+    The 'activation_method' attribute logs how the item is activated (e.g., "use_activated" or "command_word"),
+    while the action type (from the ActionType enum) reflects the actual action spent.
     """
-    def __init__(self, actor: Character, item_name: str, action_type: str = "use_item"):
-        super().__init__(actor, action_type, parameters={"item_name": item_name})
+    def __init__(self, actor: Character, item_name: str, activation_method: str = None):
+        # Determine the PF1e activation method and the corresponding action type to be spent.
+        # Default behavior: if the item is a potion, assume use activation (drinking is a standard action);
+        # if it is a command word item, then use a free action.
+        if activation_method is None:
+            if "potion" in item_name.lower():
+                self.activation_method = "use_activated"
+                self.spent_action_type = ActionType.STANDARD   # Drinking a potion is a standard action.
+            else:
+                # Default to a command word activation (free action) for items that require verbal commands.
+                self.activation_method = "command_word"
+                self.spent_action_type = ActionType.FREE
+        else:
+            self.activation_method = activation_method.lower()
+            if self.activation_method == "command_word":
+                self.spent_action_type = ActionType.FREE
+            elif self.activation_method == "use_activated":
+                self.spent_action_type = ActionType.STANDARD
+            else:
+                # Fallback: use standard action.
+                self.spent_action_type = ActionType.STANDARD
+
+        # Pass a valid action type (as a string) to the base GameAction.
+        super().__init__(actor, self.spent_action_type.value, parameters={"item_name": item_name})
         self.item_name = item_name
 
     def execute(self) -> ActionResult:
-        # For simplicity, assume inventory is a list of dicts with 'name' and 'quantity'.
+        """
+        Execute the use item action:
+          - Searches the actor's inventory for the item.
+          - Decrements the quantity if available.
+          - Constructs an ActionResult with detailed activation data.
+        
+        For items that are use activated (e.g., potions), the activation is treated as a standard action.
+        For command word activated items, the action is treated as free.
+        If no rules_engine is injected (as in isolated testing), a default RNG seed is used.
+        """
         item_found = False
         for item in self.actor.inventory:
             if item.get("name").lower() == self.item_name.lower():
                 item_found = True
                 if item.get("quantity", 0) > 0:
+                    # Decrement the item count since it is being used.
                     item["quantity"] -= 1
-                    justification = f"Used item: {self.item_name}."
+                    justification = f"Activated item: {self.item_name}."
                 else:
                     raise ValueError(f"{self.actor.name} has no {self.item_name} left.")
                 break
         if not item_found:
             raise ValueError(f"{self.actor.name} does not have {self.item_name} in inventory.")
-        result_data = {"justification": justification}
-        result = ActionResult(action="use_item", actor_name=self.actor.name, result_data=result_data)
+        # Prepare the result data including the PF1e activation method, the spent action type,
+        # the item name, and also an 'effect' message indicating successful activation.
+        result_data = {
+            "justification": justification,
+            "activation_method": self.activation_method,
+            "spent_action_type": self.spent_action_type.value,
+            "item_name": self.item_name,
+            "effect": f"{self.item_name} activated successfully."
+        }
+        # Create an ActionResult with the result data.
+        result = ActionResult(action=self.spent_action_type.value, actor_name=self.actor.name, result_data=result_data)
         result.actor_id = id(self.actor)
-        result.rng_seed = self.rules_engine.current_rng_seed
+        # For items that do not require dice rolls (like potions), if the rules_engine is not set, default rng_seed to 0.
+        if self.rules_engine is not None:
+            result.rng_seed = self.rules_engine.current_rng_seed
+        else:
+            result.rng_seed = 0
         return result
 
 # --- ConditionApplicationAction ---
