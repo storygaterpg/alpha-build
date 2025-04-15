@@ -15,25 +15,35 @@ HEADERS = {
     "User-Agent": "PathfinderSpellCrawler/1.0 (compatible; YourName/1.0; +http://example.com)"
 }
 
-# Load the spell schema from the same directory as this script
+# Load the spell schema from the same directory as this script.
 schema_path = os.path.join(os.path.dirname(__file__), "spell_schema.json")
 with open(schema_path, "r") as schema_file:
     SPELL_SCHEMA = json.load(schema_file)
 
+def clean_spell_name(name: str) -> str:
+    """
+    Remove any text within parentheses (including the parentheses) from the spell name.
+    For example, "Theft Ward (Tengu)" becomes "Theft Ward".
+    """
+    return re.sub(r"\s*\(.*?\)", "", name).strip()
+
 def slugify(name: str) -> str:
     """
     Convert a spell name to a URL-friendly slug:
+      - Remove text in parentheses.
       - Lowercase all letters.
       - Replace spaces with hyphens.
       - Remove punctuation.
     """
+    name = clean_spell_name(name)
     name = name.lower().strip().replace(" ", "-")
     valid_chars = string.ascii_lowercase + string.digits + "-"
     return "".join(ch for ch in name if ch in valid_chars)
 
 def build_spell_url(spell_name: str) -> str:
     """
-    Construct the URL for a given spell using the first letter and slug.
+    Construct the URL for a given spell using the first letter of the slug.
+    Text in parentheses is ignored for URL construction.
     """
     slug = slugify(spell_name)
     first_letter = slug[0] if slug else ""
@@ -217,32 +227,32 @@ def crawl_spell(spell_name: str) -> dict:
         return None
 
 def main():
-    # Compute file paths relative to this script's directory.
+    # Compute file paths relative to this script.
     base_dir = os.path.dirname(__file__)
     spells_json_path = os.path.join(base_dir, "spells.json")
     spell_list_path = os.path.join(base_dir, "sorcerer_wizard_spell_list.json")
     
-    # Load existing spells if the output file exists.
+    # Load existing spells if the file exists.
     if os.path.exists(spells_json_path):
         with open(spells_json_path, "r") as f:
             existing_spells = json.load(f)
     else:
         existing_spells = []
     
-    # Gather names of existing spells (case-insensitive).
+    # Build a set of existing spell names (case-insensitive).
     existing_spell_names = {spell["name"].lower() for spell in existing_spells}
     
     # Load the sorcerer/wizard spell list.
     with open(spell_list_path, "r") as f:
         sw_spell_list = json.load(f)
     
-    # Combine spell names from all levels.
+    # Create a set of all spell names from the spell list.
     spells_to_crawl = set()
     for level, spells in sw_spell_list.items():
         for spell in spells:
             spells_to_crawl.add(spell)
     
-    # Crawl only spells that aren't already present.
+    # Crawl only spells that do not already exist.
     for spell_name in spells_to_crawl:
         if spell_name.lower() in existing_spell_names:
             print(f"Spell '{spell_name}' already exists. Skipping.")
@@ -251,8 +261,8 @@ def main():
         if new_spell:
             existing_spells.append(new_spell)
             existing_spell_names.add(spell_name.lower())
-        time.sleep(2)  # Delay between requests
-
+        time.sleep(1)  # Be polite: wait between requests
+    
     # Write the updated list back to spells.json.
     with open(spells_json_path, "w") as f:
         json.dump(existing_spells, f, indent=2)
