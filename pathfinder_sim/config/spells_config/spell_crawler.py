@@ -46,6 +46,7 @@ def slugify(name: str) -> str:
     """
     cleaned = clean_spell_name(name)
     cleaned = cleaned.lower().strip().replace(" ", "-")
+    cleaned = cleaned.lower().strip().replace("'", "-")
     valid_chars = string.ascii_lowercase + string.digits + "-"
     return "".join(ch for ch in cleaned if ch in valid_chars)
 
