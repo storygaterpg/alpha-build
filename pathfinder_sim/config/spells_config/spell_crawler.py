@@ -23,41 +23,36 @@ with open(schema_path, "r") as schema_file:
 def clean_spell_name(name: str) -> str:
     """
     Clean the spell name for URL generation by:
-    - Removing text within parentheses.
-    - Removing trailing comma-separated tokens if they are in a ignore list (e.g. 'lesser', 'greater', 'communal').
-    - Removing trailing roman numeral tokens (e.g. 'IV', 'II').
+      - Removing text within parentheses.
+      - Removing trailing comma-separated tokens if they are in a defined ignore set (e.g., 'lesser', 'greater', 'communal', 'mass').
+      - Removing trailing roman numeral tokens (e.g. 'IV', 'II').
     """
-    # Remove any text within parentheses.
+    # Remove text within parentheses.
     name = re.sub(r"\s*\(.*?\)", "", name).strip()
-    
     # Remove trailing comma-separated tokens if present.
     if "," in name:
         parts = [p.strip() for p in name.split(",")]
         base_name = parts[0]
-        # Check remaining parts; if they match known version keywords, ignore them.
         ignore_tokens = {"lesser", "greater", "communal", "mass"}
-        # If any additional token is in the ignore list (case-insensitive), drop them.
         if any(token.lower() in ignore_tokens for token in parts[1:]):
             name = base_name
-    
     # Remove trailing roman numeral tokens.
     tokens = name.split()
     roman_numerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
     if tokens and tokens[-1].upper() in roman_numerals:
         tokens = tokens[:-1]
         name = " ".join(tokens)
-        
     return name.strip()
 
 def slugify(name: str) -> str:
     """
     Convert a spell name to a URL-friendly slug.
-    First, clean the spell name (remove extra version tags) and replace apostrophes with hyphens.
-    Then, lowercase the text, replace spaces with hyphens, and remove remaining punctuation.
+    First, clean the spell name, then replace apostrophes and forward slashes with hyphens,
+    lowercase the text, replace spaces with hyphens, and remove any remaining unwanted punctuation.
     """
     cleaned = clean_spell_name(name)
-    # Replace apostrophes with hyphens.
-    cleaned = cleaned.replace("'", "-")
+    # Replace apostrophes and forward slashes with hyphens.
+    cleaned = cleaned.replace("'", "-").replace("/", "-")
     cleaned = cleaned.lower().strip().replace(" ", "-")
     valid_chars = string.ascii_lowercase + string.digits + "-"
     return "".join(ch for ch in cleaned if ch in valid_chars)
@@ -111,7 +106,7 @@ def parse_article_content(soup: BeautifulSoup) -> dict:
     if not content_div:
         content_div = soup.find("div", class_="entry-content")
     if not content_div:
-        return data  # Return empty if not found
+        return data
     paragraphs = content_div.find_all("p")
     section = "header"  # initial state before any divider is encountered
     description_paras = []
@@ -130,7 +125,6 @@ def parse_article_content(soup: BeautifulSoup) -> dict:
             continue
 
         if section == "header":
-            # Expect a paragraph containing both 'School' and 'Level'
             full_text = extract_text_from_element(p)
             parts = full_text.split(";")
             for part in parts:
@@ -173,13 +167,11 @@ def parse_spell_page(html: str) -> dict:
     Parse the HTML of a spell page and map the content to our spell_schema.
     """
     soup = BeautifulSoup(html, "html.parser")
-    # Get spell name from <h1>
     h1 = soup.find("h1")
     name = extract_text_from_element(h1) if h1 else "Unknown Spell"
     
     content_data = parse_article_content(soup)
     
-    # Build the spell dictionary using content_data and defaults.
     spell = {
         "id": slugify(name),
         "name": name,
@@ -223,7 +215,6 @@ def parse_spell_page(html: str) -> dict:
                         level_mapping[cls_name] = lvl
     spell["spell_level"] = level_mapping
 
-    # Validate spell against our schema.
     try:
         jsonschema.validate(instance=spell, schema=SPELL_SCHEMA)
     except jsonschema.ValidationError as ve:
@@ -252,38 +243,36 @@ def main():
     spells_json_path = os.path.join(base_dir, "spells.json")
     spell_list_path = os.path.join(base_dir, "sorcerer_wizard_spell_list.json")
     
-    # Load existing spells if the spells.json file exists.
+    # Always start from the beginning: load the entire spell list.
     if os.path.exists(spells_json_path):
         with open(spells_json_path, "r") as f:
             existing_spells = json.load(f)
     else:
         existing_spells = []
     
-    # Build a set of existing spell names (case-insensitive).
     existing_spell_names = {spell["name"].lower() for spell in existing_spells}
     
     # Load the sorcerer/wizard spell list.
     with open(spell_list_path, "r") as f:
         sw_spell_list = json.load(f)
     
-    # Combine spell names from all levels.
-    spells_to_crawl = set()
-    for level, spells in sw_spell_list.items():
-        for spell in spells:
-            spells_to_crawl.add(spell)
+    # Instead of union-ing into a set, iterate through levels in sorted order.
+    # Sort the levels by extracting the numeric portion from the key.
+    sorted_levels = sorted(sw_spell_list.keys(), key=lambda x: int(re.search(r"\d+", x).group()))
     
-    # Crawl only spells that are not already present.
-    for spell_name in spells_to_crawl:
-        if spell_name.lower() in existing_spell_names:
-            print(f"Spell '{spell_name}' already exists. Skipping.")
-            continue
-        new_spell = crawl_spell(spell_name)
-        if new_spell:
-            existing_spells.append(new_spell)
-            existing_spell_names.add(spell_name.lower())
-        time.sleep(1)  # Be polite: wait between requests
+    for level in sorted_levels:
+        spells_in_level = sw_spell_list[level]
+        for spell_name in spells_in_level:
+            if spell_name.lower() in existing_spell_names:
+                print(f"Spell '{spell_name}' already exists. Skipping.")
+                continue
+            new_spell = crawl_spell(spell_name)
+            if new_spell:
+                existing_spells.append(new_spell)
+                existing_spell_names.add(spell_name.lower())
+            time.sleep(2)  # Delay between requests
     
-    # Write the updated list back to spells.json.
+    # Write the updated spells list back to spells.json.
     with open(spells_json_path, "w") as f:
         json.dump(existing_spells, f, indent=2)
     print(f"Crawling complete. Updated spells data written to {spells_json_path}")
