@@ -22,31 +22,43 @@ with open(schema_path, "r") as schema_file:
 
 def clean_spell_name(name: str) -> str:
     """
-    Remove any text in parentheses as well as version tags (e.g. ', Lesser', ', Greater')
-    from the spell name for URL generation.
-    For instance, "Spellcrash, Lesser" becomes "Spellcrash".
+    Clean the spell name for URL generation by:
+    - Removing text within parentheses.
+    - Removing trailing comma-separated tokens if they are in a ignore list (e.g. 'lesser', 'greater', 'communal').
+    - Removing trailing roman numeral tokens (e.g. 'IV', 'II').
     """
-    # Remove text within parentheses
+    # Remove any text within parentheses.
     name = re.sub(r"\s*\(.*?\)", "", name).strip()
-    # Remove version tags appended after a comma if the tail equals "lesser" or "greater"
+    
+    # Remove trailing comma-separated tokens if present.
     if "," in name:
-        base, tail = name.split(",", 1)
-        tail = tail.strip().lower()
-        if tail in ["lesser", "greater"]:
-            name = base.strip()
-    return name
+        parts = [p.strip() for p in name.split(",")]
+        base_name = parts[0]
+        # Check remaining parts; if they match known version keywords, ignore them.
+        ignore_tokens = {"lesser", "greater", "communal", "mass"}
+        # If any additional token is in the ignore list (case-insensitive), drop them.
+        if any(token.lower() in ignore_tokens for token in parts[1:]):
+            name = base_name
+    
+    # Remove trailing roman numeral tokens.
+    tokens = name.split()
+    roman_numerals = {"I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X"}
+    if tokens and tokens[-1].upper() in roman_numerals:
+        tokens = tokens[:-1]
+        name = " ".join(tokens)
+        
+    return name.strip()
 
 def slugify(name: str) -> str:
     """
-    Convert a spell name to a URL-friendly slug:
-      - Clean the spell name (remove parentheses and version tags).
-      - Lowercase letters.
-      - Replace spaces with hyphens.
-      - Remove punctuation.
+    Convert a spell name to a URL-friendly slug.
+    First, clean the spell name (remove extra version tags) and replace apostrophes with hyphens.
+    Then, lowercase the text, replace spaces with hyphens, and remove remaining punctuation.
     """
     cleaned = clean_spell_name(name)
+    # Replace apostrophes with hyphens.
+    cleaned = cleaned.replace("'", "-")
     cleaned = cleaned.lower().strip().replace(" ", "-")
-    cleaned = cleaned.lower().strip().replace("'", "-")
     valid_chars = string.ascii_lowercase + string.digits + "-"
     return "".join(ch for ch in cleaned if ch in valid_chars)
 
@@ -94,17 +106,17 @@ def parse_article_content(soup: BeautifulSoup) -> dict:
         "spell_resistance": "",
         "description": ""
     }
-    # Locate the main content: first try id="article-content", else class="entry-content"
+    # Find the main content; first try id="article-content", fallback to class="entry-content"
     content_div = soup.find("div", id="article-content")
     if not content_div:
         content_div = soup.find("div", class_="entry-content")
     if not content_div:
-        return data  # Return empty dictionary if not found
+        return data  # Return empty if not found
     paragraphs = content_div.find_all("p")
     section = "header"  # initial state before any divider is encountered
     description_paras = []
     for p in paragraphs:
-        # Check for divider paragraphs
+        # Check for divider paragraphs.
         if p.get("class") and "divider" in p.get("class"):
             txt = p.get_text(strip=True).upper()
             if "CASTING" in txt:
@@ -161,19 +173,19 @@ def parse_spell_page(html: str) -> dict:
     Parse the HTML of a spell page and map the content to our spell_schema.
     """
     soup = BeautifulSoup(html, "html.parser")
-    # Get the spell name from the <h1> element.
+    # Get spell name from <h1>
     h1 = soup.find("h1")
     name = extract_text_from_element(h1) if h1 else "Unknown Spell"
     
     content_data = parse_article_content(soup)
     
-    # Build the spell dictionary using content_data and default values.
+    # Build the spell dictionary using content_data and defaults.
     spell = {
         "id": slugify(name),
         "name": name,
         "school": content_data.get("school", ""),
         "subschool": "",
-        "spell_level": {},   # Will be filled based on the 'level' field.
+        "spell_level": {},   # To be filled from the 'level' field.
         "casting_time": content_data.get("casting_time", ""),
         "components": [comp.strip() for comp in content_data.get("components", "").split(",") if comp.strip()],
         "range": content_data.get("range", ""),
@@ -211,7 +223,7 @@ def parse_spell_page(html: str) -> dict:
                         level_mapping[cls_name] = lvl
     spell["spell_level"] = level_mapping
 
-    # Validate the constructed spell dictionary against our schema.
+    # Validate spell against our schema.
     try:
         jsonschema.validate(instance=spell, schema=SPELL_SCHEMA)
     except jsonschema.ValidationError as ve:
@@ -269,9 +281,9 @@ def main():
         if new_spell:
             existing_spells.append(new_spell)
             existing_spell_names.add(spell_name.lower())
-        time.sleep(1)  # Delay between requests for politeness
+        time.sleep(1)  # Be polite: wait between requests
     
-    # Write the updated spell list back to spells.json.
+    # Write the updated list back to spells.json.
     with open(spells_json_path, "w") as f:
         json.dump(existing_spells, f, indent=2)
     print(f"Crawling complete. Updated spells data written to {spells_json_path}")
