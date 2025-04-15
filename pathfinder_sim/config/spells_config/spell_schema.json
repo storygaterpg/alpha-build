@@ -1,0 +1,174 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Spell",
+    "description": "A schema for defining spells in the Pathfinder 1e simulation.",
+    "type": "object",
+    "required": [
+      "id",
+      "name",
+      "school",
+      "spell_level",
+      "casting_time",
+      "components",
+      "range",
+      "duration",
+      "saving_throw",
+      "spell_resistance",
+      "description"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "description": "A unique identifier for the spell."
+      },
+      "name": {
+        "type": "string",
+        "description": "The name of the spell."
+      },
+      "school": {
+        "type": "string",
+        "description": "The school of magic (e.g., Evocation, Abjuration)."
+      },
+      "subschool": {
+        "type": "string",
+        "description": "Optional subschool of magic if applicable.",
+        "default": ""
+      },
+      "spell_level": {
+        "type": "object",
+        "description": "A mapping from class names to the level at which the spell is available (e.g., {\"Wizard\": 3, \"Cleric\": 2}).",
+        "additionalProperties": {
+          "type": "number"
+        }
+      },
+      "casting_time": {
+        "type": "string",
+        "description": "The time required to cast the spell (e.g., '1 standard action')."
+      },
+      "components": {
+        "type": "array",
+        "description": "A list of components required (e.g., ['V', 'S', 'M']).",
+        "items": {
+          "type": "string"
+        }
+      },
+      "range": {
+        "type": "string",
+        "description": "The effective range of the spell (e.g., 'Long (100 ft. + 10 ft./level)')."
+      },
+      "area_or_target": {
+        "type": "string",
+        "description": "Specifies whether the spell targets a single creature or an area (e.g., 'Target', '20-ft.-radius spread').",
+        "default": ""
+      },
+      "area_shape": {
+        "type": "string",
+        "description": "Specifies the shape of the area effect (e.g., 'burst', 'cone', 'line', 'emanation').",
+        "default": ""
+      },
+      "duration": {
+        "type": "string",
+        "description": "The duration of the spell (e.g., 'Instantaneous', '1 round/level')."
+      },
+      "dismissible": {
+        "type": "boolean",
+        "description": "Indicates if the spell is dismissible by the caster.",
+        "default": false
+      },
+      "requires_concentration": {
+        "type": "boolean",
+        "description": "Indicates if the spell requires concentration to maintain.",
+        "default": false
+      },
+      "saving_throw": {
+        "type": "string",
+        "description": "The saving throw required, if any (e.g., 'Reflex half', 'Will negates', 'None')."
+      },
+      "spell_resistance": {
+        "type": "string",
+        "description": "Indicates if the spell is subject to spell resistance (e.g., 'Yes', 'No')."
+      },
+      "arcane_spell_failure": {
+        "type": "number",
+        "description": "The percentage chance of arcane spell failure when cast in armor.",
+        "default": 0
+      },
+      "description": {
+        "type": "string",
+        "description": "A detailed description of the spell's effects and any additional rules."
+      },
+      "material_components": {
+        "type": "string",
+        "description": "A description of material components required (if any), including any associated cost.",
+        "default": ""
+      },
+      "additional_effects": {
+        "type": "string",
+        "description": "Optional field for extra effects or notes (e.g., special conditions, extra damage dice, or unique mechanics).",
+        "default": ""
+      },
+      "bonus_effects": {
+        "type": "array",
+        "description": "List of bonus effects provided by the spell. Each bonus is defined by the affected stat, bonus amount, and bonus type.",
+        "items": {
+          "type": "object",
+          "required": ["stat", "bonus", "bonus_type"],
+          "properties": {
+            "stat": {
+              "type": "string",
+              "description": "The affected ability score (e.g., 'STR', 'DEX')."
+            },
+            "bonus": {
+              "type": "number",
+              "description": "The numerical value of the bonus."
+            },
+            "bonus_type": {
+              "type": "string",
+              "description": "The type of bonus (e.g., 'enhancement', 'dodge', 'untyped')."
+            }
+          }
+        },
+        "default": []
+      },
+      "conditions_applied": {
+        "type": "array",
+        "description": "List of conditions applied by the spell, with details such as condition name, duration, and saving throw type (if any).",
+        "items": {
+          "type": "object",
+          "required": ["condition"],
+          "properties": {
+            "condition": {
+              "type": "string",
+              "description": "The name of the condition (e.g., 'Stunned', 'Entangled')."
+            },
+            "duration": {
+              "type": "string",
+              "description": "The duration of the condition (e.g., '1 round/level')."
+            },
+            "save": {
+              "type": "string",
+              "description": "The type of saving throw required to negate or reduce the condition, if applicable."
+            }
+          }
+        },
+        "default": []
+      },
+      "special_mechanics": {
+        "type": "object",
+        "description": "An object for spell-specific mechanics such as summoning details, teleportation coordinates, or additional custom effects.",
+        "default": {}
+      },
+      "scaling": {
+        "type": "object",
+        "description": "Details on how the spell scales with caster level (e.g., damage increase, duration extension, area expansion).",
+        "default": {}
+      },
+      "spell_type": {
+        "type": "string",
+        "description": "Defines the spell's primary effect type (e.g., 'damage', 'buff', 'debuff', 'summoning', 'teleportation').",
+        "default": "damage"
+      }
+    },
+    "additionalProperties": false
+  }
+  
