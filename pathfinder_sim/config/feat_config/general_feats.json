@@ -191,7 +191,7 @@
             "Level": 4,
             "Special": "Must not have an animal companion or mount that advances as an animal companion"
         },
-        "benefit": "Gain an animal companion as if you were a druid of your character level –3 from the following list: badger, bird, camel, cat (small), dire rat, dog, horse, pony, snake (viper), or wolf. If you later gain an animal companion through another source (such as the Animal domain, divine bond, hunter’s bond, mount, or nature bond class features), the effective druid level granted by this feat stacks with that granted by other sources."
+        "benefit": "Gain an animal companion as if you were a druid of your character level –3 from the following list: badger, bird, camel, cat (small), dire rat, dog, horse, pony, snake (viper), or wolf. If you later gain an animal companion through another source (such as the Animal domain, divine bond, hunter's bond, mount, or nature bond class features), the effective druid level granted by this feat stacks with that granted by other sources."
     },
     "Animal Call": {
         "prerequisites": {
@@ -215,7 +215,7 @@
         "prerequisites": {
             "Special": "Animal companion or mount class feature"
         },
-        "benefit": "You can shrug off spells that don’t work on animals."
+        "benefit": "You can shrug off spells that don't work on animals."
     },
     "Antagonize": {
         "prerequisites": {},
@@ -304,7 +304,7 @@
                 "Spellcraft": 3
             }
         },
-        "benefit": "It’s complicated (see text)."
+        "benefit": "It's complicated (see text)."
     },
     "Aspect of the Beast": {
         "prerequisites": {
@@ -365,7 +365,7 @@
         "prerequisites": {
             "Special": "Bardic performance or raging song"
         },
-        "benefit": "You can attempt a DC 10 Perform check to aid the Perform check of an ally who also has this feat. If you succeed, your ally gains a +1 bonus for each 5 points of your check result; a check result of 10 grants a +2 bonus, a result of 15 grants a +3 bonus, and so on. If you fail, the discord applies a –5 penalty on your ally’s check."
+        "benefit": "You can attempt a DC 10 Perform check to aid the Perform check of an ally who also has this feat. If you succeed, your ally gains a +1 bonus for each 5 points of your check result; a check result of 10 grants a +2 bonus, a result of 15 grants a +3 bonus, and so on. If you fail, the discord applies a –5 penalty on your ally's check."
     },
     "Battering Repair": {
         "prerequisites": {
@@ -378,7 +378,7 @@
                 "quick clear gunslinger deed"
             ]
         },
-        "benefit": "Sometimes smacking your firearm against a solid surface is all that’s needed to unjam it. Sometimes that solid surface is a creature."
+        "benefit": "Sometimes smacking your firearm against a solid surface is all that's needed to unjam it. Sometimes that solid surface is a creature."
     },
     "Battle Singer": {
         "prerequisites": {
@@ -387,18 +387,18 @@
         },
         "benefit": "You can sing in goblin so your bardic performance inspire courage ability does not affect those who do not understand goblin."
     },
-    "Believer’s Boon": {
+    "Believer's Boon": {
         "prerequisites": {
             "Stat": {
                 "WIS": 13
             },
-            "Special": "alignment must be within one step of your deity’s"
+            "Special": "alignment must be within one step of your deity's"
         },
         "benefit": "Gain use of a 1st-level cleric domain ability."
     },
-    "Believer’s Hands": {
+    "Believer's Hands": {
         "prerequisites": {
-            "Feat": "Believer’s Boon",
+            "Feat": "Believer's Boon",
             "Alignment": "Lawful Good"
         },
         "benefit": "Use lay on hands once per day."
@@ -487,7 +487,7 @@
         "prerequisites": {
             "BAB": 11,
             "Special": "ability to cast divine spells",
-            "Alignment": "within one step of your deity’s"
+            "Alignment": "within one step of your deity's"
         },
         "benefit": "Your attacks are considered to have the alignments you share with your deity."
     },
@@ -575,7 +575,7 @@
             "Feat": "Great Fortitude or Iron Will or Lightning Reflexes",
             "Special": "Halfling Jinx trait"
         },
-        "benefit": "A jinxed target’s penalty on Fortitude, Reflex, or Will saves increases if you have the Great Fortitude, Lightning Reflexes, or Iron Will feat, respectively."
+        "benefit": "A jinxed target's penalty on Fortitude, Reflex, or Will saves increases if you have the Great Fortitude, Lightning Reflexes, or Iron Will feat, respectively."
     },
     "Bolstered Resilience": {
         "prerequisites": {
@@ -585,7 +585,7 @@
     },
     "Bonded Mind": {
         "prerequisites": {},
-        "benefit": "As long as you can see each other, you and an ally who also has this feat can trade nonverbal messages. These function as the message spell, except that you don’t need to whisper or point, and you cannot be overheard."
+        "benefit": "As long as you can see each other, you and an ally who also has this feat can trade nonverbal messages. These function as the message spell, except that you don't need to whisper or point, and you cannot be overheard."
     },
     "Bookish Rogue": {
         "prerequisites": {
@@ -601,7 +601,7 @@
         "prerequisites": {
             "Special": "Bane class feature"
         },
-        "benefit": "Grant ally’s weapon the Bane quality against a branded opponent."
+        "benefit": "Grant ally's weapon the Bane quality against a branded opponent."
     },
     "Bravery in Action": {
         "prerequisites": {
@@ -679,7 +679,7 @@
     },
     "Burning Amplification": {
         "prerequisites": {},
-        "benefit": "Whenever you cast a spell with the fire descriptor, you can take a –1 penalty on the spells’ attack rolls and reduce the spell’s saving throw DC by 1 to cause any target that is dealt fire damage to catch on fire. The targets do not take burning damage for catching on fire until their next turn, and each target can attempt a Reflex saving throw to put out the fire before being damaged each round. Rather than the normal DC 15 Reflex saving throw to put the fire out, the target must succeed at a Reflex saving throw with a DC equal 10 + the spell’s level + the modifier of your spellcasting ability score). You must choose to use this feat before making an attack roll or before your targets attempt their saving throws. This feat has no effect on spells that neither allow a saving throw nor require an attack roll."
+        "benefit": "Whenever you cast a spell with the fire descriptor, you can take a –1 penalty on the spells' attack rolls and reduce the spell's saving throw DC by 1 to cause any target that is dealt fire damage to catch on fire. The targets do not take burning damage for catching on fire until their next turn, and each target can attempt a Reflex saving throw to put out the fire before being damaged each round. Rather than the normal DC 15 Reflex saving throw to put the fire out, the target must succeed at a Reflex saving throw with a DC equal 10 + the spell's level + the modifier of your spellcasting ability score). You must choose to use this feat before making an attack roll or before your targets attempt their saving throws. This feat has no effect on spells that neither allow a saving throw nor require an attack roll."
     },
     "Burn! Burn! Burn!": {
         "prerequisites": {
@@ -690,7 +690,7 @@
         },
         "benefit": "You deal an extra 1d4 fire damage with non-magical or alchemical attacks (such as with torches or alchemical fire) and gain a +4 competence bonus to Reflex saves to avoid catching on fire or putting yourself out when on fire."
     },
-    "Butterfly’s Sting": {
+    "Butterfly's Sting": {
         "prerequisites": {
             "Feat": "Combat Expertise"
         },
@@ -703,7 +703,7 @@
                 "Knowledge (engineering)": 5
             }
         },
-        "benefit": "It’s complicated (see text)."
+        "benefit": "It's complicated (see text)."
     },
     "Call Truce": {
         "prerequisites": {
@@ -781,7 +781,7 @@
         },
         "benefit": "With a successful evasion you may move half your speed."
     },
-    "Cat’s Fall": {
+    "Cat's Fall": {
         "prerequisites": {
             "Stat": {
                 "DEX": 13
@@ -913,7 +913,7 @@
                 "must worship and receive spells from a deity"
             ]
         },
-        "benefit": "Choose one variant channeling ability that matches one of your deity’s domains, subdomains, or areas of concern. 3x/day when you channel energy, you can apply the modifications of the chosen variant channeling ability to your channeled energy, including reductions to the damage dealt or healing performed by your channeled energy. (See feat for additional details.)"
+        "benefit": "Choose one variant channeling ability that matches one of your deity's domains, subdomains, or areas of concern. 3x/day when you channel energy, you can apply the modifications of the chosen variant channeling ability to your channeled energy, including reductions to the damage dealt or healing performed by your channeled energy. (See feat for additional details.)"
     },
     "Charming Performance": {
         "prerequisites": {
@@ -925,7 +925,7 @@
             },
             "Special": "bardic performance or raging song"
         },
-        "benefit": "You can use Perform, rather than Diplomacy, to improve an NPC’s starting attitude toward you."
+        "benefit": "You can use Perform, rather than Diplomacy, to improve an NPC's starting attitude toward you."
     },
     "Charnel Soldiers": {
         "prerequisites": {
@@ -950,11 +950,11 @@
             },
             "Race": "Half-elf"
         },
-        "benefit": "Gain a human or elf ally’s teamwork feat temporarily"
+        "benefit": "Gain a human or elf ally's teamwork feat temporarily"
     },
     "Chilling Amplification": {
         "prerequisites": {},
-        "benefit": "Whenever you cast a spell with the cold descriptor, you can take a –1 penalty on attack rolls made with the spell and reduce the spell saving throw’s DC by 1 to cause any target that is dealt cold damage by the spell to have its movement speed reduced by 5 feet and become unable to take 5-foot steps. This effect lasts for 1 round + 1 round per 3 spell levels of the spell. You must choose to use this feat before making an attack roll or before your targets attempt their saving throws. This feat has no effect on spells that neither allow a saving throw nor require an attack roll."
+        "benefit": "Whenever you cast a spell with the cold descriptor, you can take a –1 penalty on attack rolls made with the spell and reduce the spell saving throw's DC by 1 to cause any target that is dealt cold damage by the spell to have its movement speed reduced by 5 feet and become unable to take 5-foot steps. This effect lasts for 1 round + 1 round per 3 spell levels of the spell. You must choose to use this feat before making an attack roll or before your targets attempt their saving throws. This feat has no effect on spells that neither allow a saving throw nor require an attack roll."
     },
     "City Sprinter": {
         "prerequisites": {
@@ -1177,7 +1177,7 @@
             },
             "Special": "bardic performance or raging song"
         },
-        "benefit": "When an ally with this feat is within 60 feet and uses a bardic performance or raging song that grants allies a morale bonus or competence bonus, you may perform the same bardic performance or raging song to increase those bonuses by +1. This increase only lasts as long as you and your ally each maintain the same performance, and cannot be extended with effects like Lingering Performance. Additional bards with this feat beyond the second don’t increase the bonuses further."
+        "benefit": "When an ally with this feat is within 60 feet and uses a bardic performance or raging song that grants allies a morale bonus or competence bonus, you may perform the same bardic performance or raging song to increase those bonuses by +1. This increase only lasts as long as you and your ally each maintain the same performance, and cannot be extended with effects like Lingering Performance. Additional bards with this feat beyond the second don't increase the bonuses further."
     },
     "Counterspell, Improved": {
         "prerequisites": {},
@@ -1187,7 +1187,7 @@
         "prerequisites": {
             "Race": "Changeling"
         },
-        "benefit": "As a standard action, you can attempt a special aid another action (1d20 + your choice of your Intelligence or Charisma modifier; DC 10). If you succeed, you can increase an adjacent spellcaster’s caster level by 1 until the beginning of your next turn. If you also have the coven witch hex, you can apply this bonus to all members of your coven within 30 feet."
+        "benefit": "As a standard action, you can attempt a special aid another action (1d20 + your choice of your Intelligence or Charisma modifier; DC 10). If you succeed, you can increase an adjacent spellcaster's caster level by 1 until the beginning of your next turn. If you also have the coven witch hex, you can apply this bonus to all members of your coven within 30 feet."
     },
     "Cover Tracks": {
         "prerequisites": {
@@ -1241,7 +1241,7 @@
         "prerequisites": {
             "Special": "Deft Hands or Trepanation"
         },
-        "benefit": "You can perform the hypnotism occult skill unlock even if you can’t use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use hypnotism one additional time per day."
+        "benefit": "You can perform the hypnotism occult skill unlock even if you can't use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use hypnotism one additional time per day."
     },
     "Cranial Implantation": {
         "prerequisites": {
@@ -1293,12 +1293,12 @@
         },
         "benefit": "Influence criminals more easily"
     },
-    "Crusader’s Flurry": {
+    "Crusader's Flurry": {
         "prerequisites": {
             "Special": "Channel energy and flurry of blows class feature",
-            "Feat": "Weapon Focus with deity’s favored weapon"
+            "Feat": "Weapon Focus with deity's favored weapon"
         },
-        "benefit": "May use flurry of blows with deity’s favored melee weapon."
+        "benefit": "May use flurry of blows with deity's favored melee weapon."
     },
     "Cutting Humiliation": {
         "prerequisites": {
@@ -1343,7 +1343,7 @@
             },
             "Special": "ability to cast darkness"
         },
-        "benefit": "Deactivate a magic weapon’s light"
+        "benefit": "Deactivate a magic weapon's light"
     },
     "Deadly Dealer": {
         "prerequisites": {
@@ -1361,7 +1361,7 @@
                 "Survival": 8
             }
         },
-        "benefit": "Increase one of your trap’s critical threat multiplier by one or give it a +4 bonus on rolls to confirm critical hits"
+        "benefit": "Increase one of your trap's critical threat multiplier by one or give it a +4 bonus on rolls to confirm critical hits"
     },
     "Deadly Troupe": {
         "prerequisites": {
@@ -1372,7 +1372,7 @@
         },
         "benefit": "Gain a +4 bonus on certain combat maneuver checks and skill checks against foes threatened by allies with this feat"
     },
-    "Death’s Host": {
+    "Death's Host": {
         "prerequisites": {
             "Feat": "Spell Focus (necromancy)"
         },
@@ -1435,7 +1435,7 @@
             },
             "Special": "must worship a deity"
         },
-        "benefit": "Once you’ve performed a specified obedience, you gain the benefit of a special ability or resistance as indicated in the “Obedience” entry for the god to whom you performed the obedience."
+        "benefit": "Once you've performed a specified obedience, you gain the benefit of a special ability or resistance as indicated in the “Obedience” entry for the god to whom you performed the obedience."
     },
     "Delay Blast": {
         "prerequisites": {
@@ -1487,7 +1487,7 @@
             },
             "Special": "ability to cast detect chaos, detect evil, detect good, detect law, or detect magic"
         },
-        "benefit": "Detect a creature’s magical abilities."
+        "benefit": "Detect a creature's magical abilities."
     },
     "Diehard": {
         "prerequisites": {
@@ -1608,7 +1608,7 @@
                 "Acrobatics": 5
             }
         },
-        "benefit": "After successful tumble through opponent’s square, gain +2 on attack rolls vs. that opponent."
+        "benefit": "After successful tumble through opponent's square, gain +2 on attack rolls vs. that opponent."
     },
     "Dispel Synergy": {
         "prerequisites": {
@@ -1641,7 +1641,7 @@
                 "Spellcraft": 5
             }
         },
-        "benefit": "Use spell recall after disrupting an opponent’s spell."
+        "benefit": "Use spell recall after disrupting an opponent's spell."
     },
     "Distant Delivery": {
         "prerequisites": {
@@ -1660,7 +1660,7 @@
             "Special": "Enlarge Spell or Reach Spell",
             "Special2": "animal companion, eidolon, familiar, or other allied creature with the share spells ability"
         },
-        "benefit": "The range of your allied creature’s share spells ability increases to close (25 feet + 5 feet for every 2 levels) as long as you have line of effect to the creature when you cast the shared spell."
+        "benefit": "The range of your allied creature's share spells ability increases to close (25 feet + 5 feet for every 2 levels) as long as you have line of effect to the creature when you cast the shared spell."
     },
     "Diverse Obedience": {
         "prerequisites": {
@@ -1670,7 +1670,7 @@
             },
             "Special": "alignment must match that of your worshiped deity"
         },
-        "benefit": "You are treated as though you had 2 more Hit Dice than you actually do for the purposes of determining what divine boons you gain as a result of performing your deity’s obedience and whenever you would gain a boon as a result of your Deific Obedience feat (and not through a prestige class), you can choose among the options available for evangelist, exalted, or sentinel boons."
+        "benefit": "You are treated as though you had 2 more Hit Dice than you actually do for the purposes of determining what divine boons you gain as a result of performing your deity's obedience and whenever you would gain a boon as a result of your Deific Obedience feat (and not through a prestige class), you can choose among the options available for evangelist, exalted, or sentinel boons."
     },
     "Divination Guide": {
         "prerequisites": {
@@ -1719,7 +1719,7 @@
         },
         "benefit": "Gain a bonus equal to your Charisma bonus on a saving throw."
     },
-    "Diviner’s Delving": {
+    "Diviner's Delving": {
         "prerequisites": {
             "Feat": "Spell Focus (divination)"
         },
@@ -1766,7 +1766,7 @@
         },
         "benefit": "Aura of courage expands and grants protection against dragon breath weapons."
     },
-    "Drunkard’s Recovery": {
+    "Drunkard's Recovery": {
         "prerequisites": {
             "Stat": {
                 "CON": 13
@@ -1928,7 +1928,7 @@
         "prerequisites": {
             "Special": "Shared consciousness class feature"
         },
-        "benefit": "Gain new spells tied to phantom’s emotional focus"
+        "benefit": "Gain new spells tied to phantom's emotional focus"
     },
     "Empath": {
         "prerequisites": {
@@ -2198,7 +2198,7 @@
         "prerequisites": {
             "Special": "Hypnotic stare class feature"
         },
-        "benefit": "Increase hypnotic stare’s range by 10 feet"
+        "benefit": "Increase hypnotic stare's range by 10 feet"
     },
     "Extra Amplification": {
         "prerequisites": {
@@ -2411,7 +2411,7 @@
                 "channel energy class feature"
             ]
         },
-        "benefit": "You gain one additional variant channeling ability that matches one of your deity’s domains, subdomains, or areas of concern. Three times per day, you can apply the modifications of this variant channel energy, reducing the damage dealt or healing performed by your channeled energy as normal. You cannot apply more than one variant channeling ability to your channeled energy at once."
+        "benefit": "You gain one additional variant channeling ability that matches one of your deity's domains, subdomains, or areas of concern. Three times per day, you can apply the modifications of this variant channel energy, reducing the damage dealt or healing performed by your channeled energy as normal. You cannot apply more than one variant channeling ability to your channeled energy at once."
     },
     "Extra Wild Talent": {
         "prerequisites": {
@@ -2435,7 +2435,7 @@
             "Special": "Detect alignment ability class feature",
             "Caster Level": 6
         },
-        "benefit": "Determine target’s exact alignment after 3 rounds of observation."
+        "benefit": "Determine target's exact alignment after 3 rounds of observation."
     },
     "Eyes of the Twilight": {
         "prerequisites": {
@@ -2448,7 +2448,7 @@
                 "low-light vision"
             ]
         },
-        "benefit": "Creatures in dim light don’t gain concealment from you"
+        "benefit": "Creatures in dim light don't gain concealment from you"
     },
     "Eye for Ingredients": {
         "prerequisites": {
@@ -2482,7 +2482,7 @@
         "prerequisites": {
             "Feat": "Iron Will"
         },
-        "benefit": "You gain a familiar, as the wizard arcane bond class feature. You do not gain the special ability the familiar normally grants its master, and the familiar does not gain the deliver touch spells, scry on familiar, share spells, speak with animals of its kind, or spell resistance special abilities. Otherwise, your total HD are used as your wizard level for determining the familiar’s abilities."
+        "benefit": "You gain a familiar, as the wizard arcane bond class feature. You do not gain the special ability the familiar normally grants its master, and the familiar does not gain the deliver touch spells, scry on familiar, share spells, speak with animals of its kind, or spell resistance special abilities. Otherwise, your total HD are used as your wizard level for determining the familiar's abilities."
     },
     "Improved Familiar Bond": {
         "prerequisites": {
@@ -2521,7 +2521,7 @@
                 "Halfling Jinx trait"
             ]
         },
-        "benefit": "A creature you jinx that is fascinated by a bard’s fascinate ability takes a –10 penalty on initiative checks while affected by the jinx. A creature under the effect of your fascinate ability has a –2 penalty on its save against your jinx."
+        "benefit": "A creature you jinx that is fascinated by a bard's fascinate ability takes a –10 penalty on initiative checks while affected by the jinx. A creature under the effect of your fascinate ability has a –2 penalty on its save against your jinx."
     },
     "Fast Crawl": {
         "prerequisites": {},
@@ -2576,7 +2576,7 @@
             },
             "Special": "judgment class feature"
         },
-        "benefit": "Judgments have greater effect on creatures of a specific type, chosen from the ranger’s favored enemy list."
+        "benefit": "Judgments have greater effect on creatures of a specific type, chosen from the ranger's favored enemy list."
     },
     "Fear Eater": {
         "prerequisites": {
@@ -2586,7 +2586,7 @@
             "Feat": "Iron Will",
             "Special": "no immunity to fear effects"
         },
-        "benefit": "Transfer others’ fear effects to yourself"
+        "benefit": "Transfer others' fear effects to yourself"
     },
     "Fearless Aura": {
         "prerequisites": {
@@ -2609,7 +2609,7 @@
                 "Spellcraft": 1
             }
         },
-        "benefit": "Trick an enemy into thinking she’s cursed"
+        "benefit": "Trick an enemy into thinking she's cursed"
     },
     "Ferocious Horde": {
         "prerequisites": {
@@ -2705,7 +2705,7 @@
             "Caster Level": 3,
             "Race": "Tiefling"
         },
-        "benefit": "You gain a +2 bonus to your effective CL when using your darkness spell-like ability. In addition, whenever you cast a spell with the [evil] descriptor that targets another creature, you can spend a swift action to apply the effects of your darkness spell-like ability to the spell cast, with the darkness effect centered on the spell’s target. Using the darkness spell-like ability in this way expends all three uses of it for the day, and it cannot be used if fewer than three uses of it remain for that day."
+        "benefit": "You gain a +2 bonus to your effective CL when using your darkness spell-like ability. In addition, whenever you cast a spell with the [evil] descriptor that targets another creature, you can spend a swift action to apply the effects of your darkness spell-like ability to the spell cast, with the darkness effect centered on the spell's target. Using the darkness spell-like ability in this way expends all three uses of it for the day, and it cannot be used if fewer than three uses of it remain for that day."
     },
     "Fiendish Facade": {
         "prerequisites": {
@@ -2753,7 +2753,7 @@
         },
         "benefit": "Gain temporary hit points when reduced to 0."
     },
-    "Fire God’s Blessing": {
+    "Fire God's Blessing": {
         "prerequisites": {
             "Race": [
                 "Half-orc",
@@ -2783,7 +2783,7 @@
         "prerequisites": {
             "Special": "Sneak attack +3d6, bleeding sneak attack rogue trick or bleed universal monster ability"
         },
-        "benefit": "When you successfully inflict sneak attack damage on a foe with a slashing weapon, your attack doesn’t go particularly deep, but you do carve away a significant portion of skin and flesh. If this sneak attack inflicts bleed damage, the victim of the sneak attack is sickened by the pain and has its natural armor bonus (if any) reduced by a number of points equal to the number of sneak attack dice you possess. These penalties persist as long as the bleed damage persists. Multiple strikes on the same foe do not stack the bleed damage, but the penalty to natural armor does stack, to a maximum penalty equal to the target’s normal full natural armor score."
+        "benefit": "When you successfully inflict sneak attack damage on a foe with a slashing weapon, your attack doesn't go particularly deep, but you do carve away a significant portion of skin and flesh. If this sneak attack inflicts bleed damage, the victim of the sneak attack is sickened by the pain and has its natural armor bonus (if any) reduced by a number of points equal to the number of sneak attack dice you possess. These penalties persist as long as the bleed damage persists. Multiple strikes on the same foe do not stack the bleed damage, but the penalty to natural armor does stack, to a maximum penalty equal to the target's normal full natural armor score."
     },
     "Flexible Hex": {
         "prerequisites": {
@@ -2825,7 +2825,7 @@
                 "Undine"
             ]
         },
-        "benefit": "Change all or part of a spell’s damage to the energy type associated with the race of an adjacent ally who has this feat"
+        "benefit": "Change all or part of a spell's damage to the energy type associated with the race of an adjacent ally who has this feat"
     },
     "Focused Disbelief": {
         "prerequisites": {
@@ -2906,7 +2906,7 @@
             "BAB": 3,
             "Race": "Kitsune"
         },
-        "benefit": "You can shapechange to a fox. Your bite attack’s damage is reduced to 1d3 but you gain a +10 racial bonus on Disguise checks made to appear as a fox."
+        "benefit": "You can shapechange to a fox. Your bite attack's damage is reduced to 1d3 but you gain a +10 racial bonus on Disguise checks made to appear as a fox."
     },
     "Free Spirit": {
         "prerequisites": {
@@ -3085,7 +3085,7 @@
                 "mercy class feature"
             ]
         },
-        "benefit": "Lay on hands heals extra hit points if the target doesn’t need a mercy."
+        "benefit": "Lay on hands heals extra hit points if the target doesn't need a mercy."
     },
     "Green Faith Acolyte": {
         "prerequisites": {
@@ -3108,18 +3108,18 @@
             "Feat": "Group Shared Spells",
             "Special": "have a familiar with the share spells and deliver touch spells abilities"
         },
-        "benefit": "You and any allies with this feat can cast spells through one another’s familiars as though each ally had the share spells ability with each other familiar. This feat otherwise functions as the share spells ability."
+        "benefit": "You and any allies with this feat can cast spells through one another's familiars as though each ally had the share spells ability with each other familiar. This feat otherwise functions as the share spells ability."
     },
     "Group Shared Spells": {
         "prerequisites": {
             "Special": "Have a familiar with the share spells ability"
         },
-        "benefit": "You and any allies with this feat can cast spells with a target of “you” on each other’s familiars as touch spells. Both the target familiar and that familiar’s master must be willing for the spell to take effect. You can cast spells on each other’s familiars even if the spells would not normally affect creatures of the targeted familiar’s type."
+        "benefit": "You and any allies with this feat can cast spells with a target of “you” on each other's familiars as touch spells. Both the target familiar and that familiar's master must be willing for the spell to take effect. You can cast spells on each other's familiars even if the spells would not normally affect creatures of the targeted familiar's type."
     },
     "Guided Hand": {
         "prerequisites": {
             "Feat": "Channel Smite",
-            "Special": "proficiency with deity’s chosen weapon"
+            "Special": "proficiency with deity's chosen weapon"
         },
         "benefit": "May use Wisdom modifier for attack rolls with favored weapon."
     },
@@ -3141,30 +3141,30 @@
         "prerequisites": {},
         "benefit": "May create, repair, and restore firearms."
     },
-    "Hand’s Autonomy": {
+    "Hand's Autonomy": {
         "prerequisites": {
             "Special": "Possessed Hand"
         },
         "benefit": "Your possessed hand can act independently."
     },
-    "Hand’s Detachment": {
+    "Hand's Detachment": {
         "prerequisites": {
-            "Feat": "Hand’s Autonomy",
+            "Feat": "Hand's Autonomy",
             "Special": "Possessed Hand"
         },
         "benefit": "Your possessed hand can painlessly pull free of your body or reattach itself, leaving you with a bloodless but raw-looking stump at the end of one arm while the hand itself performs remote tasks under your command, acting in many ways like a strange familiar"
     },
-    "Hand’s Knowledge": {
+    "Hand's Knowledge": {
         "prerequisites": {
             "Special": "Possessed Hand"
         },
         "benefit": "The connection to the memories of the spirit possessing your hand deepens."
     },
-    "Hand’s Sight": {
+    "Hand's Sight": {
         "prerequisites": {
             "Special": "Possessed Hand"
         },
-        "benefit": "While your possessed hand isn’t carrying anything, you gain darkvision with a range of 60 feet and cannot be flanked."
+        "benefit": "While your possessed hand isn't carrying anything, you gain darkvision with a range of 60 feet and cannot be flanked."
     },
     "Harmonic Sage": {
         "prerequisites": {
@@ -3214,7 +3214,7 @@
             },
             "Special": "allegiance to a Hell Knight order"
         },
-        "benefit": "Upon taking this feat, you gain proficiency in all of your order’s favored weapons. Additionally, by meditating and inflicting strenuous reckonings upon yourself, you unlock the power behind your order’s doctrine."
+        "benefit": "Upon taking this feat, you gain proficiency in all of your order's favored weapons. Additionally, by meditating and inflicting strenuous reckonings upon yourself, you unlock the power behind your order's doctrine."
     },
     "Hell Knight Obsession": {
         "prerequisites": {
@@ -3241,7 +3241,7 @@
         },
         "benefit": "2 skills of your choice are class skills."
     },
-    "Hero’s Fortune": {
+    "Hero's Fortune": {
         "prerequisites": {},
         "benefit": "You gain a hero point. The maximum number of hero points you can have at any one time is increased to 5."
     },
@@ -3310,7 +3310,7 @@
             ],
             "Feat": "Hidden Presence"
         },
-        "benefit": "Modify a possessed creature’s memories"
+        "benefit": "Modify a possessed creature's memories"
     },
     "Intrusive Presence": {
         "prerequisites": {
@@ -3352,7 +3352,7 @@
     },
     "Hindrance Dismissal": {
         "prerequisites": {},
-        "benefit": "You can dismiss any pit spell (such as create pit, hungry pit, spiked pit, and similar spells with ‘pit’ in their names) or wall spell (such as wall of fire, wall of ice, and similar spells with ‘wall’ in their names) you cast. The spells must have a duration of at least 1 round. This ability follows the normal rules for dismissing spells, allowing you to dismiss conjured pits and walls as a standard action."
+        "benefit": "You can dismiss any pit spell (such as create pit, hungry pit, spiked pit, and similar spells with ‘pit' in their names) or wall spell (such as wall of fire, wall of ice, and similar spells with ‘wall' in their names) you cast. The spells must have a duration of at least 1 round. This ability follows the normal rules for dismissing spells, allowing you to dismiss conjured pits and walls as a standard action."
     },
     "Hymn Singer": {
         "prerequisites": {
@@ -3447,7 +3447,7 @@
                 "Heal": 1
             }
         },
-        "benefit": "When attempting a Heal check that normally requires a healer’s kit, you don’t take a penalty on the check for not having a healer’s kit. When you use a healer’s kit, you can augment it with improvised supplies, gaining an additional +2 circumstance bonus on your check. Finally, you can treat any potion of cure light wounds, potion of cure moderate wounds, or potion of cure serious wounds you drink yourself or administer to another character as though its caster level were equal to the number of ranks you have in the Heal skill. The spell’s normal limitations apply; for example, a potion of cure light wounds can cure a maximum of 1d8+5 points of damage, even if you have more than 5 ranks in the Heal skill."
+        "benefit": "When attempting a Heal check that normally requires a healer's kit, you don't take a penalty on the check for not having a healer's kit. When you use a healer's kit, you can augment it with improvised supplies, gaining an additional +2 circumstance bonus on your check. Finally, you can treat any potion of cure light wounds, potion of cure moderate wounds, or potion of cure serious wounds you drink yourself or administer to another character as though its caster level were equal to the number of ranks you have in the Heal skill. The spell's normal limitations apply; for example, a potion of cure light wounds can cure a maximum of 1d8+5 points of damage, even if you have more than 5 ranks in the Heal skill."
     },
     "Improved Spell Sharing": {
         "prerequisites": {
@@ -3551,7 +3551,7 @@
                 }
             ]
         },
-        "benefit": "Share benefits of an ally’s Skill Focus or weapon proficiencies in certain situations"
+        "benefit": "Share benefits of an ally's Skill Focus or weapon proficiencies in certain situations"
     },
     "Instant Judgment": {
         "prerequisites": {
@@ -3836,7 +3836,7 @@
             "Feat": "Leadership",
             "Special": "membership in the same organization as cohort"
         },
-        "benefit": "As long as you and your cohort maintain membership in good standing within the same organization, your cohort gains a +4 morale bonus on Will saves against enchantment spells and effects. Additionally, your cohort is treated as though she possessed the same teamwork feats you do for the purpose of determining whether you receive a bonus from your teamwork feats. Your cohort doesn’t receive any bonuses from these feats unless she actually possesses the feats. If you and your cohort belong to one of the organizations listed in this section, your cohort gains the practiced leadership benefit associated with your organization. If a benefit grants your cohort access to a spell-like ability, the CL of the effect is 1st or equal to your cohort’s CL, whichever is higher."
+        "benefit": "As long as you and your cohort maintain membership in good standing within the same organization, your cohort gains a +4 morale bonus on Will saves against enchantment spells and effects. Additionally, your cohort is treated as though she possessed the same teamwork feats you do for the purpose of determining whether you receive a bonus from your teamwork feats. Your cohort doesn't receive any bonuses from these feats unless she actually possesses the feats. If you and your cohort belong to one of the organizations listed in this section, your cohort gains the practiced leadership benefit associated with your organization. If a benefit grants your cohort access to a spell-like ability, the CL of the effect is 1st or equal to your cohort's CL, whichever is higher."
     },
     "Leaf Singer": {
         "prerequisites": {
@@ -3956,7 +3956,7 @@
             "Race": "Dwarf",
             "Special": "hardy racial trait"
         },
-        "benefit": "Racial bonus on saves against spells and spell-like abilities increases by 2 when you’re adjacent to an ally who has this feat"
+        "benefit": "Racial bonus on saves against spells and spell-like abilities increases by 2 when you're adjacent to an ally who has this feat"
     },
     "Loyal to the Death": {
         "prerequisites": {
@@ -3993,9 +3993,9 @@
                 "Spellcraft": 6
             }
         },
-        "benefit": "Increase reach of spell’s touch attack by 5 feet."
+        "benefit": "Increase reach of spell's touch attack by 5 feet."
     },
-    "Mage’s Tattoo": {
+    "Mage's Tattoo": {
         "prerequisites": {
         "Feat": "Spell Focus (any except divination)"
         },
@@ -4052,7 +4052,7 @@
             "Profession (any one)": 6
         }
         },
-        "benefit": "It’s complicated (see text)."
+        "benefit": "It's complicated (see text)."
     },
     "Master of Wonders": {
         "prerequisites": {
@@ -4078,7 +4078,7 @@
         "BAB": 1,
         "Special": "Street Smarts"
         },
-        "benefit": "Measure a foe’s combat prowess and gain bonuses."
+        "benefit": "Measure a foe's combat prowess and gain bonuses."
     },
     "Menacing Bane": {
         "prerequisites": {
@@ -4116,13 +4116,13 @@
         },
         "benefit": "Feint against mindless creatures with bold stare effects."
     },
-    "Minotaur’s Charge": {
+    "Minotaur's Charge": {
         "prerequisites": {
         "Stat": { "STR": 13 },
         "Feat": "Improved Bull Rush",
         "Special": "powerful charge"
         },
-        "benefit": "When you hit an opponent with a charge attack, you might also initiate a bull rush as a free action. This does not require you to move into your opponent’s square and does not provoke an attack of opportunity. If you successfully push your opponent 15 feet or more, he is also knocked prone."
+        "benefit": "When you hit an opponent with a charge attack, you might also initiate a bull rush as a free action. This does not require you to move into your opponent's square and does not provoke an attack of opportunity. If you successfully push your opponent 15 feet or more, he is also knocked prone."
     },
     "Mirror Kin": {
         "prerequisites": {
@@ -4162,7 +4162,7 @@
     "Moonlight Summons": {
         "prerequisites": {
         "Feat": "Spell Focus (conjuration)",
-        "Special": "ability to cast summon nature’s ally"
+        "Special": "ability to cast summon nature's ally"
         },
         "benefit": "Summoned creatures are immune to confusion and sleep effects, and their natural weapons are treated as silver."
     },
@@ -4256,7 +4256,7 @@
         "prerequisites": {},
         "benefit": "You get a +2 bonus on all Knowledge (nature) checks and Survival checks. If you have 10 or more ranks in one of these skills, the bonus increases to +4 for that skill."
     },
-    "Nature’s Freedom": {
+    "Nature's Freedom": {
         "prerequisites": {
         "Special": [
             "Animal or Plant domain",
@@ -4281,7 +4281,7 @@
         "prerequisites": {
         "Feat": "Persuasive"
         },
-        "benefit": "Target of Intimidate doesn’t turn against you later"
+        "benefit": "Target of Intimidate doesn't turn against you later"
     },
     "Night Sky Hex": {
         "prerequisites": {
@@ -4290,7 +4290,7 @@
             "patron (moon, stars, or winter) class feature"
         ]
         },
-        "benefit": "One of your hex’s save DCs increases by 2 when you are in view of the night sky"
+        "benefit": "One of your hex's save DCs increases by 2 when you are in view of the night sky"
     },
     "Nimble Moves": {
         "prerequisites": {
@@ -4313,7 +4313,7 @@
         ],
         "Caster Level": 6
         },
-        "benefit": "Movement of creatures you summon via summon nature’s ally is not reduced in undergrowth."
+        "benefit": "Movement of creatures you summon via summon nature's ally is not reduced in undergrowth."
     },
     "Noble Scion": {
         "prerequisites": {
@@ -4334,7 +4334,7 @@
         "Stat": { "WIS": 13 },
         "Feat": "Alertness"
         },
-        "benefit": "The DCs of your Perception checks don’t increase when you sleep"
+        "benefit": "The DCs of your Perception checks don't increase when you sleep"
     },
     "One Mind": {
         "prerequisites": {
@@ -4342,7 +4342,7 @@
         "Skill": { "Sense Motive": 3 },
         "Race": "Human"
         },
-        "benefit": "Avoid penalties when flat-footed, blinded, or fighting invisible creatures if you’re adjacent to an ally who has this feat"
+        "benefit": "Avoid penalties when flat-footed, blinded, or fighting invisible creatures if you're adjacent to an ally who has this feat"
     },
     "One with the Land": {
         "prerequisites": {
@@ -4376,7 +4376,7 @@
         "Caster Level": 7,
         "Special": "lawful alignment, worship an evil god"
         },
-        "benefit": "Use a different spell than your foe’s when using counterspell."
+        "benefit": "Use a different spell than your foe's when using counterspell."
     },
     "Overwhelming Phantom": {
         "prerequisites": {
@@ -4458,7 +4458,7 @@
             { "Special": "phantom with magic" }
         ]
         },
-        "benefit": "Phantom’s natural weapon attacks and delivered attacks ability spells have full effect on incorporeal creatures."
+        "benefit": "Phantom's natural weapon attacks and delivered attacks ability spells have full effect on incorporeal creatures."
     },
     "Phantom Fortification": {
         "prerequisites": {
@@ -4486,13 +4486,13 @@
         "Skill": { "Knowledge (planes)": 5 },
         "Special": "favored terrain (any plane) class feature"
         },
-        "benefit": "When you are on one of the planes you’ve selected as a favored terrain, you gain a +2 bonus on weapon attack rolls against outsiders native to that plane. You also ignore up to 5 points of damage reduction when making weapon attacks against outsiders native to that plane, except for damage reduction without a type (such as DR 10/—). In addition, you gain this bonus against extraplanar creatures you encounter and identify as being from one of your planar favored terrains, such as with a successful Knowledge (planes) check, regardless of what plane you or they are on."
+        "benefit": "When you are on one of the planes you've selected as a favored terrain, you gain a +2 bonus on weapon attack rolls against outsiders native to that plane. You also ignore up to 5 points of damage reduction when making weapon attacks against outsiders native to that plane, except for damage reduction without a type (such as DR 10/—). In addition, you gain this bonus against extraplanar creatures you encounter and identify as being from one of your planar favored terrains, such as with a successful Knowledge (planes) check, regardless of what plane you or they are on."
     },
     "Planar Preservationist": {
         "prerequisites": {
         "Special": "Preservationist alchemist archetype"
         },
-        "benefit": "With every summon nature’s ally extract you learn, learn a corresponding summon monster extract."
+        "benefit": "With every summon nature's ally extract you learn, learn a corresponding summon monster extract."
     },
     "Planar Survivor": {
         "prerequisites": {
@@ -4518,7 +4518,7 @@
         },
         "benefit": "May add the celestial or fiendish template to your animal form."
     },
-    "Planewalker’s Insight": {
+    "Planewalker's Insight": {
         "prerequisites": {},
         "benefit": "Gain +2 on Knowledge (planes) checks and on Sense Motive checks against outsiders; Knowledge (planes) is a class skill for you."
     },
@@ -4540,11 +4540,11 @@
         ],
         "BAB": 3
         },
-        "benefit": "Attack with a light or one-handed piercing weapon’s pommel and knock down foes."
+        "benefit": "Attack with a light or one-handed piercing weapon's pommel and knock down foes."
     },
     "Possessed Hand": {
         "prerequisites": {},
-        "benefit": "You’ve made a peaceful and permanent bargain with a ghost, spirit, or outsider. It possesses your hand, guiding and aiding you in exchange for help in return."
+        "benefit": "You've made a peaceful and permanent bargain with a ghost, spirit, or outsider. It possesses your hand, guiding and aiding you in exchange for help in return."
     },
     "Potent Holy Symbol": {
         "prerequisites": {
@@ -4569,7 +4569,7 @@
             "Knowledge (religion)": 1
         }
         },
-        "benefit": "You gain a +2 bonus on skill checks to perform occult rituals, and on Intelligence checks to learn the method of casting an occult ritual. If you are a ritual’s primary caster, the DC for saving throws against the ritual’s effects is 2 higher. If the ritual has a minimum number of required secondary casters, that number is decreased by 1."
+        "benefit": "You gain a +2 bonus on skill checks to perform occult rituals, and on Intelligence checks to learn the method of casting an occult ritual. If you are a ritual's primary caster, the DC for saving throws against the ritual's effects is 2 higher. If the ritual has a minimum number of required secondary casters, that number is decreased by 1."
     },
     "Preferred Spell": {
         "prerequisites": {
@@ -4602,7 +4602,7 @@
         },
         "benefit": "Once per day, enter a deep trance and gain a prophetic vision."
     },
-    "Protector’s Strike": {
+    "Protector's Strike": {
         "prerequisites": {
         "Special": "Smite evil class feature",
         "BAB": 5
@@ -4614,7 +4614,7 @@
         "Special": "ability to cast conjuration (summoning) spells or a conjuration (summoning) spell-like ability",
         "Caster Level": 5
         },
-        "benefit": "Whenever you cast a touch spell while adjacent to a creature you summoned, you can have the summoned creature carry the spell’s charge. Once the spell is cast, you and any creature you summon gain the share spells ability. This feat doesn’t qualify you for feats or other rules options that require you to have an animal companion, familiar, or similar allied creature with the share spells ability."
+        "benefit": "Whenever you cast a touch spell while adjacent to a creature you summoned, you can have the summoned creature carry the spell's charge. Once the spell is cast, you and any creature you summon gain the share spells ability. This feat doesn't qualify you for feats or other rules options that require you to have an animal companion, familiar, or similar allied creature with the share spells ability."
     },
     "Psychic Combatant": {
         "prerequisites": {
@@ -4704,7 +4704,7 @@
     "Putrid Summons": {
         "prerequisites": {
         "Feat": "Spell Focus (conjuration)",
-        "Special": "ability to cast a summon monster or summon nature’s ally spell"
+        "Special": "ability to cast a summon monster or summon nature's ally spell"
         },
         "benefit": "Summon a single weaker creature that has a horrific stench."
     },
@@ -4738,7 +4738,7 @@
     "Quicken Blessing": {
         "prerequisites": {
         "Special": [
-            "Access to blessing’s major power",
+            "Access to blessing's major power",
             "blessings class feature"
         ]
         },
@@ -4754,7 +4754,7 @@
         "prerequisites": {
         "Special": "Lay on hands class feature"
         },
-        "benefit": "Expend uses of lay on hands to deal extra damage, bypassing evil creatures’ resistances and immunities."
+        "benefit": "Expend uses of lay on hands to deal extra damage, bypassing evil creatures' resistances and immunities."
     },
     "Rage Casting": {
         "prerequisites": {
@@ -4827,7 +4827,7 @@
         "prerequisites": {
         "Special": "Aura of courage"
         },
-        "benefit": "When you confirm a critical hit against an enemy, any fear effect affecting allies within 30 feet is reduced by one step. Panicked becomes frightened, frightened becomes shaken, and shaken is removed. In addition, any ally suffering other effects from a failed save against a fear effect, such as the paralysis from a mummy’s despair aura, receives a new save against the effect at the original DC."
+        "benefit": "When you confirm a critical hit against an enemy, any fear effect affecting allies within 30 feet is reduced by one step. Panicked becomes frightened, frightened becomes shaken, and shaken is removed. In addition, any ally suffering other effects from a failed save against a fear effect, such as the paralysis from a mummy's despair aura, receives a new save against the effect at the original DC."
     },
     "Ranged Disable": {
         "prerequisites": {
@@ -4866,7 +4866,7 @@
         "Special": "arcane spellcaster",
         "Caster Level": 12
         },
-        "benefit": "If you are aware of an attack against you that has already been declared and you choose to use the Arcane Shield feat, the immediate action to activate the feat occurs before the attack roll against you is resolved. In addition, all adjacent allies also gain the feat’s deflection bonus to AC for 1 round."
+        "benefit": "If you are aware of an attack against you that has already been declared and you choose to use the Arcane Shield feat, the immediate action to activate the feat occurs before the attack roll against you is resolved. In addition, all adjacent allies also gain the feat's deflection bonus to AC for 1 round."
     },
     "Reactive Healing": {
         "prerequisites": {
@@ -4996,7 +4996,7 @@
         "Skill": { "Knowledge (religion)": 1 },
         "Special": "alignment must match that of your worshiped deity"
         },
-        "benefit": "Whenever you are the only target of a divine spell cast by a follower of your chosen deity other than you, the spell’s caster level is treated as though it were 2 higher than it actually is. Additionally, whenever you regain hit points as a result of a worshiper of your deity other than you channeling energy or casting a cure spell, you regain 1 additional hit point per die rolled for the healing gained."
+        "benefit": "Whenever you are the only target of a divine spell cast by a follower of your chosen deity other than you, the spell's caster level is treated as though it were 2 higher than it actually is. Additionally, whenever you regain hit points as a result of a worshiper of your deity other than you channeling energy or casting a cure spell, you regain 1 additional hit point per die rolled for the healing gained."
     },
     "Rhabdomancy": {
         "prerequisites": {
@@ -5005,7 +5005,7 @@
             "Survival": 3
         }
         },
-        "benefit": "You can perform the dowsing occult skill unlock even if you can’t use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use dowsing one additional time per day."
+        "benefit": "You can perform the dowsing occult skill unlock even if you can't use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use dowsing one additional time per day."
     },
     "Rhetorical Flourish": {
         "prerequisites": {
@@ -5019,7 +5019,7 @@
         "Stat": { "DEX": 13 },
         "Feat": "Throw Anything"
         },
-        "benefit": "Make an attack roll with a splash weapon if it misses and lands in another creature’s square."
+        "benefit": "Make an attack roll with a splash weapon if it misses and lands in another creature's square."
     },
     "Righteous Healing": {
         "prerequisites": {
@@ -5035,9 +5035,9 @@
         },
         "Special": "hex class feature"
         },
-        "benefit": "You learn to perform a special occult ritual known as Beseeching the Patron, which temporarily grants you a hex you don’t already know how to use."
+        "benefit": "You learn to perform a special occult ritual known as Beseeching the Patron, which temporarily grants you a hex you don't already know how to use."
     },
-    "Robot’s Bane": {
+    "Robot's Bane": {
         "prerequisites": {
         "Skill": { "Knowledge (engineering)": 5 }
         },
@@ -5092,7 +5092,7 @@
         "Stat": { "INT": 13 },
         "Skill": { "Knowledge (engineering)": 2 }
         },
-        "benefit": "It’s complicated (see text)."
+        "benefit": "It's complicated (see text)."
     },
     "Sacred Summons": {
         "prerequisites": {
@@ -5124,7 +5124,7 @@
         },
         "benefit": "Whenever a transmutation spell or spell-like ability affects you, your natural armor bonus increases by 1. If you have no natural armor bonus to Armor Class, treat your natural armor bonus as 0 for the purposes of this feat. The bonus increases by 2 if the caster level of the effect is 10th or higher."
     },
-    "Scavenger’s Luck": {
+    "Scavenger's Luck": {
         "prerequisites": {
         "Skill": { "Knowledge (engineering)": 1 }
         },
@@ -5144,7 +5144,7 @@
         "prerequisites": {
         "Skill": { "Spellcraft": 1 }
         },
-        "benefit": "When you witness a creature casting a spell, you can attempt a Spellcraft check to determine what sort of spellcaster the target is—specifically, what the target’s class is."
+        "benefit": "When you witness a creature casting a spell, you can attempt a Spellcraft check to determine what sort of spellcaster the target is—specifically, what the target's class is."
     },
     "Sea Legs": {
         "prerequisites": {
@@ -5160,7 +5160,7 @@
             "Sense Motive": 1
         }
         },
-        "benefit": "Gain a +5 circumstance bonus on Bluff checks to pass secret messages and communicate a full round’s worth of information as a swift action."
+        "benefit": "Gain a +5 circumstance bonus on Bluff checks to pass secret messages and communicate a full round's worth of information as a swift action."
     },
     "Secret Signs": {
         "prerequisites": {
@@ -5192,7 +5192,7 @@
             "Knowledge (religion)": 1
         }
         },
-        "benefit": "After an hour of interaction, attempt a Sense Motive check to discern a creature’s loyalties."
+        "benefit": "After an hour of interaction, attempt a Sense Motive check to discern a creature's loyalties."
     },
     "Sense Relationships": {
         "prerequisites": {
@@ -5204,7 +5204,7 @@
         "prerequisites": {
         "Special": "Bond senses class feature"
         },
-        "benefit": "Gain a +4 bonus on Perception checks when sharing your eidolon’s senses."
+        "benefit": "Gain a +4 bonus on Perception checks when sharing your eidolon's senses."
     },
     "Shadow Druid": {
         "prerequisites": {
@@ -5246,7 +5246,7 @@
         ],
         "Special": "ability to use polymorph effects"
         },
-        "benefit": "Hinder a target’s ability to use polymorph effects when you deal damage."
+        "benefit": "Hinder a target's ability to use polymorph effects when you deal damage."
     },
     "Shapeshifting Hunter": {
         "prerequisites": {
@@ -5309,7 +5309,7 @@
         ],
         "Level": 2
         },
-        "benefit": "Offensive manifestations with Will saves reveal an opponent’s true form."
+        "benefit": "Offensive manifestations with Will saves reveal an opponent's true form."
     },
     "Shatter Resolve": {
         "prerequisites": {
@@ -5320,7 +5320,7 @@
         },
         "benefit": "When a creature damaged by your channel negative energy fails its Will save, it becomes shaken."
     },
-    "Shifter’s Edge": {
+    "Shifter's Edge": {
         "prerequisites": {
         "Stat": { "DEX": 13 },
         "Special": [
@@ -5330,7 +5330,7 @@
         },
         "benefit": "Add your shifter level to damage with your claws when using Weapon Finesse."
     },
-    "Shifter’s Rush": {
+    "Shifter's Rush": {
         "prerequisites": {
         "Special": "Wild shape class feature",
         "Class": { "Shifter": 4 }
@@ -5339,7 +5339,7 @@
     },
     "Shocking Amplification": {
         "prerequisites": {},
-        "benefit": "When you cast a spell with the electricity descriptor that targets one or more creatures, you can take a –1 penalty on the spell’s attack rolls and reduce its saving throw DC by 1 to cause the target closest to you to become fatigued for 1 round."
+        "benefit": "When you cast a spell with the electricity descriptor that targets one or more creatures, you can take a –1 penalty on the spell's attack rolls and reduce its saving throw DC by 1 to cause the target closest to you to become fatigued for 1 round."
     },
     "Shrouded in Mystery": {
         "prerequisites": {
@@ -5367,7 +5367,7 @@
         "Caster Level": 7,
         "Special": "allegiance to a Hell Knight order"
         },
-        "benefit": "As a swift action, reduce your armor’s arcane spell failure chance by 30% for spells cast this round."
+        "benefit": "As a swift action, reduce your armor's arcane spell failure chance by 30% for spells cast this round."
     },
     "Sin Seer": {
         "prerequisites": {
@@ -5385,7 +5385,7 @@
         },
         "benefit": "Your bullets ignite when you fire them."
     },
-    "Skald’s Vigor": {
+    "Skald's Vigor": {
         "prerequisites": {
         "Special": "Raging song class feature"
         },
@@ -5418,7 +5418,7 @@
         },
         "benefit": "Select a skill and use it while raging."
     },
-    "Slayer’s Knack": {
+    "Slayer's Knack": {
         "prerequisites": {
         "Special": "Favored enemy class feature",
         "BAB": 6
@@ -5438,7 +5438,7 @@
         "prerequisites": {
         "Special": "Halfling Jinx trait"
         },
-        "benefit": "Your jinx’s penalty on saving throws also applies to the target’s initiative and attack rolls."
+        "benefit": "Your jinx's penalty on saving throws also applies to the target's initiative and attack rolls."
     },
     "Sly Draw": {
         "prerequisites": {
@@ -5497,13 +5497,13 @@
         "Feat": "Alertness",
         "Skill": { "Perception": 5 }
         },
-        "benefit": "Perform the read aura occult skill unlock even if you can’t use psychic magic; if you can cast psychic spells or have Psychic Sensitivity, you can use read aura one additional time per day."
+        "benefit": "Perform the read aura occult skill unlock even if you can't use psychic magic; if you can cast psychic spells or have Psychic Sensitivity, you can use read aura one additional time per day."
     },
     "Spell Bane": {
         "prerequisites": {
         "Special": "Bane class feature"
         },
-        "benefit": "Your spells’ DCs increase by 2 when bane is in effect."
+        "benefit": "Your spells' DCs increase by 2 when bane is in effect."
     },
     "Spell Bluff": {
         "prerequisites": {
@@ -5643,7 +5643,7 @@
         "Feat": "Absorb Spirit",
         "Skill": { "Diplomacy": 5 }
         },
-        "benefit": "Talk to spirits you’ve absorbed."
+        "benefit": "Talk to spirits you've absorbed."
     },
     "Spirit Symbiosis": {
         "prerequisites": {
@@ -5696,7 +5696,7 @@
         "prerequisites": {},
         "benefit": "Gain resistance to possessing spirits."
     },
-    "Spirit’s Gift": {
+    "Spirit's Gift": {
         "prerequisites": {
         "Special": "animal companion or familiar class feature"
         },
@@ -5720,7 +5720,7 @@
         },
         "benefit": "Increase the attack power of your spirit spells."
     },
-    "Spiritualist’s Call": {
+    "Spiritualist's Call": {
         "prerequisites": {
         "Special": "Phantom class feature"
         },
@@ -5763,7 +5763,7 @@
         },
         "benefit": "Apply metamagic to one spell and keep the standard casting time."
     },
-    "Spontaneous Nature’s Ally": {
+    "Spontaneous Nature's Ally": {
         "prerequisites": {
         "Skill": { "Knowledge (nature)": 5 },
         "Special": [
@@ -5771,7 +5771,7 @@
             "Animal or Plant domain"
         ]
         },
-        "benefit": "Lose a spell slot to spontaneously cast a summon nature’s ally spell of the same level."
+        "benefit": "Lose a spell slot to spontaneously cast a summon nature's ally spell of the same level."
     },
     "Squash Flat": {
         "prerequisites": {
@@ -5905,7 +5905,7 @@
             "Skill Focus (Intimidate)"
         ]
         },
-        "benefit": "Increases Intimidate’s duration to 2d6 hours"
+        "benefit": "Increases Intimidate's duration to 2d6 hours"
     },
     "Timely Coordination": {
         "prerequisites": {},
@@ -5915,7 +5915,7 @@
         "prerequisites": {
         "Level": 5
         },
-        "benefit": "As Leadership, but you can attract only a 1st-level cohort (referred to hereafter as a torchbearer) with this feat, and can’t recruit followers. You determine your Leadership score according to the rules presented in the Leadership feat, but your torchbearer is always at least 3 levels lower than your level."
+        "benefit": "As Leadership, but you can attract only a 1st-level cohort (referred to hereafter as a torchbearer) with this feat, and can't recruit followers. You determine your Leadership score according to the rules presented in the Leadership feat, but your torchbearer is always at least 3 levels lower than your level."
     },
     "Torrid Tolerance": {
         "prerequisites": {
@@ -5995,7 +5995,7 @@
         },
         "benefit": "You treat plant creatures with Int scores of 3 or lower as animals for the purposes of the Handle Animal skill. Plant creatures without an Int score are treated as animals with an Int of 1 for these purposes."
     },
-    "Trapper’s Setup": {
+    "Trapper's Setup": {
         "prerequisites": {
         "Skill": {
             "Craft (traps)": 5
@@ -6014,7 +6014,7 @@
             "Knowledge (arcana)": 2
         }
         },
-        "benefit": "You can perform the faith healing occult skill unlock even if you can’t use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use faith healing one additional time per day."
+        "benefit": "You can perform the faith healing occult skill unlock even if you can't use psychic magic. If you can cast psychic spells or have the Psychic Sensitivity feat, you can use faith healing one additional time per day."
     },
     "Triangulate": {
         "prerequisites": {
@@ -6060,7 +6060,7 @@
             "Appraise": 3
         }
         },
-        "benefit": "You can perform the psychometry occult skill unlock even if you can’t use psychic magic, though you must consume a drink of high-quality alcohol (costing at least 10 gp per drink) to do so."
+        "benefit": "You can perform the psychometry occult skill unlock even if you can't use psychic magic, though you must consume a drink of high-quality alcohol (costing at least 10 gp per drink) to do so."
     },
     "Turn Undead": {
         "prerequisites": {
@@ -6106,7 +6106,7 @@
         "prerequisites": {
         "Feat": "Combat Casting"
         },
-        "benefit": "Don’t make concentration checks for violent movement, gain a +2 bonus on all other concentration checks."
+        "benefit": "Don't make concentration checks for violent movement, gain a +2 bonus on all other concentration checks."
     },
     "Unbound Bravery": {
         "prerequisites": {
@@ -6115,7 +6115,7 @@
             "worshiper of a god of luck or drink"
         ]
         },
-        "benefit": "You can add the bonus from bravery to Escape Artist checks and combat maneuver checks to escape a grapple. If your bonus from bravery is +2 or higher, then once per day, you can grant that bonus to an ally within 30 feet on a Will save against a fear effect, an Escape Artist check, or a combat maneuver check to escape a grapple. Granting this bonus to an ally is an immediate action and must be declared before the result of your ally’s check is revealed."
+        "benefit": "You can add the bonus from bravery to Escape Artist checks and combat maneuver checks to escape a grapple. If your bonus from bravery is +2 or higher, then once per day, you can grant that bonus to an ally within 30 feet on a Will save against a fear effect, an Escape Artist check, or a combat maneuver check to escape a grapple. Granting this bonus to an ally is an immediate action and must be declared before the result of your ally's check is revealed."
     },
     "Undaunted Bravery": {
         "prerequisites": {
@@ -6185,7 +6185,7 @@
         "Level": 10,
         "Special": "Must be in a class that grants a familiar or animal companion"
         },
-        "benefit": "Your animal companion or familiar’s type changes to “undead.” The creature gains fast healing 5 as well as your vampire or dhampir weaknesses. If you are a vampire, the creature also gains the following abilities, depending on what type of vampire you are."
+        "benefit": "Your animal companion or familiar's type changes to “undead.” The creature gains fast healing 5 as well as your vampire or dhampir weaknesses. If you are a vampire, the creature also gains the following abilities, depending on what type of vampire you are."
     },
     "Vandal": {
         "prerequisites": {
@@ -6197,7 +6197,7 @@
         "prerequisites": {
         "Race": "Jiang-shi vampire"
         },
-        "benefit": "You’ve learned how to create variant vampiric prayer scrolls."
+        "benefit": "You've learned how to create variant vampiric prayer scrolls."
     },
     "Vermin Heart": {
         "prerequisites": {
@@ -6226,13 +6226,13 @@
         "prerequisites": {
         "Special": "Eidolon class feature"
         },
-        "benefit": "+4 bonus on Perception checks when your eidolon is within arm’s reach, conscious, and not helpless."
+        "benefit": "+4 bonus on Perception checks when your eidolon is within arm's reach, conscious, and not helpless."
     },
     "Vigilant Phantom": {
         "prerequisites": {
         "Special": "Phantom class feature"
         },
-        "benefit": "+4 on Perception checks within arm’s reach of active phantom"
+        "benefit": "+4 on Perception checks within arm's reach of active phantom"
     },
     "Vile Leadership": {
         "prerequisites": {
@@ -6332,7 +6332,7 @@
         ],
         "Race": "Tiefling"
         },
-        "benefit": "You regain double the normal amount of hit points with a full night’s rest."
+        "benefit": "You regain double the normal amount of hit points with a full night's rest."
     },
     "Wild Growth Channel": {
         "prerequisites": {
@@ -6411,7 +6411,7 @@
             "Sense Motive": 1
         }
         },
-        "benefit": "Use Bluff to aid ally’s Disguise"
+        "benefit": "Use Bluff to aid ally's Disguise"
     },
     "Witch Knife": {
         "prerequisites": {
@@ -6474,7 +6474,7 @@
             "Linguistics": 3
         }
         },
-        "benefit": "Use Linguistics to communicate with creatures with which you don’t share a language"
+        "benefit": "Use Linguistics to communicate with creatures with which you don't share a language"
     },
     "Zealous Mind": {
         "prerequisites": {

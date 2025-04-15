@@ -75,7 +75,7 @@
         ],
         "Special": "proficient with heavy armor"
       },
-      "benefit": "For the purpose of class features (such as a ranger’s combat style, a barbarian’s fast movement, or a magus’s spellcasting), you treat Gray Maiden plate as medium armor or heavy armor, whichever is more beneficial to a given ability. This does not affect the armor’s statistics, and it is still considered heavy armor for all other purposes."
+      "benefit": "For the purpose of class features (such as a ranger's combat style, a barbarian's fast movement, or a magus's spellcasting), you treat Gray Maiden plate as medium armor or heavy armor, whichever is more beneficial to a given ability. This does not affect the armor's statistics, and it is still considered heavy armor for all other purposes."
     },
     "Agile Maneuvers": {
       "prerequisites": {},
@@ -150,7 +150,7 @@
         "Feat": "Weapon Focus",
         "BAB": 12
       },
-      "benefit": "Choose one weapon with which you have the Weapon Focus feat. When you strike an opponent that has a chance of negating critical hits or sneak attacks, such as from the fortification armor special ability, reduce that chance by 25%. Treat creatures that are normally immune to critical hits and sneak attacks as instead having a 75% chance to negate the critical hit or sneak attack, taking only the attack’s normal damage"
+      "benefit": "Choose one weapon with which you have the Weapon Focus feat. When you strike an opponent that has a chance of negating critical hits or sneak attacks, such as from the fortification armor special ability, reduce that chance by 25%. Treat creatures that are normally immune to critical hits and sneak attacks as instead having a 75% chance to negate the critical hit or sneak attack, taking only the attack's normal damage"
     },
     "Ancestral Enmity": {
       "prerequisites": {
@@ -163,7 +163,7 @@
         "BAB": 1,
         "Special": "weapon familiarity racial trait"
       },
-      "benefit": "Gain proficiency with your race’s racial weapons or gain a bonus Weapon Focus feat with one racial weapon at a time"
+      "benefit": "Gain proficiency with your race's racial weapons or gain a bonus Weapon Focus feat with one racial weapon at a time"
     },
     "Animal Ferocity": {
       "prerequisites": {
@@ -267,7 +267,7 @@
           }
         ]
       },
-      "benefit": "Grant adjacent allies +2 dodge bonus to AC against single adjacent opponent’s next melee attack (as long as that attack comes before the beginning of your next turn), but you take –2 AC against that opponent until your next turn."
+      "benefit": "Grant adjacent allies +2 dodge bonus to AC against single adjacent opponent's next melee attack (as long as that attack comes before the beginning of your next turn), but you take –2 AC against that opponent until your next turn."
     },
     "Archon Diversion": {
       "prerequisites": {
@@ -308,7 +308,7 @@
           }
         ]
       },
-      "benefit": "Take no penalty to AC when using Archon Style and can spend a swift action instead of a move action to use this ability. Whenever you take damage from using Archon Diversion to divert an opponent’s attack toward yourself, any allies threatening your opponent can make an AOO against the diverted opponent."
+      "benefit": "Take no penalty to AC when using Archon Style and can spend a swift action instead of a move action to use this ability. Whenever you take damage from using Archon Diversion to divert an opponent's attack toward yourself, any allies threatening your opponent can make an AOO against the diverted opponent."
     },
     "Arcing Weapon": {
       "prerequisites": {
@@ -427,7 +427,7 @@
           }
         ]
       },
-      "benefit": "You can use the chosen melee weapon with any class ability that can be used with an unarmed strike, such as an unchained monk’s style strike ability. In addition, you are treated as a monk with a level equal to your character level for the purpose of determining the number of times per day that you can use feats with uses per day that depend upon your monk level, such as the Stunning Fist or Perfect Strike feats."
+      "benefit": "You can use the chosen melee weapon with any class ability that can be used with an unarmed strike, such as an unchained monk's style strike ability. In addition, you are treated as a monk with a level equal to your character level for the purpose of determining the number of times per day that you can use feats with uses per day that depend upon your monk level, such as the Stunning Fist or Perfect Strike feats."
     },
     "Ascetic Strike": {
       "prerequisites": {
@@ -447,7 +447,7 @@
           }
         ]
       },
-      "benefit": "You can use the unarmed strike damage of a monk 4 levels lower than your character level (minimum 1st) instead of the base damage for the chosen weapon. Ascetic Strike functions in all other ways as the brawler’s close weapon mastery class feature."
+      "benefit": "You can use the unarmed strike damage of a monk 4 levels lower than your character level (minimum 1st) instead of the base damage for the chosen weapon. Ascetic Strike functions in all other ways as the brawler's close weapon mastery class feature."
     },
     "Awe-Inspiring Smash": {
       "prerequisites": {
@@ -457,7 +457,7 @@
         "Feat": "Power Attack",
         "BAB": 3
       },
-      "benefit": "You can apply your Strength modifier instead of your Charisma modifier to performance combat checks. In addition, when you spend a swift action to attempt a performance combat check that was triggered by a successful bull rush or sunder combat maneuver check, you gain a +2 bonus on the performance combat check. For every 5 points by which your attack exceeded your opponent’s CMD, this bonus increases by 2."
+      "benefit": "You can apply your Strength modifier instead of your Charisma modifier to performance combat checks. In addition, when you spend a swift action to attempt a performance combat check that was triggered by a successful bull rush or sunder combat maneuver check, you gain a +2 bonus on the performance combat check. For every 5 points by which your attack exceeded your opponent's CMD, this bonus increases by 2."
     },
     "Awesome Blow": {
       "prerequisites": {
@@ -518,7 +518,7 @@
         "Feat": "Improved Bull Rush",
         "Size": "Large or larger"
       },
-      "benefit": "As a standard action, you can perform the awesome throw combat maneuver. You do this by making a thrown weapon attack; if you don’t have the Throw Anything feat, you must use a large, bulky, and relatively regular-shaped object with a hardness of at least 5 (such as a rock or treasure chest). If that attack hits a corporeal opponent smaller than you, the opponent takes damage and is knocked away, flying 10 feet in a straight line away from you and falling prone. If an obstacle prevents the completion of your target’s move, the target and the obstacle each take 1d6 points of damage, and the target is knocked prone in a space adjacent to the obstacle."
+      "benefit": "As a standard action, you can perform the awesome throw combat maneuver. You do this by making a thrown weapon attack; if you don't have the Throw Anything feat, you must use a large, bulky, and relatively regular-shaped object with a hardness of at least 5 (such as a rock or treasure chest). If that attack hits a corporeal opponent smaller than you, the opponent takes damage and is knocked away, flying 10 feet in a straight line away from you and falling prone. If an obstacle prevents the completion of your target's move, the target and the obstacle each take 1d6 points of damage, and the target is knocked prone in a space adjacent to the obstacle."
     },
     "Banner of Doom": {
         "prerequisites": {
@@ -539,7 +539,7 @@
         "prerequisites": {
         "BAB": 4
         },
-        "benefit": "Once per day, gain the use of a combat feat you don’t possess for 1 minute"
+        "benefit": "Once per day, gain the use of a combat feat you don't possess for 1 minute"
     },
     "Bashing Finish": {
         "prerequisites": {
@@ -569,7 +569,7 @@
         },
         "benefit": "Let out a cry that grants allies a +1 bonus on attack rolls and +4 bonus on saves against fear"
     },
-    "Bear’s Balance": {
+    "Bear's Balance": {
         "prerequisites": {
         "Feat": "Iron Will",
         "Special": "rage class feature"
@@ -764,7 +764,7 @@
             "Perception": 15
         }
         },
-        "benefit": "While you are using Blinded Blade Style and you are blinded or unable to see, your ability to pinpoint creatures’ locations using Blinded Competence improves to function like blindsight rather than blindsense, and the range increases to 30 feet. In addition, you add half your character level to the DCs of Bluff checks to feint you in combat."
+        "benefit": "While you are using Blinded Blade Style and you are blinded or unable to see, your ability to pinpoint creatures' locations using Blinded Competence improves to function like blindsight rather than blindsense, and the range increases to 30 feet. In addition, you add half your character level to the DCs of Bluff checks to feint you in combat."
     },
     "Blinding Flash": {
         "prerequisites": {
@@ -774,7 +774,7 @@
         "Feat": "Combat Expertise",
         "Special": "special (see text)"
         },
-        "benefit": "As a move action gaze attack, reflect light into foe’s eyes, dazzling foe for 1 round."
+        "benefit": "As a move action gaze attack, reflect light into foe's eyes, dazzling foe for 1 round."
     },
     "Blinding Light": {
         "prerequisites": {
@@ -861,7 +861,7 @@
         "prerequisites": {
         "Feat": "Combat Reflexes"
         },
-        "benefit": "Use AOO to add a bonus to adjacent ally’s AC"
+        "benefit": "Use AOO to add a bonus to adjacent ally's AC"
     },
     "Body Shield": {
         "prerequisites": {
@@ -981,7 +981,7 @@
         ],
         "Special": "proficient with heavy armor"
         },
-        "benefit": "While you’re using Bulette Charge Style, whenever you succeed at an overrun combat maneuver check against a foe, that foe takes an amount of damage equal to 1d8 (if your size is Medium) or 1d6 (if your size is Small) + 1/2 your armor bonus to AC + 1-1/2 times your Strength bonus."
+        "benefit": "While you're using Bulette Charge Style, whenever you succeed at an overrun combat maneuver check against a foe, that foe takes an amount of damage equal to 1d8 (if your size is Medium) or 1d6 (if your size is Small) + 1/2 your armor bonus to AC + 1-1/2 times your Strength bonus."
     },
     "Bulette Leap": {
         "prerequisites": {
@@ -1056,7 +1056,7 @@
     },
     "Call Out": {
         "prerequisites": {},
-        "benefit": "As a standard action, you can make an Intimidate check against a hostile target within 30 feet that can clearly see and hear you. The DC of this check is equal to 10 + your opponent’s Hit Dice + its Wisdom modifier. If the target is trained in Sense Motive, the DC is instead equal to 10 + your opponent’s Sense Motive bonus, if higher. If you succeed at this check, the target enters a duel with you. The target cannot withdraw from the duel for 1 round + 1 round for every 5 by which the check beat the DC."
+        "benefit": "As a standard action, you can make an Intimidate check against a hostile target within 30 feet that can clearly see and hear you. The DC of this check is equal to 10 + your opponent's Hit Dice + its Wisdom modifier. If the target is trained in Sense Motive, the DC is instead equal to 10 + your opponent's Sense Motive bonus, if higher. If you succeed at this check, the target enters a duel with you. The target cannot withdraw from the duel for 1 round + 1 round for every 5 by which the check beat the DC."
     },
     "Canny Tumble": {
         "prerequisites": {
@@ -1070,7 +1070,7 @@
         },
         "benefit": "Gain a bonus on melee attack rolls when you use Acrobatics to avoid attacks of opportunity"
     },
-    "Caster’s Champion": {
+    "Caster's Champion": {
         "prerequisites": {},
         "benefit": "Three times per day as a swift action, when you are within 30 feet of an ally who is an arcane spellcaster, you can channel a portion of her arcane power into your weapons."
     },
@@ -1143,7 +1143,7 @@
     },
     "Choir of Blades": {
         "prerequisites": {},
-        "benefit": "Gain an ally’s bonus on attack rolls against a creature or a subtype, as well as the ally’s racial weapon proficiencies"
+        "benefit": "Gain an ally's bonus on attack rolls against a creature or a subtype, as well as the ally's racial weapon proficiencies"
     },
     "Chokehold": {
         "prerequisites": {
@@ -1173,7 +1173,7 @@
         ],
         "BAB": 6
         },
-        "benefit": "When you are adjacent to a foe, as a full-round action, you can take a full-attack action to make melee attacks against the foe, moving 5 ft. before each attack. You must move 5 ft. before each melee attack you make, and can’t exceed your maximum speed, exceed your maximum number of attacks in a round, or attack any other target until the beginning of your next turn."
+        "benefit": "When you are adjacent to a foe, as a full-round action, you can take a full-attack action to make melee attacks against the foe, moving 5 ft. before each attack. You must move 5 ft. before each melee attack you make, and can't exceed your maximum speed, exceed your maximum number of attacks in a round, or attack any other target until the beginning of your next turn."
     },
     "Circuitous Shot": {
         "prerequisites": {
@@ -1321,7 +1321,7 @@
         ],
         "BAB": 16
         },
-        "benefit": "While you are using Cloak and Dagger Style and wielding your chosen weapon, whenever you hit an opponent that is denied its Dexterity bonus to AC or that you are flanking, or make an attack using Vital Strike (or its improved or greater versions), you can attempt a dirty trick combat maneuver check against that opponent as a free action. If you succeed, the target must succeed at a Fortitude save (DC = 10 + 1/2 your BAB + your Intelligence modifier) or take an additional penalty from the dirty trick selected from the following list: anchored in place and unable to move from that square, confused, exhausted, or staggered. This additional penalty lasts only 1 round, regardless of how long the dirty trick’s normal penalty lasts, and can be removed by the target with a standard action. You can only attempt one free dirty trick combat maneuver check per round using this feat."
+        "benefit": "While you are using Cloak and Dagger Style and wielding your chosen weapon, whenever you hit an opponent that is denied its Dexterity bonus to AC or that you are flanking, or make an attack using Vital Strike (or its improved or greater versions), you can attempt a dirty trick combat maneuver check against that opponent as a free action. If you succeed, the target must succeed at a Fortitude save (DC = 10 + 1/2 your BAB + your Intelligence modifier) or take an additional penalty from the dirty trick selected from the following list: anchored in place and unable to move from that square, confused, exhausted, or staggered. This additional penalty lasts only 1 round, regardless of how long the dirty trick's normal penalty lasts, and can be removed by the target with a standard action. You can only attempt one free dirty trick combat maneuver check per round using this feat."
     },
     "Close-Quarters Thrower": {
         "prerequisites": {
@@ -1355,7 +1355,7 @@
     },
     "Cockatrice Strike": {
         "prerequisites": {
-        "Feat": "Medusa’s Wrath",
+        "Feat": "Medusa's Wrath",
         "BAB": 14
         },
         "benefit": "Turn a target to stone with a critical hit"
@@ -1626,7 +1626,7 @@
         "Feat": "Critical Focus",
         "BAB": 13
         },
-        "benefit": "Whenever you score a critical hit, the target’s speed is halved"
+        "benefit": "Whenever you score a critical hit, the target's speed is halved"
     },
     "Critical, Deafening": {
         "prerequisites": {
@@ -1719,7 +1719,7 @@
         },
         "benefit": "You gain a +2 competence bonus to your CMD when an enemy uses Acrobatics to move through a square you threaten. For each ally within your reach that also has this feat, the bonus increases by an additional 2."
     },
-    "Crusader’s Fist": {
+    "Crusader's Fist": {
         "prerequisites": {
         "Special": "Lay on hands or touch of corruption class feature",
         "Feat": "Improved Unarmed Strike",
@@ -1731,7 +1731,7 @@
         "prerequisites": {
         "Feat": "Stunning Fist"
         },
-        "benefit": "Stunning Fist reduces target’s AC"
+        "benefit": "Stunning Fist reduces target's AC"
     },
     "Cudgeler Style": {
         "prerequisites": {
@@ -1811,7 +1811,7 @@
             "Perform (dance)": 1
         }
         },
-        "benefit": "When wielding a spiked chain one-handed, you can add your Dexterity modifier instead of your Strength modifier to that weapon’s damage. The spiked chain must be one appropriate for your size. During your turn, you treat your reach with the spiked chain as 5 feet greater. You lose these benefits while fighting with multiple weapons or when using a shield (but not when using a buckler)."
+        "benefit": "When wielding a spiked chain one-handed, you can add your Dexterity modifier instead of your Strength modifier to that weapon's damage. The spiked chain must be one appropriate for your size. During your turn, you treat your reach with the spiked chain as 5 feet greater. You lose these benefits while fighting with multiple weapons or when using a shield (but not when using a buckler)."
     },
     "Darting Viper": {
         "prerequisites": {
@@ -1924,7 +1924,7 @@
             "Improved Unarmed Strike"
         ]
         },
-        "benefit": "You have learned to leverage a grappling creature’s weight against it. While you’re grappled, attacks you make against the grappler using armor spikes, a light or one-handed weapon, a natural weapon, or an unarmed strike deal damage as if the strike or weapon were one size category larger than it actually is."
+        "benefit": "You have learned to leverage a grappling creature's weight against it. While you're grappled, attacks you make against the grappler using armor spikes, a light or one-handed weapon, a natural weapon, or an unarmed strike deal damage as if the strike or weapon were one size category larger than it actually is."
     },
     "Deadly Stroke": {
         "prerequisites": {
@@ -2088,7 +2088,7 @@
         "prerequisites": {},
         "benefit": "Gain +1 morale bonus on melee attack and damage when alone"
     },
-    "Destroyer’s Blessing": {
+    "Destroyer's Blessing": {
         "prerequisites": {
         "Race": "half-orc or orc",
         "Special": [
@@ -2167,7 +2167,7 @@
         },
         "Class Feature": "arcane pool"
         },
-        "benefit": "When you use Dimensional Awareness to make an AOO against a creature being summoned or called into a square you threaten, you can additionally use an immediate action to attempt to send the creature back to its home plane. Attempt a Spellcraft check (DC = 15 + the creature’s CR [minimum 1] + the spell level of the spell that summoned the creature). If you succeed, the creature does not get to act and is immediately sent back to its home plane."
+        "benefit": "When you use Dimensional Awareness to make an AOO against a creature being summoned or called into a square you threaten, you can additionally use an immediate action to attempt to send the creature back to its home plane. Attempt a Spellcraft check (DC = 15 + the creature's CR [minimum 1] + the spell level of the spell that summoned the creature). If you succeed, the creature does not get to act and is immediately sent back to its home plane."
     },
     "Dirty Trick, Improved": {
         "prerequisites": {
@@ -2300,7 +2300,7 @@
             "Fighter Level": 6
         }
         },
-        "benefit": "Ranged attacks increase enemy’s DC to cast spells"
+        "benefit": "Ranged attacks increase enemy's DC to cast spells"
     },
     "Disruptive": {
         "prerequisites": {
@@ -2384,13 +2384,13 @@
         },
         "Special": "evasion"
         },
-        "benefit": "When you are targeted by an area-of-effect that deals 1/2 dmg on a successful Ref save, you may, as an immediate action, attempt to move an adjacent foe into harm’s way as well."
+        "benefit": "When you are targeted by an area-of-effect that deals 1/2 dmg on a successful Ref save, you may, as an immediate action, attempt to move an adjacent foe into harm's way as well."
     },
     "Divine Fighting Technique": {
         "prerequisites": {
         "Special": "Worship a single patron deity that has an established divine fighting technique plus special"
         },
-        "benefit": "You can use your patron deity’s fighting technique and receive any benefit associated with that technique for which you qualify."
+        "benefit": "You can use your patron deity's fighting technique and receive any benefit associated with that technique for which you qualify."
     },
     "Divine Assault": {
         "prerequisites": {
@@ -2733,7 +2733,7 @@
             ]
         }
         },
-        "benefit": "Lower angered opponent’s defenses until she attacks you"
+        "benefit": "Lower angered opponent's defenses until she attacks you"
     },
     "Entreating Critical": {
         "prerequisites": {
@@ -2759,7 +2759,7 @@
         "Feat": "Deadly Aim",
         "BAB": 3
         },
-        "benefit": "When you wield a ranged weapon that you are proficient with and that has a strength rating, add 2 to the weapon’s strength rating. You don’t take a penalty on attack rolls for having a Strength modifier lower than the strength rating of a weapon, provided you’re proficient with that weapon."
+        "benefit": "When you wield a ranged weapon that you are proficient with and that has a strength rating, add 2 to the weapon's strength rating. You don't take a penalty on attack rolls for having a Strength modifier lower than the strength rating of a weapon, provided you're proficient with that weapon."
     },
     "Exotic Weapon Proficiency": {
         "prerequisites": {
@@ -2793,7 +2793,7 @@
         },
         "benefit": "When you succeed at a sneak attack with Seething Hatred, roll d8s for damage instead of d6s"
     },
-    "Faerie’s Strike": {
+    "Faerie's Strike": {
         "prerequisites": {
         "Special": "Nature Magic or the ability to cast druid or ranger spells",
         "Feat": "Vital Strike",
@@ -3056,7 +3056,7 @@
             "Precise Shot"
         ]
         },
-        "benefit": "Allies who also have this feat cannot provide soft cover to enemies, allowing you to make attacks of opportunity against an enemy even if those allies grant you soft cover against that foe’s attacks."
+        "benefit": "Allies who also have this feat cannot provide soft cover to enemies, allowing you to make attacks of opportunity against an enemy even if those allies grant you soft cover against that foe's attacks."
     },
     "Friendly Rivalry": {
         "prerequisites": {
@@ -3082,7 +3082,7 @@
         },
         "benefit": "Do not take the Power Attack penalty on the first attack each round"
     },
-    "Fury’s Fall": {
+    "Fury's Fall": {
         "prerequisites": {
         "Feat": "Improved Trip"
         },
@@ -3110,10 +3110,10 @@
         },
         "benefit": "While raging, you gain SR equal to 10 + your class level against spells with the [good] descriptor."
     },
-    "Fury’s Snare": {
+    "Fury's Snare": {
         "prerequisites": {
         "Feat": [
-            "Fury’s Fall",
+            "Fury's Fall",
             "Improved Trip"
         ]
         },
@@ -3176,7 +3176,7 @@
         "BAB": 4,
         "Special": "defensive training racial trait"
         },
-        "benefit": "Attack a giant as an immediate action when the giant’s AOO misses an ally with this feat"
+        "benefit": "Attack a giant as an immediate action when the giant's AOO misses an ally with this feat"
     },
     "Gloom Strike": {
         "prerequisites": {
@@ -3238,13 +3238,13 @@
         },
         "Feat": "Combat Expertise"
         },
-        "benefit": "If you successfully use the aid another action to give an ally who also has this feat a +2 bonus to AC against an opponent’s next attack, the ally is also not considered flanked or flat-footed against that opponent until the beginning of your next turn."
+        "benefit": "If you successfully use the aid another action to give an ally who also has this feat a +2 bonus to AC against an opponent's next attack, the ally is also not considered flanked or flat-footed against that opponent until the beginning of your next turn."
     },
     "Grabbing Style": {
         "prerequisites": {
         "Feat": "Improved Grapple",
         "BAB": 6,
-        "Special": "brawler’s flurry or flurry of blows"
+        "Special": "brawler's flurry or flurry of blows"
         },
         "benefit": "Take no penalty for grabbing a foe one-handed, retain your Dex bonus to AC when pinning"
     },
@@ -3315,15 +3315,15 @@
         },
         "benefit": "You gain an additional +1 bonus on melee and thrown weapon attacks against targets of your hatred racial trait."
     },
-    "Greater Hunter’s Bond": {
+    "Greater Hunter's Bond": {
         "prerequisites": {
-        "Feat": "Improved Hunter’s Bond",
-        "Special": "hunter’s bond (companions) class feature",
+        "Feat": "Improved Hunter's Bond",
+        "Special": "hunter's bond (companions) class feature",
         "Class": {
             "ranger": 12
         }
         },
-        "benefit": "Select targets equal to your Wisdom modifier to benefit from your hunter’s bond"
+        "benefit": "Select targets equal to your Wisdom modifier to benefit from your hunter's bond"
     },
     "Greater Spring Attack": {
         "prerequisites": {
@@ -3470,7 +3470,7 @@
         "Feat": "Any combat feat",
         "Special": "ability to gain an animal companion, cohort, eidolon, familiar, or mount"
         },
-        "benefit": "Your animal companion, cohort, eidolon, familiar, or mount doesn’t count as threatening your opponent for the purposes of feats that require you to be the only character threatening a target. Allies with Hit Dice equal to or less than 1/2 your own Hit Dice don’t count as threatening opponents for the purposes of such feats."
+        "benefit": "Your animal companion, cohort, eidolon, familiar, or mount doesn't count as threatening your opponent for the purposes of feats that require you to be the only character threatening a target. Allies with Hit Dice equal to or less than 1/2 your own Hit Dice don't count as threatening opponents for the purposes of such feats."
     },
     "Hex Strike": {
         "prerequisites": {
@@ -3634,7 +3634,7 @@
         ],
         "BAB": 6
         },
-        "benefit": "Ruin your foes’ teamwork and spread doubt among them"
+        "benefit": "Ruin your foes' teamwork and spread doubt among them"
     },
     "Indomitable Mount": {
         "prerequisites": {
@@ -3646,7 +3646,7 @@
         },
         "benefit": "Once per round you can substitute your Ride check for your mount's saving throw."
     },
-    "In Harm’s Way": {
+    "In Harm's Way": {
         "prerequisites": {
         "Feat": "Bodyguard"
         },
@@ -3768,7 +3768,7 @@
             "Stunning Fist"
         ]
         },
-        "benefit": "With successful Stunning Fist, you may cripple opponent’s mouth"
+        "benefit": "With successful Stunning Fist, you may cripple opponent's mouth"
     },
     "Bonebreaker": {
         "prerequisites": {
@@ -3819,7 +3819,7 @@
             "Sidestep"
         ]
         },
-        "benefit": "When an opponent charges you, you gain a +4 dodge bonus to your AC. If the charger’s attack roll misses you and his movement ends while he is adjacent to you, you can switch places with the opponent as an immediate action, and he is considered to be flanked by you until the end of your next turn. You can’t use the benefits of Juke if you ready an action to set a weapon with the brace special quality against a charging foe."
+        "benefit": "When an opponent charges you, you gain a +4 dodge bonus to your AC. If the charger's attack roll misses you and his movement ends while he is adjacent to you, you can switch places with the opponent as an immediate action, and he is considered to be flanked by you until the end of your next turn. You can't use the benefits of Juke if you ready an action to set a weapon with the brace special quality against a charging foe."
     },
     "Just out of Reach": {
         "prerequisites": {
@@ -4086,7 +4086,7 @@
         "Feat": "Lightning Reflexes",
         "Class Feature": "evasion"
         },
-        "benefit": "When you succeed at a Reflex save against a spell or effect that affects an area, as an immediate action you can attempt an Acrobatics check to jump out of the effect’s area."
+        "benefit": "When you succeed at a Reflex save against a spell or effect that affects an area, as an immediate action you can attempt an Acrobatics check to jump out of the effect's area."
     },
     "Let Them Come": {
         "prerequisites": {
@@ -4122,7 +4122,7 @@
             "Point-Blank Shot"
         ]
         },
-        "benefit": "While making a ranged attack, you can ignore any cover bonuses to AC, including total cover, unless the target also has cover from above, such as a roof or forest canopy. When using this feat, treat your target as if it were one range increment farther away. You can’t use this feat unless you have headroom equal to at least half the attack’s range."
+        "benefit": "While making a ranged attack, you can ignore any cover bonuses to AC, including total cover, unless the target also has cover from above, such as a roof or forest canopy. When using this feat, treat your target as if it were one range increment farther away. You can't use this feat unless you have headroom equal to at least half the attack's range."
     },
     "Lookout": {
         "prerequisites": {},
@@ -4307,7 +4307,7 @@
         },
         "BAB": 1
         },
-        "benefit": "Use Sense Motive to gain additional information about a foe’s martial training."
+        "benefit": "Use Sense Motive to gain additional information about a foe's martial training."
     },
     "Measured Response": {
         "prerequisites": {
@@ -4315,9 +4315,9 @@
         },
         "benefit": "You may choose to automatically deal average damage if you hit with an attack."
     },
-    "Medusa’s Wrath": {
+    "Medusa's Wrath": {
         "prerequisites": {
-        "Feat": "Gorgon’s Fist",
+        "Feat": "Gorgon's Fist",
         "BAB": 11
         },
         "benefit": "Make 2 extra attacks against a hindered foe"
@@ -4350,7 +4350,7 @@
         "Feat": "Combat Expertise",
         "BAB": 4
         },
-        "benefit": "If you are the only character threatening an opponent and that opponent uses a combat feat, you can take an immediate action to gain the benefit of that feat until the end of your next turn. You must meet all the feat’s prerequisites. If a feat has a daily use limitation, any uses of that feat while you’re using Mirror Move count toward that feat’s daily limit. You can use Mirror Move 1/day for every 4 levels you have attained."
+        "benefit": "If you are the only character threatening an opponent and that opponent uses a combat feat, you can take an immediate action to gain the benefit of that feat until the end of your next turn. You must meet all the feat's prerequisites. If a feat has a daily use limitation, any uses of that feat while you're using Mirror Move count toward that feat's daily limit. You can use Mirror Move 1/day for every 4 levels you have attained."
     },
     "Misdirection Tactics": {
         "prerequisites": {
@@ -4400,7 +4400,7 @@
         ],
         "BAB": 1
         },
-        "benefit": "While using a tower shield, add the shield’s bonus to AC (including its enhancement bonus) to your CMD against bull rush and overrun combat maneuvers. You can use a tower shield to grant you total cover along one edge of your space as a move action."
+        "benefit": "While using a tower shield, add the shield's bonus to AC (including its enhancement bonus) to your CMD against bull rush and overrun combat maneuvers. You can use a tower shield to grant you total cover along one edge of your space as a move action."
     },
     "Mobile Fortress": {
         "prerequisites": {
@@ -4414,7 +4414,7 @@
         ],
         "BAB": 4
         },
-        "benefit": "While using a tower shield, add half of the shield’s bonus to AC (including its enhancement bonus) to your touch AC and take only a –1 penalty on attack rolls because of the shield’s encumbrance. Also, when you use a tower shield to gain total cover, any adjacent ally gains total cover against attacks passing through the selected edge of your space."
+        "benefit": "While using a tower shield, add half of the shield's bonus to AC (including its enhancement bonus) to your touch AC and take only a –1 penalty on attack rolls because of the shield's encumbrance. Also, when you use a tower shield to gain total cover, any adjacent ally gains total cover against attacks passing through the selected edge of your space."
     },
     "Mobile Stronghold": {
         "prerequisites": {
@@ -4531,7 +4531,7 @@
         },
         "benefit": "You are treated as mounted for use of the lance"
     },
-    "Nature’s Weapons": {
+    "Nature's Weapons": {
         "prerequisites": {
         "Feat": "Catch Off-Guard",
         "BAB": 2,
@@ -4647,7 +4647,7 @@
         "Stat": { "INT": 13 },
         "Feat": "Combat Expertise"
         },
-        "benefit": "When you successfully use the aid another action to improve the next attack roll against an opponent by an ally who also has this feat, that attack also ignores any Armor Class bonus granted by the opponent’s shield. This benefit affects only physical shields, not shield bonuses from spells or other sources."
+        "benefit": "When you successfully use the aid another action to improve the next attack roll against an opponent by an ally who also has this feat, that attack also ignores any Armor Class bonus granted by the opponent's shield. This benefit affects only physical shields, not shield bonuses from spells or other sources."
     },
     "Opening Volley": {
         "prerequisites": {},
@@ -4709,7 +4709,7 @@
         },
         "Feat": [ "Two-Weapon Fighting", "Weapon Finesse" ]
         },
-        "benefit": "You can gain the benefit of the Fencing Grace, Slashing Grace, or Starry Grace feats while fighting with two weapons. Your penalties from two-weapon fighting increase by 2 on all attack rolls you make when doing so, and you can’t decrease the penalties to less than –2 even if other abilities would reduce the penalties further. Add 1/2 your Dexterity bonus to damage with your off-hand weapon instead of 1/2 your Strength modifier. If you attack without using your off-hand weapon, you can use the aforementioned feats despite your other hand being occupied. In addition, Two-Weapon Grace counts as Double Slice for the purposes of qualifying for the Two-Weapon Rend feat."
+        "benefit": "You can gain the benefit of the Fencing Grace, Slashing Grace, or Starry Grace feats while fighting with two weapons. Your penalties from two-weapon fighting increase by 2 on all attack rolls you make when doing so, and you can't decrease the penalties to less than –2 even if other abilities would reduce the penalties further. Add 1/2 your Dexterity bonus to damage with your off-hand weapon instead of 1/2 your Strength modifier. If you attack without using your off-hand weapon, you can use the aforementioned feats despite your other hand being occupied. In addition, Two-Weapon Grace counts as Double Slice for the purposes of qualifying for the Two-Weapon Rend feat."
     },
     "Outslug Weave": {
         "prerequisites": {
@@ -4723,7 +4723,7 @@
         },
         "Feat": [ "Two-Weapon Fighting", "Outslug Style", "Weapon Focus (with chosen weapon)" ]
         },
-        "benefit": "While using Outslug Style, you don’t take a –2 penalty to your AC when using the Lunge feat. The bonuses to AC and on weapon damage rolls that you gain from Outslug Style increase to +2."
+        "benefit": "While using Outslug Style, you don't take a –2 penalty to your AC when using the Lunge feat. The bonuses to AC and on weapon damage rolls that you gain from Outslug Style increase to +2."
     },
     "Outslug Sprint": {
         "prerequisites": {
@@ -4886,7 +4886,7 @@
         "prerequisites": {
         "BAB": 1
         },
-        "benefit": "When you wield a reach weapon with which you are proficient, allies don’t provide soft cover to opponents you attack with reach."
+        "benefit": "When you wield a reach weapon with which you are proficient, allies don't provide soft cover to opponents you attack with reach."
     },
     "Piercing Grapple": {
         "prerequisites": {
@@ -5223,7 +5223,7 @@
         "Class Feature": "Quivering palm",
         "BAB": 13
         },
-        "benefit": "You can cause either coma, memory loss, or great pain (chosen before the quivering palm’s attack roll is made) to an opponent instead of killing it when you affect it with your quivering palm, as long as you do so within a number of days equal to your monk level."
+        "benefit": "You can cause either coma, memory loss, or great pain (chosen before the quivering palm's attack roll is made) to an opponent instead of killing it when you affect it with your quivering palm, as long as you do so within a number of days equal to your monk level."
     },
     "Ranged Disarm": {
         "prerequisites": {
@@ -5556,9 +5556,9 @@
         "prerequisites": {
         "Feat": "Improved Unarmed Strike"
         },
-        "benefit": "Reduce target’s speed to 5ft."
+        "benefit": "Reduce target's speed to 5ft."
     },
-    "Gorgon’s Fist": {
+    "Gorgon's Fist": {
         "prerequisites": {
         "Feat": "Scorpion Style",
         "BAB": 6
@@ -5570,7 +5570,7 @@
         "Feat": "Combat Expertise",
         "Race": "merfolk"
         },
-        "benefit": "When you make a successful melee attack against a swimming target, as a free action you can attempt to knock the target off balance. Treat this as a trip combat maneuver. If you succeed, the target is considered off balance (see Table: Combat Adjustments Underwater) until it recovers its balance, usually by making a Swim check on its turn. This feat has no effect on creatures with a swim speed, those using magic such as freedom of movement, and creatures that can’t be tripped."
+        "benefit": "When you make a successful melee attack against a swimming target, as a free action you can attempt to knock the target off balance. Treat this as a trip combat maneuver. If you succeed, the target is considered off balance (see Table: Combat Adjustments Underwater) until it recovers its balance, usually by making a Swim check on its turn. This feat has no effect on creatures with a swim speed, those using magic such as freedom of movement, and creatures that can't be tripped."
     },
     "Second Chance": {
         "prerequisites": {
@@ -5602,7 +5602,7 @@
         "prerequisites": {
         "Feat": "Opportune parry and riposte deed"
         },
-        "benefit": "Add foe’s Power Attack damage to your riposte."
+        "benefit": "Add foe's Power Attack damage to your riposte."
     },
     "Serpent Lash": {
         "prerequisites": {
@@ -5736,7 +5736,7 @@
         "Feat": ["Shielded Gauntlet Attack", "Shield Gauntlet Style", "Weapon Focus (gauntlet or spiked gauntlet)"],
         "Proficiency": ["bucklers", "light shields"]
         },
-        "benefit": "While using Shield Gauntlet Style, you no longer lose your shield bonus to AC when you attack with your gauntlet (or spiked gauntlet) or use it to hold a weapon. In addition, you add your gauntlet’s enhancement bonus to the shield bonus to AC granted by this feat as if it were a shield enhancement bonus."
+        "benefit": "While using Shield Gauntlet Style, you no longer lose your shield bonus to AC when you attack with your gauntlet (or spiked gauntlet) or use it to hold a weapon. In addition, you add your gauntlet's enhancement bonus to the shield bonus to AC granted by this feat as if it were a shield enhancement bonus."
     },
     "Cushioning Shield": {
         "prerequisites": {
@@ -5767,7 +5767,7 @@
         ],
         "Skill": {"Sense Motive": 1}
         },
-        "benefit": "You add your shield’s bonus to AC to the DC of feint attempts against you."
+        "benefit": "You add your shield's bonus to AC to the DC of feint attempts against you."
     },
     "Greater Ray Shield": {
         "prerequisites": {
@@ -5784,7 +5784,7 @@
             {"Class": {"Fighter": 4}}
         ]
         },
-        "benefit": "When performing a bull rush or overrun combat maneuver as part of a charge, you don’t provoke an attack of opportunity for that maneuver. If you already have the Improved Bull Rush or Improved Overrun feats, you gain an additional +2 bonus on your combat maneuver check when attempting the respective maneuver."
+        "benefit": "When performing a bull rush or overrun combat maneuver as part of a charge, you don't provoke an attack of opportunity for that maneuver. If you already have the Improved Bull Rush or Improved Overrun feats, you gain an additional +2 bonus on your combat maneuver check when attempting the respective maneuver."
     },
     "Improved Shield Focus (Shield Mastery)": {
         "prerequisites": {
@@ -5802,7 +5802,7 @@
         ],
         "Proficiency": ["light shields", "heavy shields", "tower shields"]
         },
-        "benefit": "You can use a two-handed weapon sized appropriately for you from the polearm or spears weapon group while also using a light, heavy, or tower shield with which you are proficient. The shield’s armor check penalty (if any) applies to attacks made with the weapon."
+        "benefit": "You can use a two-handed weapon sized appropriately for you from the polearm or spears weapon group while also using a light, heavy, or tower shield with which you are proficient. The shield's armor check penalty (if any) applies to attacks made with the weapon."
     },
     "Shielded Mage": {
         "prerequisites": {
@@ -5869,7 +5869,7 @@
         "Additional": ["Shikigami Mimicry", "Shikigami Style"],
         "Skill": {"Use Magic Device": 5}
         },
-        "benefit": "You channel a magic item’s power to enhance its improvised attacks, even though it was never meant to be used as a weapon."
+        "benefit": "You channel a magic item's power to enhance its improvised attacks, even though it was never meant to be used as a weapon."
     },
     "Sprightly Armor": {
         "prerequisites": {
@@ -5881,7 +5881,7 @@
         "Special": "armor training class feature",
         "Proficiency": "light armor"
         },
-        "benefit": "You add your armor’s enhancement bonus as a bonus on your initiative checks."
+        "benefit": "You add your armor's enhancement bonus as a bonus on your initiative checks."
     },
     "Stumbling Bash": {
         "prerequisites": {
@@ -5922,7 +5922,7 @@
         ],
         "Proficiency": "bucklers"
         },
-        "benefit": "You still gain a buckler’s bonus to AC even if you use your shield hand for some other purpose. When you wield a buckler, your shield hand is considered free for the purposes of casting spells, wielding weapons, and using any other abilities that require you to have a free hand or interact with your shield, such as the swashbuckler’s precise strike deed or the Weapon Finesse feat."
+        "benefit": "You still gain a buckler's bonus to AC even if you use your shield hand for some other purpose. When you wield a buckler, your shield hand is considered free for the purposes of casting spells, wielding weapons, and using any other abilities that require you to have a free hand or interact with your shield, such as the swashbuckler's precise strike deed or the Weapon Finesse feat."
     },
     "Shot on the Run": {
         "prerequisites": {
@@ -6039,7 +6039,7 @@
         },
         "benefit": "Treat a slashing weapon as a piercing melee weapon"
     },
-    "Slayer’s Feint": {
+    "Slayer's Feint": {
         "prerequisites": {
         "Stat": {"DEX": 15},
         "Feat": ["Acrobatic or slayer 1", "Combat Expertise"],
@@ -6091,7 +6091,7 @@
         "Stat": {"STR": 13},
         "Feat": ["Improved Sunder", "Smashing Style", "Weapon Focus (chosen weapon)"]
         },
-        "benefit": "While using Smashing Style, reduce an object’s hardness by 1 when you successfully damage it with a sunder combat maneuver."
+        "benefit": "While using Smashing Style, reduce an object's hardness by 1 when you successfully damage it with a sunder combat maneuver."
     },
     "Smashing Dent": {
         "prerequisites": {
@@ -6099,7 +6099,7 @@
         "Feat": ["Improved Sunder", "Smashing Crush", "Smashing Style", "Weapon Focus (chosen weapon)"],
         "BAB": 6
         },
-        "benefit": "While using Smashing Style, reduce a suit of armor’s armor bonus to Armor Class by 1 and increase its armor check penalty by 1 when you damage it with a sunder combat maneuver."
+        "benefit": "While using Smashing Style, reduce a suit of armor's armor bonus to Armor Class by 1 and increase its armor check penalty by 1 when you damage it with a sunder combat maneuver."
     },
     "Smiting Reversal": {
         "prerequisites": {
@@ -6166,7 +6166,7 @@
         "Feat": "Vital Strike",
         "BAB": 6
         },
-        "benefit": "Whenever you use the attack action against a creature that is possessed, both the creature and any creature possessing it are damaged by your attack (the amount of damage includes your weapon’s damage dice, your Strength modifier, weapon special abilities, and so on). The possessing creature can attempt a Will save (DC = 10 + 1/2 your base attack bonus + your Charisma modifier) to halve the damage. Damage Reduction applies normally against this attack, but incorporeal creatures take full damage from this attack as if they were corporeal."
+        "benefit": "Whenever you use the attack action against a creature that is possessed, both the creature and any creature possessing it are damaged by your attack (the amount of damage includes your weapon's damage dice, your Strength modifier, weapon special abilities, and so on). The possessing creature can attempt a Will save (DC = 10 + 1/2 your base attack bonus + your Charisma modifier) to halve the damage. Damage Reduction applies normally against this attack, but incorporeal creatures take full damage from this attack as if they were corporeal."
     },
     "Spear Dancing Style": {
         "prerequisites": {
@@ -6187,7 +6187,7 @@
         "Stat": {"DEX": 17},
         "Feat": ["Spear Dancing Spiral", "Spear Dancing Style", "Two-Weapon Fighting", "Weapon Finesse", "Weapon Focus (chosen weapon)"]
         },
-        "benefit": "While using Spear Dancing Style and making a full attack using the chosen weapon as a double weapon, you can grant the reach special weapon feature to one or both of the weapon’s ends until the end of your turn as a swift action."
+        "benefit": "While using Spear Dancing Style and making a full attack using the chosen weapon as a double weapon, you can grant the reach special weapon feature to one or both of the weapon's ends until the end of your turn as a swift action."
     },
     "Spellbreaker": {
         "prerequisites": {
@@ -6371,7 +6371,7 @@
         "prerequisites": {
         "Special": "Pistol-whip gunslinger deed"
         },
-        "benefit": "Your fighting technique makes you equally deadly with your firearm’s stock as with its bullets."
+        "benefit": "Your fighting technique makes you equally deadly with your firearm's stock as with its bullets."
     },
     "Stock-Striker Sweep": {
         "prerequisites": {
@@ -6508,7 +6508,7 @@
         "Feat": ["Far Shot", "Point-Blank Shot", "Precise Shot"],
         "Special": "keen senses racial trait"
         },
-        "benefit": "When you damage a target with a ranged attack, it can’t make attacks of opportunity against allies who have this feat"
+        "benefit": "When you damage a target with a ranged attack, it can't make attacks of opportunity against allies who have this feat"
     },
     "Surprise Follow-Through": {
         "prerequisites": {
@@ -6528,7 +6528,7 @@
     },
     "Swap Places": {
         "prerequisites": {},
-        "benefit": "Whenever you are adjacent to an ally who also has this feat, you can move into your ally’s square as part of normal movement. At the same time, your ally moves into your previous space as an immediate action. Both you and your ally must be willing and able to move to take advantage of this feat. Your ally must be the same size as you to utilize this feat. Your ally does not provoke an AOO from this movement, but you provoke as normal. This movement does not count against your ally’s movement on his next turn."
+        "benefit": "Whenever you are adjacent to an ally who also has this feat, you can move into your ally's square as part of normal movement. At the same time, your ally moves into your previous space as an immediate action. Both you and your ally must be willing and able to move to take advantage of this feat. Your ally must be the same size as you to utilize this feat. Your ally does not provoke an AOO from this movement, but you provoke as normal. This movement does not count against your ally's movement on his next turn."
     },
     "Sweeping Dodge": {
         "prerequisites": {
@@ -6550,7 +6550,7 @@
         "Feat": "Swift Iron Style",
         "Proficiency": "medium armor"
         },
-        "benefit": "Once per day when using Swift Iron Style, when you’re hit by a weapon, unarmed attack, or natural weapon, you can treat all dice other than the weapon’s base damage dice (including extra dice from sneak attack, critical hit, magic special weapon abilities, and Vital Strike) as having rolled 1s. You can use this ability a second time per day when your BAB reaches +8, and a third time at +16."
+        "benefit": "Once per day when using Swift Iron Style, when you're hit by a weapon, unarmed attack, or natural weapon, you can treat all dice other than the weapon's base damage dice (including extra dice from sneak attack, critical hit, magic special weapon abilities, and Vital Strike) as having rolled 1s. You can use this ability a second time per day when your BAB reaches +8, and a third time at +16."
     },
     "Swift Sprint": {
         "prerequisites": {
@@ -6558,7 +6558,7 @@
         "Feat": ["Swift Iron Style", "Swift Refuge"],
         "Proficiency": "medium armor"
         },
-        "benefit": "When you’re charging, running, or taking no action in your turn other than movement, your armor does not reduce your movement."
+        "benefit": "When you're charging, running, or taking no action in your turn other than movement, your armor does not reduce your movement."
     },
     "Sword And Pistol": {
         "prerequisites": {
@@ -6586,7 +6586,7 @@
         "Feat": ["Combat Expertise", "Improved Feint", "Swordplay Style", "Swordplay Upset", "Weapon Focus (chosen weapon)"],
         "BAB": 7
         },
-        "benefit": "While using Swordplay Style, when you make one or more melee attacks, you can forgo a single melee attack to prepare an action to attempt to disrupt an opponent’s attack. If you succeed, you gain a +4 shield bonus to your Armor Class against attacks made by your opponent until the start of your next turn."
+        "benefit": "While using Swordplay Style, when you make one or more melee attacks, you can forgo a single melee attack to prepare an action to attempt to disrupt an opponent's attack. If you succeed, you gain a +4 shield bonus to your Armor Class against attacks made by your opponent until the start of your next turn."
     },
     "Sympathetic Rage": {
         "prerequisites": {
@@ -6623,7 +6623,7 @@
         "Race": "Goblin",
         "Size": "Small or smaller"
         },
-        "benefit": "When you successfully make an Acrobatics check to avoid provoking an AOO from a larger opponent when you move through its threatened area or its space, you can make that opponent lose its balance until the end of its next turn as a free action. While that creature’s balance is lost, if it attempts to move, it must make a successful DC 15 Acrobatics check or fall prone, wasting the move action. You can only affect one creature with this effect each round."
+        "benefit": "When you successfully make an Acrobatics check to avoid provoking an AOO from a larger opponent when you move through its threatened area or its space, you can make that opponent lose its balance until the end of its next turn as a free action. While that creature's balance is lost, if it attempts to move, it must make a successful DC 15 Acrobatics check or fall prone, wasting the move action. You can only affect one creature with this effect each round."
     },
     "Tantrum": {
         "prerequisites": {
@@ -6735,7 +6735,7 @@
         "Skill": {"Acrobatics": 1},
         "Race": "Vanara"
         },
-        "benefit": "You gain a +2 bonus to your CMD against all trip attacks. If your square has a branch or other sturdy large object that you could hang from, as a swift action you may make a DC 15 Acrobatics check to jump upward and use your tail to hang from that object. While hanging, you can’t be tripped, you ignore the effects of difficult terrain in your square, and you gain a +2 bonus to your CMD against bull rush, drag, and reposition attacks. If you leave that square (including if you are moved against your will), you lose your grip on the object and are no longer hanging. While hanging, you cannot use your tail for anything else."
+        "benefit": "You gain a +2 bonus to your CMD against all trip attacks. If your square has a branch or other sturdy large object that you could hang from, as a swift action you may make a DC 15 Acrobatics check to jump upward and use your tail to hang from that object. While hanging, you can't be tripped, you ignore the effects of difficult terrain in your square, and you gain a +2 bonus to your CMD against bull rush, drag, and reposition attacks. If you leave that square (including if you are moved against your will), you lose your grip on the object and are no longer hanging. While hanging, you cannot use your tail for anything else."
     },
     "Trick Riding": {
         "prerequisites": {
@@ -6871,7 +6871,7 @@
             {"Feat": "Starry Grace"}
         ]
         },
-        "benefit": "You can gain the benefit of the Fencing Grace, Slashing Grace, or Starry Grace feats while fighting with two weapons. Your penalties from two-weapon fighting increase by 2 on all attack rolls you make when doing so, and you can’t decrease the penalties to less than –2 even if other abilities would reduce the penalties further. Add 1/2 your Dexterity bonus to damage with your off-hand weapon instead of 1/2 your Strength modifier. If you attack without using your off-hand weapon, you can use the aforementioned feats despite your other hand being occupied. In addition, Two-Weapon Grace counts as Double Slice for the purposes of qualifying for the Two-Weapon Rend feat."
+        "benefit": "You can gain the benefit of the Fencing Grace, Slashing Grace, or Starry Grace feats while fighting with two weapons. Your penalties from two-weapon fighting increase by 2 on all attack rolls you make when doing so, and you can't decrease the penalties to less than –2 even if other abilities would reduce the penalties further. Add 1/2 your Dexterity bonus to damage with your off-hand weapon instead of 1/2 your Strength modifier. If you attack without using your off-hand weapon, you can use the aforementioned feats despite your other hand being occupied. In addition, Two-Weapon Grace counts as Double Slice for the purposes of qualifying for the Two-Weapon Rend feat."
     },
     "Two-Weapon Rend": {
         "prerequisites": {
@@ -6961,7 +6961,7 @@
         ],
         "Special": "proficiency with bucklers"
         },
-        "benefit": "While using Upsetting Shield Style, the penalty on attack rolls foes take for being hit by your shield bash attack applies to their attacks against any target. If an adjacent foe taking this penalty makes an attack roll against any target and misses the target’s AC by 5 or more, that foe provokes an AOO from you. You can only make one AOO against an opponent as a result of this feat or Upsetting Strike each round."
+        "benefit": "While using Upsetting Shield Style, the penalty on attack rolls foes take for being hit by your shield bash attack applies to their attacks against any target. If an adjacent foe taking this penalty makes an attack roll against any target and misses the target's AC by 5 or more, that foe provokes an AOO from you. You can only make one AOO against an opponent as a result of this feat or Upsetting Strike each round."
     },
     "Vanguard Style": {
         "prerequisites": {
@@ -6971,7 +6971,7 @@
         ],
         "Special": "proficiency with light or heavy shields"
         },
-        "benefit": "While using this style, when an adjacent ally is required to make a Reflex saving throw, you can expend a use of an AOO to attempt the aid another action to improve your ally’s Reflex save. Your ally gains a +2 bonus to all Reflex saves while adjacent to you until the beginning of your next turn."
+        "benefit": "While using this style, when an adjacent ally is required to make a Reflex saving throw, you can expend a use of an AOO to attempt the aid another action to improve your ally's Reflex save. Your ally gains a +2 bonus to all Reflex saves while adjacent to you until the beginning of your next turn."
     },
     "Vanguard Hustle": {
         "prerequisites": {
@@ -6989,7 +6989,7 @@
         ],
         "Special": "proficiency with light or heavy shields"
         },
-        "benefit": "Add half of your shield’s enhancement bonus to the shield bonus to AC that you grant to an ally using the Saving Shield feat. While using Vanguard Style, whenever you increase your threatened area with Combat Patrol, your ward retains the bonuses of Vanguard Style as long as he remains within your threatened area, and you can use Bodyguard, Saving Shield, and Vanguard Style whenever an ally that is within this threatened area is the target of an attack."
+        "benefit": "Add half of your shield's enhancement bonus to the shield bonus to AC that you grant to an ally using the Saving Shield feat. While using Vanguard Style, whenever you increase your threatened area with Combat Patrol, your ward retains the bonuses of Vanguard Style as long as he remains within your threatened area, and you can use Bodyguard, Saving Shield, and Vanguard Style whenever an ally that is within this threatened area is the target of an attack."
     },
     "Vanguard Ward": {
         "prerequisites": {
@@ -7083,7 +7083,7 @@
         ],
         "Special": "proficient with the selected weapon"
         },
-        "benefit": "As a standard action, you can make a ranged touch attack using a ranged weapon with which you have Weapon Focus. If successful, instead of dealing damage or applying any other effects of the attack, you may attempt an Intimidate check to demoralize the target as a free action. The target doesn’t need to be within 30 feet, nor does it need to be able to see or hear you."
+        "benefit": "As a standard action, you can make a ranged touch attack using a ranged weapon with which you have Weapon Focus. If successful, instead of dealing damage or applying any other effects of the attack, you may attempt an Intimidate check to demoralize the target as a free action. The target doesn't need to be within 30 feet, nor does it need to be able to see or hear you."
     },
     "Wave Strike": {
         "prerequisites": {
@@ -7123,7 +7123,7 @@
     },
     "Weapon of the Chosen": {
         "prerequisites": {
-        "Feat": "Weapon Focus with deity’s favored weapon",
+        "Feat": "Weapon Focus with deity's favored weapon",
         "Special": "worship and receive spells from a deity"
         },
         "benefit": "As a swift action, your first attack with the weapon counts as magical"
@@ -7163,7 +7163,7 @@
         "Feat": "Weapon Focus",
         "BAB": 1
         },
-        "benefit": "When wielding a weapon with which you have Weapon Focus, you can shift your grip as a swift action so that your weapon deals bludgeoning, piercing, or slashing damage instead of the damage type normally dealt by that weapon. You may switch back to the weapon’s normal damage type or another damage type as a swift action."
+        "benefit": "When wielding a weapon with which you have Weapon Focus, you can shift your grip as a swift action so that your weapon deals bludgeoning, piercing, or slashing damage instead of the damage type normally dealt by that weapon. You may switch back to the weapon's normal damage type or another damage type as a swift action."
     },
     "Weathered Warrior": {
         "prerequisites": {
@@ -7274,7 +7274,7 @@
         },
         "benefit": "Gain 20% concealment if you move"
     },
-    "Winter’s Strike": {
+    "Winter's Strike": {
         "prerequisites": {
         "OR": [
             {
