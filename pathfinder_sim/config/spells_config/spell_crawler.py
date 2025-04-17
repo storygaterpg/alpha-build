@@ -227,11 +227,11 @@ def crawl_spell(spell_name: str) -> dict:
     Crawl a single spell page using the provided spell name.
     """
     url = build_spell_url(spell_name)
-    print(f"Crawling {spell_name} from {url}")
+    # print(f"Crawling {spell_name} from {url}")
     html = fetch_spell_page(url)
     if html:
         spell_data = parse_spell_page(html)
-        print(f"Extracted spell: {spell_data['name']}")
+        # print(f"Extracted spell: {spell_data['name']}")
         return spell_data
     else:
         print(f"Failed to fetch spell: {spell_name}")
@@ -264,13 +264,13 @@ def main():
         spells_in_level = sw_spell_list[level]
         for spell_name in spells_in_level:
             if spell_name.lower() in existing_spell_names:
-                print(f"Spell '{spell_name}' already exists. Skipping.")
+                # print(f"Spell '{spell_name}' already exists. Skipping.")
                 continue
             new_spell = crawl_spell(spell_name)
             if new_spell:
                 existing_spells.append(new_spell)
                 existing_spell_names.add(spell_name.lower())
-            time.sleep(2)  # Delay between requests
+            time.sleep(1)  # Delay between requests
     
     # Write the updated spells list back to spells.json.
     with open(spells_json_path, "w") as f:
