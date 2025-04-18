@@ -20,6 +20,22 @@ schema_path = os.path.join(os.path.dirname(__file__), "spell_schema.json")
 with open(schema_path, "r") as schema_file:
     SPELL_SCHEMA = json.load(schema_file)
 
+# Exceptions mapping for known misspellings or special cases
+EXCEPTIONS = {
+    "speechreader's sight": "speechreaders-sight",
+    "bestow planar infusion i": "bestow-planar-infusion-i",
+    "guardian monument, lesser": "guardian-monument-lesser",
+    "guardian monument, greater": "guardian-monument-lesser",
+    "damnation stride": "damnation-strike",
+    "spellbane": "aroden-s-spellbane",
+}
+
+# Some slugs actually live under the wrong letter directory on the wiki:
+PREFIX_OVERRIDES = {
+    "aroden-s-spellbane": "s",
+}
+
+
 def clean_spell_name(name: str) -> str:
     """
     Clean the spell name for URL generation by:
@@ -47,9 +63,10 @@ def clean_spell_name(name: str) -> str:
 def slugify(name: str) -> str:
     """
     Convert a spell name to a URL-friendly slug.
-    First, clean the spell name, then replace apostrophes and forward slashes with hyphens,
-    lowercase the text, replace spaces with hyphens, and remove any remaining unwanted punctuation.
     """
+    key = name.lower()
+    if key in EXCEPTIONS:
+        return EXCEPTIONS[key]
     cleaned = clean_spell_name(name)
     # Replace apostrophes and forward slashes with hyphens.
     cleaned = cleaned.replace("'", "-").replace("/", "-")
@@ -59,10 +76,13 @@ def slugify(name: str) -> str:
 
 def build_spell_url(spell_name: str) -> str:
     """
-    Construct the URL for a given spell using the first letter of the cleaned slug.
+    Construct the URL for a given spell.
+    Applies any slug exceptions, then picks the correct first‐letter folder
+    (overridden for known mis‑filed pages).
     """
     slug = slugify(spell_name)
-    first_letter = slug[0] if slug else ""
+    # override the directory letter if needed
+    first_letter = PREFIX_OVERRIDES.get(slug, slug[0] if slug else "")
     return f"{BASE_URL}{first_letter}/{slug}/"
 
 def fetch_spell_page(url: str) -> str:
@@ -168,18 +188,22 @@ def parse_spell_page(html: str) -> dict:
     """
     soup = BeautifulSoup(html, "html.parser")
     h1 = soup.find("h1")
-    name = extract_text_from_element(h1) if h1 else "Unknown Spell"
-    
+    raw_name = extract_text_from_element(h1) if h1 else ""
+
     content_data = parse_article_content(soup)
-    
+
     spell = {
-        "id": slugify(name),
-        "name": name,
+        # 'name' will be overridden to match the original list entry
+        "name": raw_name,
         "school": content_data.get("school", ""),
         "subschool": "",
         "spell_level": {},   # To be filled from the 'level' field.
         "casting_time": content_data.get("casting_time", ""),
-        "components": [comp.strip() for comp in content_data.get("components", "").split(",") if comp.strip()],
+        "components": [
+            comp.strip()
+            for comp in content_data.get("components", "").split(",")
+            if comp.strip()
+        ],
         "range": content_data.get("range", ""),
         "area_or_target": content_data.get("area_or_target", ""),
         "area_shape": "",
@@ -198,40 +222,42 @@ def parse_spell_page(html: str) -> dict:
         "scaling": {},
         "spell_type": "damage"
     }
-    # Process the 'level' field to build a mapping.
-    level_str = content_data.get("level", "")
-    level_mapping = {}
-    if level_str:
-        parts = re.split(r"[,;]", level_str)
-        for part in parts:
-            part = part.strip()
-            match = re.search(r"([\w/]+)\s+(\d+)", part, re.IGNORECASE)
-            if match:
-                classes = match.group(1).split("/")
-                lvl = int(match.group(2))
-                for cls in classes:
-                    cls_name = cls.strip()
-                    if cls_name:
-                        level_mapping[cls_name] = lvl
-    spell["spell_level"] = level_mapping
 
+    # Build the class→level mapping from the 'level' text
+    level_str = content_data.get("level", "")
+    if level_str:
+        for part in re.split(r"[,;]", level_str):
+            part = part.strip()
+            m = re.search(r"([\w/]+)\s+(\d+)", part, re.IGNORECASE)
+            if m:
+                classes, lvl = m.group(1), int(m.group(2))
+                for cls in classes.split("/"):
+                    cls = cls.strip()
+                    if cls:
+                        spell["spell_level"][cls] = lvl
+
+    # Add temporary 'id' for schema validation, then remove it
+    temp_id = slugify(raw_name)
+    spell["id"] = temp_id
     try:
         jsonschema.validate(instance=spell, schema=SPELL_SCHEMA)
     except jsonschema.ValidationError as ve:
-        print(f"Validation error for spell '{name}': {ve.message}")
-    
+        print(f"Validation error for spell '{spell['name']}': {ve.message}")
+    del spell["id"]
+
     return spell
 
 def crawl_spell(spell_name: str) -> dict:
     """
     Crawl a single spell page using the provided spell name.
+    Keeps the name exactly as in the spell list and omits any 'id' field.
     """
     url = build_spell_url(spell_name)
-    # print(f"Crawling {spell_name} from {url}")
     html = fetch_spell_page(url)
     if html:
         spell_data = parse_spell_page(html)
-        # print(f"Extracted spell: {spell_data['name']}")
+        # Override the parsed name with the exact list entry
+        spell_data["name"] = spell_name
         return spell_data
     else:
         print(f"Failed to fetch spell: {spell_name}")
