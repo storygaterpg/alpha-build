@@ -1,0 +1,162 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Spell",
+  "description": "A schema for defining spells in the Pathfinder 1e simulation.",
+  "type": "object",
+  "required": [
+    "name",
+    "school",
+    "spell_level",
+    "casting_time",
+    "components",
+    "range",
+    "duration",
+    "saving_throw",
+    "spell_resistance",
+    "description"
+  ],
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "The name of the spell."
+    },
+    "school": {
+      "type": "string",
+      "description": "The school of magic (e.g., Evocation, Abjuration)."
+    },
+    "subschool": {
+      "type": "string",
+      "description": "Optional subschool of magic if applicable.",
+      "default": ""
+    },
+    "spell_level": {
+      "type": "object",
+      "description": "Mapping from class names to the spell level (e.g., {\"Wizard\":3, \"Cleric\":2}).",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "casting_time": {
+      "type": "string",
+      "description": "Time to cast the spell (e.g., '1 standard action')."
+    },
+    "components": {
+      "type": "array",
+      "description": "List of components required (e.g., ['V','S','M']).",
+      "items": { "type": "string" }
+    },
+    "range": {
+      "type": "string",
+      "description": "Effective range (e.g., 'Long (100 ft. + 10 ft./level)')."
+    },
+    "area_or_target": {
+      "type": "string",
+      "description": "Area or target spec (e.g., '20-ft. radius spread').",
+      "default": ""
+    },
+    "area_shape": {
+      "type": "string",
+      "description": "Shape of area effect (e.g., 'burst','cone').",
+      "default": ""
+    },
+    "duration": {
+      "type": "string",
+      "description": "Duration of the spell (e.g., '1 round/level')."
+    },
+    "dismissible": {
+      "type": "boolean",
+      "description": "Whether the caster can dismiss the spell.",
+      "default": false
+    },
+    "requires_concentration": {
+      "type": "boolean",
+      "description": "Whether the spell requires ongoing concentration.",
+      "default": false
+    },
+    "saving_throw": {
+      "type": "string",
+      "description": "Saving throw (e.g., 'Will negates', 'None')."
+    },
+    "spell_resistance": {
+      "type": "string",
+      "description": "Whether subject to spell resistance ('Yes' or 'No')."
+    },
+    "arcane_spell_failure": {
+      "type": "number",
+      "description": "Chance of arcane spell failure (percent).",
+      "default": 0
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the spell's effects."
+    },
+    "material_components": {
+      "type": "string",
+      "description": "Material components required, including cost.",
+      "default": ""
+    },
+    "additional_effects": {
+      "type": "string",
+      "description": "Extra effects or notes (e.g., special mechanics).",
+      "default": ""
+    },
+    "bonus_effects": {
+      "type": "array",
+      "description": "List of bonus effects ({stat, bonus, bonus_type}).",
+      "items": {
+        "type": "object",
+        "required": ["stat","bonus","bonus_type"],
+        "properties": {
+          "stat": { "type": "string" },
+          "bonus": { "type": "number" },
+          "bonus_type": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "conditions_applied": {
+      "type": "array",
+      "description": "List of conditions ({condition, duration, save}).",
+      "items": {
+        "type": "object",
+        "required": ["condition"],
+        "properties": {
+          "condition": { "type": "string" },
+          "duration": { "type": "string" },
+          "save": { "type": "string" }
+        }
+      },
+      "default": []
+    },
+    "special_mechanics": {
+      "type": "object",
+      "description": "Spell-specific mechanics (e.g., teleportation data).",
+      "default": {}
+    },
+    "scaling": {
+      "type": "object",
+      "description": "How the spell scales with caster level.",
+      "default": {}
+    },
+    "spell_type": {
+      "type": "string",
+      "description": "Primary effect type (e.g., 'damage','buff','summoning').",
+      "default": "damage"
+    },
+    "creatures": {
+      "type": "array",
+      "description": "For summoning spells: list of creatures available to summon.",
+      "items": {
+        "type": "object",
+        "required": ["name","url","subtype","source"],
+        "properties": {
+          "name": { "type": "string" },
+          "url": { "type": ["string","null"] },
+          "subtype": { "type": "string" },
+          "source": { "type": "string" }
+        }
+      }
+    }
+  },
+  "additionalProperties": false
+}
