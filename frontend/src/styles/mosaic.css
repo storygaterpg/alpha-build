@@ -1,0 +1,182 @@
+/* Mosaic Layout Styling */
+
+/* Base mosaic container */
+.mosaic-container {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: var(--spacing-md);
+  background-color: var(--background-color);
+}
+
+/* Layout controls */
+.layout-controls {
+  position: absolute;
+  top: var(--spacing-sm);
+  right: var(--spacing-md);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  padding: var(--spacing-xs);
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: var(--border-radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Style for mosaic windows */
+.mosaic-window {
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-md);
+  background-color: var(--surface-color);
+  overflow: hidden;
+}
+
+/* Window title bar */
+.mosaic-window-toolbar {
+  background-color: var(--primary-color);
+  color: white;
+  height: auto;
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+.mosaic-window-title {
+  font-size: var(--font-size-md);
+  font-weight: var(--font-weight-medium);
+}
+
+.mosaic-window-controls {
+  margin-right: var(--spacing-xs);
+}
+
+/* Window body */
+.mosaic-window-body {
+  display: flex;
+  flex: 1;
+  width: auto;
+  height: 100%;
+  padding: var(--spacing-md);
+  overflow: hidden;
+}
+
+/* Tile content */
+.tile-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* Splitter styling */
+.mosaic-split {
+  background-color: var(--divider-color);
+}
+
+.mosaic-split:hover {
+  background-color: var(--primary-light);
+}
+
+/* Dragging overlay */
+.mosaic-drop-target {
+  background-color: rgba(0, 0, 0, 0.2);
+  border: 2px dashed var(--primary-color);
+}
+
+/* Tile types specific styling */
+.map-panel,
+.chat-panel,
+.log-panel,
+.action-bar,
+.turn-indicator,
+.character-sheet,
+.video-grid {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  width: auto;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--border-radius-md);
+  padding: var(--spacing-md);
+}
+
+/* Panel headers */
+.panel-header {
+  margin-bottom: var(--spacing-sm);
+  font-size: var(--font-size-xl);
+  font-weight: var(--font-weight-bold);
+}
+
+/* Scrollable content areas */
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--spacing-sm);
+  background-color: rgba(0, 0, 0, 0.03);
+  border-radius: var(--border-radius-sm);
+}
+
+/* Card styling for panel sections */
+.panel-card {
+  background-color: var(--surface-color);
+  border-radius: var(--border-radius-sm);
+  padding: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Phaser container */
+.phaser-container {
+  width: 100%;
+  height: 100%;
+  border-radius: var(--border-radius-sm);
+  overflow: hidden;
+}
+
+/* Chat and log message styling */
+.message-list,
+.log-messages {
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-message,
+.log-entry {
+  margin-bottom: var(--spacing-xs);
+  font-size: var(--font-size-sm);
+}
+
+/* Status rows in turn indicator */
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-sm);
+}
+
+.initiative-list {
+  margin-top: var(--spacing-md);
+}
+
+.tag-container {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: var(--spacing-xs);
+}
+
+/* Action buttons container */
+.action-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+/* Game page */
+.game-page {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+} 
