@@ -42,6 +42,12 @@ const GlobalStyles = () => {
         background-color: transparent !important;
         border: none !important;
         cursor: move;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto !important;
+        z-index: 10;
       }
 
       .mosaic-window-body {
@@ -51,8 +57,9 @@ const GlobalStyles = () => {
 
       /* Adjustment for mini header windows */
       .mosaic-window-mini-header .mosaic-window-body {
-        top: 10px !important;
+        top: 0 !important;
         height: calc(100% - 10px) !important;
+        bottom: 10px !important;
       }
 
       /* Remove all outlines */
