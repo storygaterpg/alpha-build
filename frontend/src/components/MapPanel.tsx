@@ -108,7 +108,7 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
   }, []);
 
   return (
-    <div className="map-panel">
+    <div className="map-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div 
         id="phaser-game" 
         ref={gameContainerRef} 

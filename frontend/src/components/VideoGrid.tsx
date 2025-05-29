@@ -368,7 +368,12 @@ const VideoGrid: React.FC = () => {
   };
 
   return (
-    <div className="video-grid glass-panel">
+    <div className="video-grid" style={{ 
+      height: '100%',
+      display: 'flex', 
+      flexDirection: 'column',
+      overflow: 'hidden'
+    }}>
       {isLayoutExpanded && (
         <div style={{ 
           position: 'absolute',

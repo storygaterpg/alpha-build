@@ -181,7 +181,7 @@ const ChatPanel: React.FC = () => {
   };
 
   return (
-    <div className="chat-panel">
+    <div className="chat-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <div 
         className="scrollable-content message-list" 
         ref={messageListRef}
@@ -192,7 +192,8 @@ const ChatPanel: React.FC = () => {
           overflowY: 'auto',
           display: 'flex',
           flexDirection: 'column',
-          gap: '8px'
+          gap: '8px',
+          flex: 1
         }}
       >
         {messages.length === 0 ? (

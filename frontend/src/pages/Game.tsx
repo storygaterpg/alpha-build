@@ -232,7 +232,12 @@ const Game: React.FC = () => {
                 toolbarControls={getToolbarControls(id)}
                 draggable={true}
                 renderPreview={() => <div />} // Empty preview to avoid outline issues
-                className="no-outline-window" // Add specific class for targeting
+                className="no-outline-window mosaic-window-mini-header" // Use mini header instead of no header
+                renderToolbar={() => (
+                  <div className="mini-toolbar">
+                    <div className="drag-handle" />
+                  </div>
+                )} // Mini toolbar with drag handle
               >
                 {renderTileContent(id)}
               </MosaicWindow>

@@ -284,6 +284,24 @@ body {
   outline: none !important;
 }
 
+/* Headerless mosaic window styles */
+.headerless-mosaic-window .mosaic-window-toolbar {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.headerless-mosaic-window .mosaic-window-body {
+  height: 100% !important;
+  top: 0 !important;
+}
+
+.headerless-mosaic-window .empty-toolbar {
+  display: none;
+}
+
 /* Target blue outlines specifically */
 .glass-mosaic *:focus,
 .glass-mosaic *:focus-visible,
@@ -344,6 +362,44 @@ body {
 .glass-mosaic .mosaic-window-title {
   color: var(--glass-text-primary);
   font-weight: 500;
+}
+
+/* Mini header styling for draggable mosaic windows */
+.mosaic-window-mini-header .mosaic-window-toolbar {
+  display: flex !important;
+  height: 10px !important;
+  min-height: 10px !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+  border: none !important;
+  cursor: move;
+}
+
+.mini-toolbar {
+  width: 100%;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mini-toolbar .drag-handle {
+  width: 30px;
+  height: 4px;
+  background-color: var(--glass-border);
+  border-radius: 2px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.mosaic-window-mini-header:hover .drag-handle {
+  opacity: 1;
+  background-color: var(--glass-primary);
+}
+
+.mosaic-window-mini-header .mosaic-window-body {
+  height: calc(100% - 10px) !important;
+  top: 10px !important;
 }
 
 /* Mosaic drop target */

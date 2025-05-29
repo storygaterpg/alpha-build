@@ -30,8 +30,13 @@ const LogView: React.FC = () => {
   };
 
   return (
-    <div className="log-panel">
-      <div className="scrollable-content log-messages" style={{ padding: '16px', height: '100%' }}>
+    <div className="log-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div className="scrollable-content log-messages" style={{ 
+        padding: '16px', 
+        height: '100%',
+        flex: 1,
+        overflowY: 'auto' 
+      }}>
         {logs.length === 0 ? (
           <p><em>No game events recorded yet.</em></p>
         ) : (
