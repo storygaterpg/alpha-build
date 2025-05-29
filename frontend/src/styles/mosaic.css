@@ -68,19 +68,39 @@
   overflow: hidden;
 }
 
-/* Splitter styling */
+/* Splitter styling - improved for better usability */
 .mosaic-split {
   background-color: var(--divider-color);
+  transition: background-color 0.2s ease;
+  z-index: 10;
 }
 
 .mosaic-split:hover {
   background-color: var(--primary-light);
 }
 
+.mosaic-split-line {
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Make split bars more grabbable */
+.mosaic-split.mosaic-split-row {
+  width: 6px !important;
+  margin: 0 -3px;
+  cursor: col-resize !important;
+}
+
+.mosaic-split.mosaic-split-column {
+  height: 6px !important;
+  margin: -3px 0;
+  cursor: row-resize !important;
+}
+
 /* Dragging overlay */
 .mosaic-drop-target {
   background-color: rgba(0, 0, 0, 0.2);
   border: 2px dashed var(--primary-color);
+  z-index: 11;
 }
 
 /* Tile types specific styling */

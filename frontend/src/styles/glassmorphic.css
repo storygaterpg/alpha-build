@@ -284,12 +284,26 @@ body {
   padding: 0;
 }
 
+/* Enhanced split bars for better resizing */
 .glass-mosaic .mosaic-split {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.15);
+  z-index: 10;
+  transition: background 0.2s ease;
 }
 
 .glass-mosaic .mosaic-split:hover {
-  background: rgba(67, 97, 238, 0.4);
+  background: rgba(67, 97, 238, 0.6);
+  cursor: col-resize;
+}
+
+.glass-mosaic .mosaic-split.mosaic-split-column {
+  height: 6px !important;
+  cursor: row-resize;
+}
+
+.glass-mosaic .mosaic-split.mosaic-split-row {
+  width: 6px !important;
+  cursor: col-resize;
 }
 
 /* Mosaic window title */
@@ -302,6 +316,18 @@ body {
 .glass-mosaic .mosaic-drop-target {
   background: rgba(67, 97, 238, 0.2);
   border: 2px dashed var(--glass-primary);
+}
+
+/* Zero state view */
+.glass-mosaic .zero-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--glass-text-secondary);
+  font-size: 1.2rem;
+  background: rgba(29, 31, 58, 0.3);
+  border-radius: var(--glass-border-radius);
 }
 
 /* Card styled elements */

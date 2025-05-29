@@ -1,9 +1,19 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { Intent, ButtonGroup, Button } from '@blueprintjs/core';
+import { Mosaic, MosaicWindow, MosaicNode } from 'react-mosaic-component';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
 import { RootState } from '../store';
 import { moveActor, addActor, removeActor, updateActor } from '../store/slices/gameSlice';
-import { resetLayout, PRESET_LAYOUTS, applyPresetLayout, LayoutPresetId } from '../store/slices/settingsSlice';
+import { 
+  resetLayout, 
+  PRESET_LAYOUTS, 
+  applyPresetLayout, 
+  LayoutPresetId, 
+  ViewId,
+  updateLayout
+} from '../store/slices/settingsSlice';
 import { websocketClient } from '../network';
 import { Game as PhaserGame } from '../phaser/game';
 import { Position, Actor, Item } from '../store/types';
@@ -35,15 +45,27 @@ const safeShowToast = (props: any) => {
   }
 };
 
+/**
+ * Game component - Main game interface
+ */
 const Game: React.FC = () => {
   const dispatch = useDispatch();
   const player = useSelector((state: RootState) => state.game.player);
   const actors = useSelector((state: RootState) => state.game.actors);
+  const currentLayout = useSelector((state: RootState) => state.settings.currentLayout);
   const lastLayoutId = useSelector((state: RootState) => state.settings.lastLayoutId) as LayoutPresetId;
   
   // Phaser game instance
   const [phaserGame, setPhaserGame] = useState<PhaserGame | null>(null);
   const [gameError, setGameError] = useState<string | null>(null);
+  
+  // Define a simple default layout to avoid any issues with stored layouts
+  const defaultLayout: MosaicNode<ViewId> = {
+    direction: 'row',
+    first: 'chatView',
+    second: 'logView',
+    splitPercentage: 70
+  };
   
   // Handle game errors safely with a try/catch block
   const handleGameError = useCallback((message: string, error: any) => {
@@ -91,7 +113,70 @@ const Game: React.FC = () => {
     }
   }, []); // Empty dependency array ensures this only runs once
 
-  // Debug button to help diagnose issues
+  // Reset local storage on component mount to ensure clean state
+  useEffect(() => {
+    try {
+      // Reset to a known good layout on first load
+      dispatch(applyPresetLayout('combat'));
+    } catch (error) {
+      console.error("Failed to reset layout:", error);
+    }
+  }, [dispatch]);
+
+  // Handle layout changes
+  const handleLayoutChange = useCallback((newLayout: MosaicNode<ViewId> | null) => {
+    if (newLayout) {
+      dispatch(updateLayout(newLayout));
+    }
+  }, [dispatch]);
+
+  // Render tile content based on viewId
+  const renderTileContent = useCallback((viewId: ViewId) => {
+    switch (viewId) {
+      case 'mapView':
+        return <MapPanel onGameInitialized={handleGameInitialized} />;
+      case 'chatView':
+        return <ChatPanel />;
+      case 'logView':
+        return <LogView />;
+      case 'videoView1':
+      case 'videoView2':
+      case 'videoView3':
+        return <VideoGrid />;
+      default:
+        return <div>Unknown view: {viewId}</div>;
+    }
+  }, [handleGameInitialized]);
+
+  // Get the title for each tile
+  const getTileTitle = useCallback((viewId: ViewId): string => {
+    switch (viewId) {
+      case 'mapView':
+        return 'Map';
+      case 'chatView':
+        return 'Chat';
+      case 'logView':
+        return 'Game Log';
+      case 'videoView1':
+        return 'Video 1';
+      case 'videoView2':
+        return 'Video 2';
+      case 'videoView3':
+        return 'Video 3';
+      default:
+        return 'Unknown';
+    }
+  }, []);
+
+  // Create toolbar controls for a mosaic window
+  const getToolbarControls = useCallback((viewId: ViewId) => {
+    return []; // Empty for now - can add custom buttons later
+  }, []);
+
+  // Get current effective layout (preferring currentLayout, falling back to default)
+  const effectiveLayout = currentLayout || defaultLayout;
+
+  // Debug function to help diagnose issues
   const debugLayout = () => {
     console.log("Current game state:", { 
       phaserGame: phaserGame ? "initialized" : "not initialized",
@@ -99,164 +184,13 @@ const Game: React.FC = () => {
       actors,
       error: gameError,
       toasterAvailable: !!AppToaster,
-      currentView: lastLayoutId
+      currentLayout,
+      effectiveLayout
     });
   };
 
-  // Render view based on the current layout preset
-  const renderView = () => {
-    switch (lastLayoutId) {
-      case 'combat':
-        return (
-          <div className="game-grid" style={{ 
-            display: 'grid',
-            gridTemplateColumns: '6fr 4fr',
-            gridTemplateRows: '1fr 1fr 300px',
-            gap: '16px',
-            height: 'calc(100vh - 70px)',
-            width: '100%'
-          }}>
-            {/* Map (main) */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '1', 
-              gridRow: '1 / span 2',
-              minHeight: '400px',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <MapPanel onGameInitialized={handleGameInitialized} />
-            </div>
-            
-            {/* Chat */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '2', 
-              gridRow: '1',
-              maxHeight: '100%',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <ChatPanel />
-            </div>
-            
-            {/* Log */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '2', 
-              gridRow: '2',
-              maxHeight: '100%',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <LogView />
-            </div>
-            
-            {/* Video Grid (bottom) */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '1 / span 2', 
-              gridRow: '3',
-              height: '100%',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <VideoGrid />
-            </div>
-          </div>
-        );
-        
-      case 'story':
-        return (
-          <div className="game-grid" style={{ 
-            display: 'grid',
-            gridTemplateColumns: '1fr 300px',
-            gridTemplateRows: 'auto 1fr 300px',
-            gap: '16px',
-            height: 'calc(100vh - 70px)',
-            width: '100%'
-          }}>
-            {/* Chat (main) */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '1', 
-              gridRow: '1 / span 2',
-              minHeight: '400px',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <ChatPanel />
-            </div>
-            
-            {/* Log */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '2', 
-              gridRow: '1 / span 2',
-              maxHeight: '100%',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <LogView />
-            </div>
-            
-            {/* Video Grid (bottom) */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '1 / span 2', 
-              gridRow: '3',
-              height: '100%',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <VideoGrid />
-            </div>
-          </div>
-        );
-        
-      case 'roleplay':
-      default: // Default to roleplay if no matching layout is found
-        return (
-          <div className="game-grid" style={{ 
-            display: 'grid',
-            gridTemplateColumns: '1fr 300px',
-            gridTemplateRows: 'auto 1fr 300px',
-            gap: '16px',
-            height: 'calc(100vh - 70px)',
-            width: '100%'
-          }}>
-            {/* Video Grid (main) */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '1', 
-              gridRow: '1 / span 2',
-              minHeight: '400px',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <VideoGrid />
-            </div>
-            
-            {/* Log */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '2', 
-              gridRow: '1 / span 2',
-              maxHeight: '100%',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <LogView />
-            </div>
-            
-            {/* Chat (bottom) */}
-            <div className="game-grid-panel" style={{ 
-              gridColumn: '1 / span 2', 
-              gridRow: '3',
-              height: '100%',
-              borderRadius: '12px',
-              overflow: 'hidden'
-            }}>
-              <ChatPanel />
-            </div>
-          </div>
-        );
-    }
-  };
-
   return (
-    <div className="game-page" style={{ padding: "16px" }}>
+    <div className="game-page glass-mosaic" style={{ padding: "16px", height: "calc(100vh - 32px)" }}>
       {/* Header with layout controls */}
       <div style={{ 
         marginBottom: '16px', 
@@ -275,8 +209,28 @@ const Game: React.FC = () => {
         </button>
       </div>
       
-      {/* Render the current view */}
-      {renderView()}
+      {/* Mosaic Layout - With fixed resize options */}
+      <div style={{ height: 'calc(100% - 48px)', position: 'relative' }}>
+        <DndProvider backend={HTML5Backend}>
+          <Mosaic<ViewId>
+            renderTile={(id, path) => (
+              <MosaicWindow<ViewId>
+                path={path}
+                title={getTileTitle(id)}
+                toolbarControls={getToolbarControls(id)}
+                draggable={true}
+              >
+                {renderTileContent(id)}
+              </MosaicWindow>
+            )}
+            value={effectiveLayout}
+            onChange={handleLayoutChange}
+            className="mosaic-blueprint-theme"
+            resize={{ minimumPaneSizePercentage: 10 }}
+            zeroStateView={<div className="zero-state">Add a panel to get started</div>}
+          />
+        </DndProvider>
+      </div>
     </div>
   );
 };

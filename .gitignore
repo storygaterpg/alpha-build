@@ -5,3 +5,4 @@ __pycache__/
 .venv
 server/venv
 server_env
+node_modules/

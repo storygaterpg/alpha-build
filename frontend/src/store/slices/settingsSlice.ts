@@ -4,15 +4,15 @@ import { MosaicNode } from 'react-mosaic-component';
 // Type for layout presets
 export type LayoutPresetId = 'combat' | 'story' | 'roleplay';
 
+// Type for view IDs
+export type ViewId = 'mapView' | 'chatView' | 'logView' | 'videoView1' | 'videoView2' | 'videoView3';
+
 // Type for saved layout
 export interface SavedLayout {
   id: string;
   name: string;
   layout: MosaicNode<ViewId> | null;
 }
-
-// Type for our view IDs - matches the Game.tsx component
-export type ViewId = 'mapView' | 'chatView' | 'logView' | 'actionView' | 'turnView' | 'characterView' | 'videoView';
 
 // Define preset layouts
 export const PRESET_LAYOUTS: Record<LayoutPresetId, MosaicNode<ViewId>> = {
@@ -21,7 +21,7 @@ export const PRESET_LAYOUTS: Record<LayoutPresetId, MosaicNode<ViewId>> = {
     first: {
       direction: 'column',
       first: 'mapView',
-      second: 'videoView',
+      second: 'videoView1',
       splitPercentage: 70,
     },
     second: {
@@ -37,13 +37,13 @@ export const PRESET_LAYOUTS: Record<LayoutPresetId, MosaicNode<ViewId>> = {
     first: {
       direction: 'column',
       first: 'chatView',
-      second: 'videoView',
+      second: 'videoView1',
       splitPercentage: 70,
     },
     second: {
       direction: 'column',
       first: 'logView',
-      second: 'videoView',
+      second: 'videoView2',
       splitPercentage: 30,
     },
     splitPercentage: 70,
@@ -52,14 +52,14 @@ export const PRESET_LAYOUTS: Record<LayoutPresetId, MosaicNode<ViewId>> = {
     direction: 'row',
     first: {
       direction: 'column',
-      first: 'videoView',
+      first: 'videoView1',
       second: 'chatView',
       splitPercentage: 70,
     },
     second: {
       direction: 'column',
       first: 'logView',
-      second: 'videoView',
+      second: 'videoView2',
       splitPercentage: 30,
     },
     splitPercentage: 70,
@@ -89,103 +89,62 @@ const loadSavedLayout = (): MosaicNode<ViewId> | null => {
   return PRESET_LAYOUTS.combat;
 };
 
-// Load the saved layout ID from localStorage
-const loadSavedLayoutId = (): string | null => {
+// Save layout to localStorage
+const saveLayoutToStorage = (layout: MosaicNode<ViewId> | null): void => {
   try {
-    const savedId = localStorage.getItem(`${LAYOUT_STORAGE_KEY}-id`);
-    if (savedId && (savedId === 'combat' || savedId === 'story' || savedId === 'roleplay')) {
-      return savedId;
+    if (layout) {
+      localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(layout));
     }
   } catch (error) {
-    console.error('Failed to load layout ID from localStorage:', error);
+    console.error('Failed to save layout to localStorage:', error);
   }
-  return 'combat';
 };
 
-// Initial state
-const initialState: SettingsState = {
-  currentLayout: loadSavedLayout(),
-  savedLayouts: [],
-  lastLayoutId: loadSavedLayoutId(),
-};
-
-// Create the settings slice
-export const settingsSlice = createSlice({
+// Create settings slice
+const settingsSlice = createSlice({
   name: 'settings',
-  initialState,
+  initialState: {
+    currentLayout: loadSavedLayout(),
+    savedLayouts: [],
+    lastLayoutId: 'combat' as string | null,
+  } as SettingsState,
   reducers: {
-    // Update the current layout
+    // Update current layout
     updateLayout: (state, action: PayloadAction<MosaicNode<ViewId> | null>) => {
       state.currentLayout = action.payload;
-      try {
-        localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(action.payload));
-      } catch (error) {
-        console.error('Failed to save layout to localStorage:', error);
-      }
+      saveLayoutToStorage(action.payload);
     },
-
-    // Apply a preset layout
-    applyPresetLayout: (state, action: PayloadAction<LayoutPresetId>) => {
-      const presetId = action.payload;
-      const preset = PRESET_LAYOUTS[presetId];
-      
-      if (preset) {
-        state.currentLayout = preset;
-        state.lastLayoutId = presetId;
-        
-        try {
-          localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(preset));
-          localStorage.setItem(`${LAYOUT_STORAGE_KEY}-id`, presetId);
-        } catch (error) {
-          console.error('Failed to save preset layout to localStorage:', error);
-        }
-      }
-    },
-
-    // Reset to combat layout
+    
+    // Reset layout to default combat view
     resetLayout: (state) => {
       state.currentLayout = PRESET_LAYOUTS.combat;
       state.lastLayoutId = 'combat';
-      
-      try {
-        localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(PRESET_LAYOUTS.combat));
-        localStorage.setItem(`${LAYOUT_STORAGE_KEY}-id`, 'combat');
-      } catch (error) {
-        console.error('Failed to reset layout in localStorage:', error);
-      }
+      saveLayoutToStorage(PRESET_LAYOUTS.combat);
     },
-
-    // Save the current layout with a name
+    
+    // Apply a preset layout
+    applyPresetLayout: (state, action: PayloadAction<LayoutPresetId>) => {
+      const presetId = action.payload;
+      state.currentLayout = PRESET_LAYOUTS[presetId];
+      state.lastLayoutId = presetId;
+      saveLayoutToStorage(PRESET_LAYOUTS[presetId]);
+    },
+    
+    // Save current layout with a name
     saveLayout: (state, action: PayloadAction<{ id: string; name: string }>) => {
       const { id, name } = action.payload;
-      
-      // Check if we're updating an existing layout
-      const existingIndex = state.savedLayouts.findIndex(layout => layout.id === id);
-      
-      if (existingIndex >= 0) {
-        // Update existing layout
-        state.savedLayouts[existingIndex] = {
+      if (state.currentLayout) {
+        const savedLayout: SavedLayout = {
           id,
           name,
-          layout: state.currentLayout
+          layout: state.currentLayout,
         };
-      } else {
-        // Add new layout
-        state.savedLayouts.push({
-          id,
-          name,
-          layout: state.currentLayout
-        });
-      }
-      
-      // Update local storage
-      try {
-        localStorage.setItem('storygate-saved-layouts', JSON.stringify(state.savedLayouts));
-      } catch (error) {
-        console.error('Failed to save layouts to localStorage:', error);
+        
+        state.savedLayouts.push(savedLayout);
+        state.lastLayoutId = id;
       }
     },
-
+    
     // Load a saved layout
     loadLayout: (state, action: PayloadAction<string>) => {
       const layoutId = action.payload;
@@ -194,13 +153,7 @@ export const settingsSlice = createSlice({
       if (savedLayout && savedLayout.layout) {
         state.currentLayout = savedLayout.layout;
         state.lastLayoutId = layoutId;
-        
-        try {
-          localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(savedLayout.layout));
-          localStorage.setItem(`${LAYOUT_STORAGE_KEY}-id`, layoutId);
-        } catch (error) {
-          console.error('Failed to load layout from localStorage:', error);
-        }
+        saveLayoutToStorage(savedLayout.layout);
       }
     },
     
@@ -209,37 +162,24 @@ export const settingsSlice = createSlice({
       const layoutId = action.payload;
       state.savedLayouts = state.savedLayouts.filter(layout => layout.id !== layoutId);
       
-      // Update local storage
-      try {
-        localStorage.setItem('storygate-saved-layouts', JSON.stringify(state.savedLayouts));
-      } catch (error) {
-        console.error('Failed to update saved layouts in localStorage:', error);
+      // If we deleted the active layout, reset to combat
+      if (state.lastLayoutId === layoutId) {
+        state.currentLayout = PRESET_LAYOUTS.combat;
+        state.lastLayoutId = 'combat';
+        saveLayoutToStorage(PRESET_LAYOUTS.combat);
       }
     },
-    
-    // Load saved layouts from localStorage (called on app init)
-    loadSavedLayouts: (state) => {
-      try {
-        const savedLayouts = localStorage.getItem('storygate-saved-layouts');
-        if (savedLayouts) {
-          state.savedLayouts = JSON.parse(savedLayouts);
-        }
-      } catch (error) {
-        console.error('Failed to load saved layouts from localStorage:', error);
-      }
-    }
-  }
+  },
 });
 
 // Export actions
 export const {
   updateLayout,
-  applyPresetLayout,
   resetLayout,
+  applyPresetLayout,
   saveLayout,
   loadLayout,
   deleteLayout,
-  loadSavedLayouts
 } = settingsSlice.actions;
 
 // Export reducer
