@@ -13,6 +13,26 @@
   -webkit-focus-ring-color: transparent !important;
 }
 
+/* Additional selectors to target any possible dotted outlines */
+.mosaic-root,
+.mosaic-root:focus,
+.mosaic-root div,
+.mosaic-root div:focus,
+.mosaic-blueprint-theme,
+.mosaic-blueprint-theme:focus,
+.mosaic-blueprint-theme *,
+.mosaic-blueprint-theme *:focus,
+[class*="bp3-"],
+[class*="bp4-"],
+[class*="mosaic"] {
+  outline: none !important;
+  outline-width: 0 !important;
+  border-style: none !important;
+  outline-style: none !important;
+  box-shadow: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
 :root {
   /* Glassmorphic color palette */
   --glass-primary: #4361ee;

@@ -15,6 +15,7 @@ import 'react-mosaic-component/react-mosaic-component.css'
 import './styles/main.css'
 import './styles/mosaic.css'
 import './styles/glassmorphic.css'
+import './index.css'
 
 import App from './App.tsx'
 import { store } from './store'
@@ -23,6 +24,42 @@ import { registerServiceWorker } from './serviceWorkerRegistration'
 
 // Initialize Blueprint.js focus style manager
 FocusStyleManager.onlyShowFocusOnTabs();
+
+// Add style to remove any remaining dotted outlines
+const removeOutlines = () => {
+  const style = document.createElement('style');
+  style.textContent = `
+    /* Target all possible outline cases, especially mosaic-root and blueprint theme */
+    .mosaic,
+    .mosaic-root,
+    .mosaic-window,
+    .mosaic-blueprint-theme,
+    .mosaic-blueprint-theme *,
+    [class*="bp3-"],
+    [class*="bp4-"],
+    [class*="mosaic"],
+    .mosaic *,
+    .mosaic-root *,
+    .mosaic-window *,
+    .mosaic:focus,
+    .mosaic-root:focus,
+    .mosaic-window:focus,
+    .mosaic *:focus,
+    .mosaic-root *:focus,
+    .mosaic-window *:focus,
+    div[tabindex],
+    div[tabindex]:focus {
+      outline: none !important;
+      outline-width: 0 !important;
+      outline-style: none !important;
+      outline-color: transparent !important;
+      border-style: none !important;
+      -webkit-focus-ring-color: transparent !important;
+      box-shadow: none !important;
+    }
+  `;
+  document.head.appendChild(style);
+};
 
 // Add decorative glowing orbs in the background - optimized version
 const addGlowingOrbs = () => {
@@ -87,6 +124,9 @@ const addGlowingOrbs = () => {
 
 // Run after DOM is ready, but only if not in low-memory mode
 window.addEventListener('DOMContentLoaded', () => {
+  // Apply the outline fix immediately
+  removeOutlines();
+
   // Check available memory before adding decorative elements
   if ((window.performance as any)?.memory?.jsHeapSizeLimit && 
      (window.performance as any).memory.jsHeapSizeLimit < 2000000000) { // Less than ~2GB available
