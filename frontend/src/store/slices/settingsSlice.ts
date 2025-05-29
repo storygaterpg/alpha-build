@@ -40,12 +40,7 @@ export const PRESET_LAYOUTS: Record<LayoutPresetId, MosaicNode<ViewId>> = {
       second: 'videoView1',
       splitPercentage: 70,
     },
-    second: {
-      direction: 'column',
-      first: 'logView',
-      second: 'videoView2',
-      splitPercentage: 30,
-    },
+    second: 'logView',
     splitPercentage: 70,
   },
   roleplay: {
@@ -53,15 +48,10 @@ export const PRESET_LAYOUTS: Record<LayoutPresetId, MosaicNode<ViewId>> = {
     first: {
       direction: 'column',
       first: 'videoView1',
-      second: 'chatView',
+      second: 'logView',
       splitPercentage: 70,
     },
-    second: {
-      direction: 'column',
-      first: 'logView',
-      second: 'videoView2',
-      splitPercentage: 30,
-    },
+    second: 'chatView',
     splitPercentage: 70,
   },
 };
