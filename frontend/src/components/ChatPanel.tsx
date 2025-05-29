@@ -189,24 +189,39 @@ const ChatPanel: React.FC = () => {
           padding: '16px', 
           margin: '16px',
           height: 'calc(100% - 60px)',
-          overflowY: 'auto' 
+          overflowY: 'auto',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '8px'
         }}
       >
         {messages.length === 0 ? (
-          <div className="glass-card">
+          <div className="chat-bubble system-bubble">
             <strong>System:</strong> Welcome to StoryGate RPG, {playerName || 'Adventurer'}!
           </div>
         ) : (
           messages.map((msg) => (
             <div 
               key={msg.id} 
-              className={`message-card ${msg.type === 'player' ? 'player-message' : 'system-message'}`}
+              className={`chat-bubble ${msg.type === 'player' ? 'player-bubble' : 'system-bubble'}`}
+              style={{
+                alignSelf: msg.type === 'player' ? 'flex-end' : 'flex-start',
+                maxWidth: '80%',
+                padding: '10px 14px',
+                borderRadius: '18px',
+                backgroundColor: msg.type === 'player' ? 'rgba(67, 97, 238, 0.2)' : 'rgba(29, 31, 58, 0.4)',
+                borderLeft: msg.type === 'player' ? 'none' : '3px solid rgba(76, 201, 240, 0.5)',
+                borderRight: msg.type === 'player' ? '3px solid rgba(247, 37, 133, 0.5)' : 'none',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                position: 'relative'
+              }}
             >
-              <div className="message-header">
-                <strong>{msg.sender}</strong>
-                <span className="message-time">{new Date(msg.timestamp).toLocaleTimeString()}</span>
+              <div className="bubble-sender" style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                {msg.sender}
               </div>
-              <div className="message-content">{msg.content}</div>
+              <div className="bubble-content" style={{ wordBreak: 'break-word' }}>
+                {msg.content}
+              </div>
             </div>
           ))
         )}
@@ -236,9 +251,10 @@ const ChatPanel: React.FC = () => {
           style={{
             backgroundColor: 'rgba(29, 31, 58, 0.3)',
             border: '1px solid var(--glass-border)',
-            borderRadius: '8px',
+            borderRadius: '20px',
             color: 'var(--glass-text-primary)',
-            whiteSpace: 'normal'
+            whiteSpace: 'normal',
+            padding: '10px 16px'
           }}
           rightElement={
             <Button
@@ -252,6 +268,30 @@ const ChatPanel: React.FC = () => {
           autoFocus
         />
       </div>
+      
+      {/* Add CSS for chat bubbles */}
+      <style>
+        {`
+          .chat-bubble {
+            transition: all 0.2s ease;
+          }
+          
+          .chat-bubble:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+          }
+          
+          .player-bubble {
+            background: linear-gradient(to right, rgba(67, 97, 238, 0.1), rgba(67, 97, 238, 0.2));
+            border-bottom-right-radius: 4px;
+          }
+          
+          .system-bubble {
+            background: linear-gradient(to left, rgba(29, 31, 58, 0.3), rgba(29, 31, 58, 0.5));
+            border-bottom-left-radius: 4px;
+          }
+        `}
+      </style>
     </div>
   );
 };

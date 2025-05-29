@@ -1,0 +1,58 @@
+/* Global reset for outlines and focus indicators */
+* {
+  outline: none !important;
+}
+
+*:focus,
+*:focus-visible,
+*:active,
+*:focus-within,
+*:visited,
+button:focus,
+div:focus,
+[tabindex]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Target specific browser focus indicators */
+::-moz-focus-inner {
+  border: 0 !important;
+}
+
+/* Disable webkit focus ring */
+:focus {
+  outline-color: transparent !important;
+  outline-style: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* Target React Mosaic specifically */
+.mosaic,
+.mosaic-root,
+.mosaic-tile,
+.mosaic-window,
+.mosaic-window-toolbar,
+.mosaic-window-body,
+.mosaic-window-title,
+.mosaic-window-controls,
+.mosaic-split,
+.mosaic-split-line,
+.mosaic-drop-target,
+[class*="mosaic"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Focus states for mosaic elements */
+.mosaic:focus,
+.mosaic *:focus,
+.mosaic-window:focus,
+.mosaic-window *:focus,
+.mosaic-split:focus,
+[class*="mosaic"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* ... existing code ... */ 

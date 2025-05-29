@@ -8,6 +8,29 @@
     <meta name="theme-color" content="#5e81ac" />
     <meta name="description" content="A flexible mosaic-based RPG game interface" />
     <link rel="manifest" href="/manifest.json" />
+    <style>
+      *:focus, 
+      *:focus-visible, 
+      button:focus, 
+      div:focus, 
+      [tabindex]:focus,
+      .mosaic, 
+      .mosaic *, 
+      .mosaic-window, 
+      .mosaic-window *,
+      .mosaic:focus,
+      .mosaic *:focus,
+      .mosaic-window:focus,
+      .mosaic-window *:focus,
+      .mosaic-split:focus,
+      [class*="mosaic"]:focus,
+      .no-outlines,
+      .no-outlines * {
+        outline: none !important;
+        box-shadow: none !important;
+        -webkit-focus-ring-color: transparent !important;
+      }
+    </style>
     <title>StoryGate RPG</title>
   </head>
   <body>

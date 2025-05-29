@@ -24,46 +24,84 @@ import { registerServiceWorker } from './serviceWorkerRegistration'
 // Initialize Blueprint.js focus style manager
 FocusStyleManager.onlyShowFocusOnTabs();
 
-// Add decorative glowing orbs in the background
+// Add decorative glowing orbs in the background - optimized version
 const addGlowingOrbs = () => {
+  // Only add decorative elements if not in low-memory mode
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    console.log('Reduced motion preference detected, skipping decorative elements');
+    return;
+  }
+  
   const body = document.body;
   
-  // Create primary orb
+  // Create single orb container instead of multiple elements
+  const orbContainer = document.createElement('div');
+  orbContainer.className = 'orb-container';
+  
+  // Fix position to make it fixed relative to viewport
+  orbContainer.style.position = 'fixed';
+  orbContainer.style.top = '0';
+  orbContainer.style.left = '0';
+  orbContainer.style.width = '100%';
+  orbContainer.style.height = '100%';
+  orbContainer.style.zIndex = '-1';
+  orbContainer.style.overflow = 'hidden';
+  orbContainer.style.pointerEvents = 'none';
+  
+  // Create primary orb (smaller size)
   const primaryOrb = document.createElement('div');
   primaryOrb.className = 'glow-orb primary';
-  primaryOrb.style.width = '300px';
-  primaryOrb.style.height = '300px';
+  primaryOrb.style.width = '200px'; // Reduced from 300px
+  primaryOrb.style.height = '200px'; // Reduced from 300px
+  primaryOrb.style.position = 'absolute';
   primaryOrb.style.top = '10%';
   primaryOrb.style.left = '5%';
   
-  // Create secondary orb
-  const secondaryOrb = document.createElement('div');
-  secondaryOrb.className = 'glow-orb secondary';
-  secondaryOrb.style.width = '250px';
-  secondaryOrb.style.height = '250px';
-  secondaryOrb.style.bottom = '10%';
-  secondaryOrb.style.right = '5%';
+  // Only add second orb if on desktop-sized screens
+  if (window.innerWidth > 768) {
+    // Create secondary orb (smaller size)
+    const secondaryOrb = document.createElement('div');
+    secondaryOrb.className = 'glow-orb secondary';
+    secondaryOrb.style.width = '150px'; // Reduced from 250px
+    secondaryOrb.style.height = '150px'; // Reduced from 250px
+    secondaryOrb.style.position = 'absolute';
+    secondaryOrb.style.bottom = '10%';
+    secondaryOrb.style.right = '5%';
+    orbContainer.appendChild(secondaryOrb);
+  }
   
-  // Create accent orb
-  const accentOrb = document.createElement('div');
-  accentOrb.className = 'glow-orb accent';
-  accentOrb.style.width = '200px';
-  accentOrb.style.height = '200px';
-  accentOrb.style.top = '50%';
-  accentOrb.style.left = '50%';
-  accentOrb.style.transform = 'translate(-50%, -50%)';
+  // Add orbs to container
+  orbContainer.appendChild(primaryOrb);
   
-  // Add orbs to body
-  body.appendChild(primaryOrb);
-  body.appendChild(secondaryOrb);
-  body.appendChild(accentOrb);
+  // Add container to body
+  body.appendChild(orbContainer);
+  
+  // Also ensure the body and html don't overflow
+  document.documentElement.style.overflow = 'hidden';
+  document.documentElement.style.height = '100%';
+  body.style.overflow = 'auto';
+  body.style.height = '100%';
+  body.style.margin = '0';
+  body.style.padding = '0';
 };
 
-// Run after DOM is ready
-window.addEventListener('DOMContentLoaded', addGlowingOrbs);
+// Run after DOM is ready, but only if not in low-memory mode
+window.addEventListener('DOMContentLoaded', () => {
+  // Check available memory before adding decorative elements
+  if ((window.performance as any)?.memory?.jsHeapSizeLimit && 
+     (window.performance as any).memory.jsHeapSizeLimit < 2000000000) { // Less than ~2GB available
+    console.log('Low memory environment detected, skipping decorative elements');
+  } else {
+    addGlowingOrbs();
+  }
+});
+
+// For development mode detection - in a real environment, this would use proper environment variables
+// but for simplicity we'll just hardcode this to true (assume we're in development)
+const isDevelopment = true;
 
 // Initialize performance monitoring in development mode
-if (process.env.NODE_ENV === 'development') {
+if (isDevelopment) {
   performanceMonitor.start();
   console.log('Performance monitoring enabled in development mode');
   

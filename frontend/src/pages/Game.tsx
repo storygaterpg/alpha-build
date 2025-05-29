@@ -190,13 +190,20 @@ const Game: React.FC = () => {
   };
 
   return (
-    <div className="game-page glass-mosaic" style={{ padding: "16px", height: "calc(100vh - 32px)" }}>
+    <div className="game-page glass-mosaic" style={{ 
+      padding: "16px", 
+      height: "calc(100vh - 32px)",
+      overflow: "hidden",
+      display: "flex",
+      flexDirection: "column"
+    }}>
       {/* Header with layout controls */}
       <div style={{ 
         marginBottom: '16px', 
         display: 'flex', 
         justifyContent: 'space-between',
-        alignItems: 'center'
+        alignItems: 'center',
+        flexShrink: 0 /* Prevent header from shrinking */
       }}>
         <LayoutControls />
         
@@ -210,7 +217,12 @@ const Game: React.FC = () => {
       </div>
       
       {/* Mosaic Layout - With fixed resize options */}
-      <div style={{ height: 'calc(100% - 48px)', position: 'relative' }}>
+      <div style={{ 
+        height: 'calc(100% - 48px)', 
+        position: 'relative',
+        flex: 1,
+        overflow: 'hidden'
+      }}>
         <DndProvider backend={HTML5Backend}>
           <Mosaic<ViewId>
             renderTile={(id, path) => (
@@ -219,13 +231,15 @@ const Game: React.FC = () => {
                 title={getTileTitle(id)}
                 toolbarControls={getToolbarControls(id)}
                 draggable={true}
+                renderPreview={() => <div />} // Empty preview to avoid outline issues
+                className="no-outline-window" // Add specific class for targeting
               >
                 {renderTileContent(id)}
               </MosaicWindow>
             )}
             value={effectiveLayout}
             onChange={handleLayoutChange}
-            className="mosaic-blueprint-theme"
+            className="mosaic-blueprint-theme no-outlines" // Add custom class
             resize={{ minimumPaneSizePercentage: 10 }}
             zeroStateView={<div className="zero-state">Add a panel to get started</div>}
           />

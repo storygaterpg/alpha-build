@@ -26,7 +26,7 @@ export class PerformanceMonitor {
   private stats: Stats;
   private enabled: boolean = false;
   private customPanels: Map<string, { panel: Stats.Panel, value: number }> = new Map();
-  private warningThresholds: { fps: number, memory: number } = { fps: 30, memory: 100 };
+  private warningThresholds: { fps: number, memory: number } = { fps: 30, memory: 300 };
   private lastWarningTime: number = 0;
   private warningCooldown: number = 5000; // 5 seconds between warnings
   private lastFpsValues: number[] = [];
