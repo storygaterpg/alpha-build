@@ -1,15 +1,23 @@
 import React, { useRef, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import { Position, Toaster } from '@blueprintjs/core';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import 'react-mosaic-component/react-mosaic-component.css';
+import { useDispatch } from 'react-redux';
 
 // Import pages
 import Home from './pages/Home';
 import Game from './pages/Game';
 import './styles/glassmorphic.css';
 import './styles/mosaic.css';
+
+// Import socket actions
+import { socketConnect, socketDisconnect } from './store/slices/socketSlice';
+
+// Import our components
+import ConnectionStatus from './components/ConnectionStatus';
+import NotificationsDisplay from './components/NotificationsDisplay';
 
 // Create global AppToaster instance
 export const AppToaster = Toaster.create({
@@ -121,10 +129,57 @@ const GlobalStyles = () => {
   return null;
 };
 
+/**
+ * Determine the appropriate WebSocket URL based on environment or fallbacks
+ */
+function getWebSocketUrl(): string {
+  // First priority: Use the environment variable if available
+  if (import.meta.env.VITE_WEBSOCKET_URL) {
+    return import.meta.env.VITE_WEBSOCKET_URL as string;
+  }
+  
+  // Second priority: Use the backend port from environment or default to 8000
+  const serverPort = import.meta.env.VITE_WEBSOCKET_PORT || '8000';
+  
+  // Determine protocol
+  const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+  
+  // Use the same hostname as the current page
+  return `${protocol}//${window.location.hostname}:${serverPort}`;
+}
+
+// Socket connection manager
+const SocketManager: React.FC = () => {
+  const dispatch = useDispatch();
+  const location = useLocation();
+  
+  // Connect to WebSocket when entering the game page, disconnect when leaving
+  useEffect(() => {
+    const isGameRoute = location.pathname === '/game';
+    
+    if (isGameRoute) {
+      // Connect to WebSocket when entering game page
+      dispatch(socketConnect({}));
+      
+      // Disconnect when leaving game page
+      return () => {
+        dispatch(socketDisconnect());
+      };
+    }
+  }, [location.pathname, dispatch]);
+  
+  return null;
+};
+
 const App: React.FC = () => {
   return (
     <div className="app-container">
       <GlobalStyles />
+      <SocketManager />
+      <NotificationsDisplay />
+      <div className="app-header">
+        <ConnectionStatus />
+      </div>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/game" element={<Game />} />

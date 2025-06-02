@@ -1,26 +1,19 @@
-# PowerShell script to start the StoryGateRPG game
+# PowerShell script to start StoryGateRPG
+Write-Host "Starting StoryGateRPG Game" -ForegroundColor Cyan
 
-Write-Host "Starting StoryGateRPG Game" -ForegroundColor Green
-
-# First set up the server
 Write-Host "Setting up server..." -ForegroundColor Yellow
-Push-Location "$PSScriptRoot\server"
+Set-Location -Path server
 .\reset_and_setup.ps1
-Pop-Location
+Set-Location -Path ..
 
-# Start the server (minimal version by default)
 Write-Host "Starting server..." -ForegroundColor Green
-Start-Process PowerShell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot\server'; .\run_minimal_server.ps1"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location -Path '$PWD\server'; .\run_server.ps1"
 
-# Wait for server to initialize
 Write-Host "Wait for server to initialize..." -ForegroundColor Yellow
 Start-Sleep -Seconds 5
 
-# Start the frontend
 Write-Host "Starting frontend..." -ForegroundColor Green
-Start-Process PowerShell -ArgumentList "-NoExit", "-Command", "cd '$PSScriptRoot\frontend'; npm run dev"
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "Set-Location -Path '$PWD\frontend'; npm run dev"
 
-Write-Host ""
-Write-Host "Both server and frontend are now running." -ForegroundColor Cyan
-Write-Host "To stop the game, close both PowerShell windows." -ForegroundColor Cyan
-Write-Host "" 
+Write-Host "`nBoth server and frontend are now running." -ForegroundColor Cyan
+Write-Host "To stop the game, close both PowerShell windows." -ForegroundColor Cyan 

@@ -1,4 +1,14 @@
 {
+  "name": "storygate-rpg",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "start": "powershell -File ./start_game.ps1",
+    "dev": "cd frontend; npm run dev",
+    "dev:frontend": "cd frontend; npm run dev",
+    "dev:server": "cd server; powershell -File ./run_server.ps1",
+    "setup": "cd server; powershell -File ./setup.ps1; cd ../frontend; npm install"
+  },
   "dependencies": {
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1"

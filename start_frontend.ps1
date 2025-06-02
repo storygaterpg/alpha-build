@@ -4,5 +4,5 @@ Write-Host "Starting StoryGateRPG Frontend" -ForegroundColor Green
 
 # Start the frontend
 Write-Host "Starting frontend..." -ForegroundColor Green
-Push-Location "$PSScriptRoot\frontend"
+Set-Location -Path "$PSScriptRoot\frontend"
 npm run dev 

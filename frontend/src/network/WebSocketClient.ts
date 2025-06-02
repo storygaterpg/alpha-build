@@ -18,10 +18,10 @@ export type WebSocketEventType =
   | 'message'      // Generic message
   | string;        // Custom event types
 
-// Event handler type
+// Define handler type for events
 export type WebSocketEventHandler = (data?: any) => void;
 
-// Safe wrapper for using AppToaster
+// Safe toast helper that works even if AppToaster is not initialized
 const safeShowToast = (props: any) => {
   if (AppToaster && typeof AppToaster.show === 'function') {
     try {
@@ -34,172 +34,232 @@ const safeShowToast = (props: any) => {
   }
 };
 
-export class WebSocketClient {
+// Check if we're in a test environment
+const isTestEnvironment = (): boolean => {
+  return typeof process !== 'undefined' && process.env?.NODE_ENV === 'test';
+};
+
+// Get environment variables in a way that works in both browser and test environments
+const getEnvVar = (name: string, defaultValue: string = ''): string => {
+  if (isTestEnvironment()) {
+    // In test environment, use the mock values from setupTests.js
+    return (global as any).import?.meta?.env?.[name] || defaultValue;
+  } else {
+    // In browser environment, use Vite's import.meta.env
+    return (import.meta.env as any)[name] || defaultValue;
+  }
+};
+
+/**
+ * Determine the appropriate WebSocket URL based on environment or fallbacks
+ * @param customPath Optional path to append to the WebSocket URL
+ */
+function getWebSocketUrl(customPath?: string): string {
+  // First priority: Use the environment variable if available
+  let url = '';
+  const wsUrl = getEnvVar('VITE_WEBSOCKET_URL');
+  
+  if (wsUrl) {
+    url = wsUrl;
+  } else {
+    // Second priority: Use the backend port from environment or default to 8000
+    const serverPort = getEnvVar('VITE_WEBSOCKET_PORT', '8000');
+    
+    // Determine protocol
+    const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+    
+    // Use the same hostname as the current page or localhost in tests
+    const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
+    url = `${protocol}//${hostname}:${serverPort}`;
+  }
+
+  // Add the custom path if provided
+  if (customPath) {
+    // Make sure we don't double up on slashes
+    if (url.endsWith('/') && customPath.startsWith('/')) {
+      url += customPath.substring(1);
+    } else if (!url.endsWith('/') && !customPath.startsWith('/')) {
+      url += '/' + customPath;
+    } else {
+      url += customPath;
+    }
+  }
+
+  return url;
+}
+
+/**
+ * Checks if a WebSocket connection can be established
+ * @param url WebSocket URL to test
+ * @param timeoutMs Timeout in milliseconds
+ * @returns Promise that resolves with success or rejects with error
+ */
+async function testWebSocketConnection(url: string, timeoutMs: number = 5000): Promise<{success: boolean, message?: string}> {
+  return new Promise((resolve) => {
+    try {
+      const socket = new WebSocket(url);
+      
+      // Set up timeout
+      const timeout = setTimeout(() => {
+        socket.close();
+        resolve({ 
+          success: false, 
+          message: `Connection attempt timed out after ${timeoutMs}ms` 
+        });
+      }, timeoutMs);
+      
+      socket.onopen = () => {
+        clearTimeout(timeout);
+        socket.close();
+        resolve({ success: true });
+      };
+      
+      socket.onerror = () => {
+        clearTimeout(timeout);
+        socket.close();
+        resolve({ 
+          success: false, 
+          message: 'Failed to establish connection' 
+        });
+      };
+    } catch (error) {
+      resolve({ 
+        success: false, 
+        message: error instanceof Error ? error.message : 'Unknown error' 
+      });
+    }
+  });
+}
+
+class WebSocketClient {
+  private static instance: WebSocketClient;
   private socket: WebSocket | null = null;
-  private url: string;
-  private eventHandlers: Map<WebSocketEventType, WebSocketEventHandler[]> = new Map();
+  private url: string = '';
+  private connected: boolean = false;
+  private reconnectTimer: NodeJS.Timeout | null = null;
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
-  private reconnectInterval: number = 3000; // 3 seconds
-  private isConnecting: boolean = false;
-  private manualClose: boolean = false;
+  private reconnectDelay: number = 2000;
+  private lastCloseCode: number | null = null;
+  private lastCloseReason: string | null = null;
+  private connectionPath: string | undefined = undefined;
+  private connectionAttemptInProgress: boolean = false;
   
-  // Notification management
-  private lastErrorTime: number = 0;
-  private errorNotificationDebounce: number = 10000; // 10 seconds between error notifications
-  private connectionAttempts: number = 0;
-  private maxConnectionAttempts: number = 3; // Max attempts when server is unavailable
-  private hasShownErrorNotification: boolean = false;
-  private hasShownReconnectFailedNotification: boolean = false;
+  // Event handlers
+  private messageHandlers: Map<string, Set<WebSocketEventHandler>> = new Map();
+  private connectHandlers: Set<WebSocketEventHandler> = new Set();
+  private disconnectHandlers: Set<WebSocketEventHandler> = new Set();
+  private errorHandlers: Set<WebSocketEventHandler> = new Set();
+
+  // Private constructor to enforce singleton pattern
+  private constructor() {}
+
+  // Get the singleton instance
+  public static getInstance(): WebSocketClient {
+    if (!WebSocketClient.instance) {
+      WebSocketClient.instance = new WebSocketClient();
+    }
+    return WebSocketClient.instance;
+  }
 
   /**
-   * Create a new WebSocketClient
+   * Get the current WebSocket URL
    */
-  constructor() {
-    // Get the WebSocket URL from environment variables or use a default
-    this.url = import.meta.env.VITE_SERVER_URL || 'ws://localhost:8000/ws';
+  public getUrl(): string {
+    return this.url;
+  }
+
+  /**
+   * Get the last close code and reason
+   */
+  public getLastCloseInfo(): { code: number | null, reason: string | null } {
+    return {
+      code: this.lastCloseCode,
+      reason: this.lastCloseReason
+    };
+  }
+
+  /**
+   * Test connectivity to multiple WebSocket paths
+   * @returns Promise resolving to the best working URL or undefined if none work
+   */
+  public async testConnectivity(): Promise<string | undefined> {
+    // Paths to try in order - prioritize /ws which is the main server endpoint
+    const pathsToTry = ['/ws', '', '/socket', '/socket.io'];
+    
+    console.log('Testing WebSocket connectivity to multiple paths...');
+    
+    for (const path of pathsToTry) {
+      const url = getWebSocketUrl(path);
+      console.log(`Testing connection to: ${url}`);
+      
+      const result = await testWebSocketConnection(url, 5000);
+      
+      if (result.success) {
+        console.log(`✓ Successfully connected to ${url}`);
+        return path;
+      } else {
+        console.log(`✗ Failed to connect to ${url}: ${result.message}`);
+      }
+    }
+    
+    console.log('No working WebSocket paths found');
+    return undefined;
   }
 
   /**
    * Connect to the WebSocket server
+   * @param url Optional URL to override the default
+   * @param path Optional path to append to the URL
    */
-  public connect(): void {
-    if (this.socket && (this.socket.readyState === WebSocket.OPEN || this.socket.readyState === WebSocket.CONNECTING)) {
-      console.log('WebSocket already connected or connecting');
-      return;
+  public async connect(url?: string, path?: string): Promise<boolean> {
+    if (this.socket && this.connected) {
+      console.log('WebSocket already connected');
+      return true;
     }
     
-    if (this.isConnecting) {
-      console.log('WebSocket connection already in progress');
-      return;
+    if (this.connectionAttemptInProgress) {
+      console.log('Connection attempt already in progress');
+      return false;
     }
     
-    // If we've exceeded the maximum connection attempts, don't try again
-    if (this.connectionAttempts >= this.maxConnectionAttempts) {
-      console.log(`Maximum connection attempts (${this.maxConnectionAttempts}) reached, not trying again`);
-      return;
-    }
-    
-    this.isConnecting = true;
-    this.connectionAttempts++;
+    this.connectionAttemptInProgress = true;
     
     try {
-      console.log(`Connecting to WebSocket server at ${this.url} (attempt ${this.connectionAttempts}/${this.maxConnectionAttempts})`);
+      // Clear last close info
+      this.lastCloseCode = null;
+      this.lastCloseReason = null;
+      
+      // If path is provided, save it for reconnection attempts
+      if (path) {
+        this.connectionPath = path;
+      }
+      
+      // If no explicit path is provided, and we don't have a saved path,
+      // try to find a working one
+      if (!url && !this.connectionPath) {
+        this.connectionPath = await this.testConnectivity();
+      }
+      
+      // Determine URL - provided URL takes precedence over auto-determined URL
+      this.url = url || getWebSocketUrl(this.connectionPath);
+      
+      console.log('WebSocket connecting to:', this.url);
+      
       this.socket = new WebSocket(this.url);
       
-      this.socket.onopen = () => {
-        console.log('WebSocket connection established');
-        this.isConnecting = false;
-        this.reconnectAttempts = 0;
-        this.connectionAttempts = 0;
-        this.hasShownErrorNotification = false;
-        this.hasShownReconnectFailedNotification = false;
-        
-        // Show success notification
-        safeShowToast({
-          message: "Connected to game server",
-          intent: Intent.SUCCESS,
-          icon: "tick-circle",
-          timeout: 3000
-        });
-        
-        // Dispatch connect event
-        this.dispatchEvent('connect');
-      };
+      this.socket.onopen = this.handleOpen.bind(this);
+      this.socket.onmessage = this.handleMessage.bind(this);
+      this.socket.onclose = this.handleClose.bind(this);
+      this.socket.onerror = this.handleError.bind(this);
       
-      this.socket.onclose = (event) => {
-        console.log(`WebSocket connection closed: ${event.code} - ${event.reason}`);
-        this.isConnecting = false;
-        this.socket = null;
-        
-        // Dispatch disconnect event
-        this.dispatchEvent('disconnect', { code: event.code, reason: event.reason });
-        
-        // Attempt to reconnect if not closed manually and not closed cleanly
-        if (!this.manualClose && !event.wasClean && this.reconnectAttempts < this.maxReconnectAttempts) {
-          this.reconnectAttempts++;
-          
-          // Only show the reconnection notification for the first attempt or every few attempts
-          if (this.reconnectAttempts === 1 || this.reconnectAttempts % 3 === 0) {
-            // Show reconnection notification
-            safeShowToast({
-              message: `Connection lost. Reconnecting (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`,
-              intent: Intent.WARNING,
-              icon: "refresh",
-              timeout: 3000
-            });
-          }
-          
-          console.log(`Attempting to reconnect (${this.reconnectAttempts}/${this.maxReconnectAttempts})...`);
-          
-          setTimeout(() => {
-            this.connect();
-          }, this.reconnectInterval);
-        } else if (this.reconnectAttempts >= this.maxReconnectAttempts && !this.hasShownReconnectFailedNotification) {
-          // Show failed reconnection notification (only once)
-          this.hasShownReconnectFailedNotification = true;
-          safeShowToast({
-            message: "Failed to reconnect after multiple attempts. Please refresh the page.",
-            intent: Intent.DANGER,
-            icon: "error",
-            timeout: 0 // Don't auto-dismiss
-          });
-        }
-        
-        this.manualClose = false;
-      };
-      
-      this.socket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        
-        // Check if we should show an error notification (debounce)
-        const now = Date.now();
-        if (!this.hasShownErrorNotification || (now - this.lastErrorTime > this.errorNotificationDebounce)) {
-          this.hasShownErrorNotification = true;
-          this.lastErrorTime = now;
-          
-          // Show error notification
-          safeShowToast({
-            message: "WebSocket connection error. Server may be unavailable.",
-            intent: Intent.DANGER,
-            icon: "warning-sign",
-            timeout: 5000
-          });
-        }
-        
-        // Dispatch error event
-        this.dispatchEvent('error', error);
-      };
-      
-      this.socket.onmessage = (event) => {
-        try {
-          const message = JSON.parse(event.data);
-          
-          if (message.type && message.data) {
-            // Dispatch the event to any registered listeners
-            this.dispatchEvent(message.type, message.data);
-          }
-        } catch (error) {
-          console.error('Error parsing WebSocket message:', error);
-        }
-      };
+      return true;
     } catch (error) {
-      console.error('Error connecting to WebSocket server:', error);
-      this.isConnecting = false;
-      
-      // Show connection error notification (with debounce)
-      const now = Date.now();
-      if (!this.hasShownErrorNotification || (now - this.lastErrorTime > this.errorNotificationDebounce)) {
-        this.hasShownErrorNotification = true;
-        this.lastErrorTime = now;
-        
-        safeShowToast({
-          message: "Failed to connect to game server. Server may be unavailable.",
-          intent: Intent.DANGER,
-          icon: "error",
-          timeout: 5000
-        });
-      }
+      console.error('Failed to connect WebSocket:', error);
+      this.handleError(error);
+      return false;
+    } finally {
+      this.connectionAttemptInProgress = false;
     }
   }
 
@@ -208,34 +268,57 @@ export class WebSocketClient {
    */
   public disconnect(): void {
     if (this.socket) {
-      this.manualClose = true;
       this.socket.close();
       this.socket = null;
+      this.connected = false;
+      
+      // Clear any reconnect timers
+      if (this.reconnectTimer) {
+        clearTimeout(this.reconnectTimer);
+        this.reconnectTimer = null;
+      }
+      
+      console.log('WebSocket disconnected');
     }
   }
 
   /**
-   * Reset the connection state and attempt counts
+   * Check if the WebSocket is connected
    */
-  public resetConnectionState(): void {
-    this.reconnectAttempts = 0;
-    this.connectionAttempts = 0;
-    this.isConnecting = false;
-    this.manualClose = false;
-    this.hasShownErrorNotification = false;
-    this.hasShownReconnectFailedNotification = false;
-    
-    // Close existing socket if it exists
-    if (this.socket) {
-      try {
-        this.socket.close();
-      } catch (error) {
-        console.error('Error closing socket during reset:', error);
-      }
-      this.socket = null;
+  public isConnected(): boolean {
+    return this.connected;
+  }
+
+  /**
+   * Check if a connection attempt is in progress
+   */
+  public isConnecting(): boolean {
+    return this.connectionAttemptInProgress;
+  }
+
+  /**
+   * Send a message to the server
+   * @param eventType The event type
+   * @param data The data to send
+   */
+  public send(eventType: string, data: any): void {
+    if (!this.socket || !this.connected) {
+      console.error('Cannot send message, WebSocket not connected');
+      return;
     }
-    
-    console.log('WebSocket connection state reset');
+
+    try {
+      // Format message to match server expectations
+      const message = JSON.stringify({
+        event: eventType,      // Changed from 'type' to 'event'
+        payload: data,         // Changed from 'data' to 'payload'
+        timestamp: Date.now()  // Kept for client-side logging but not used by server
+      });
+      
+      this.socket.send(message);
+    } catch (error) {
+      console.error('Error sending WebSocket message:', error);
+    }
   }
 
   /**
@@ -244,11 +327,39 @@ export class WebSocketClient {
    * @param handler The handler function to call when the event occurs
    */
   public on(eventType: WebSocketEventType, handler: WebSocketEventHandler): void {
-    if (!this.eventHandlers.has(eventType)) {
-      this.eventHandlers.set(eventType, []);
+    if (eventType === 'message') {
+      // For message events, we need to register message type handlers
+      if (typeof handler !== 'function') {
+        console.error('Message handler must be a function');
+        return;
+      }
+      
+      const messageType = 'default'; // Default message type
+      if (!this.messageHandlers.has(messageType)) {
+        this.messageHandlers.set(messageType, new Set());
+      }
+      
+      this.messageHandlers.get(messageType)?.add(handler);
+    } else if (eventType === 'connect') {
+      this.connectHandlers.add(handler);
+    } else if (eventType === 'disconnect') {
+      this.disconnectHandlers.add(handler);
+    } else if (eventType === 'error') {
+      this.errorHandlers.add(handler);
+    }
+  }
+
+  /**
+   * Register a handler for a specific message type
+   * @param messageType The message type to listen for
+   * @param handler The handler function to call when the event occurs
+   */
+  public onMessageType(messageType: string, handler: WebSocketEventHandler): void {
+    if (!this.messageHandlers.has(messageType)) {
+      this.messageHandlers.set(messageType, new Set());
     }
     
-    this.eventHandlers.get(eventType)!.push(handler);
+    this.messageHandlers.get(messageType)?.add(handler);
   }
 
   /**
@@ -257,111 +368,154 @@ export class WebSocketClient {
    * @param handler The handler function to remove
    */
   public off(eventType: WebSocketEventType, handler: WebSocketEventHandler): void {
-    if (!this.eventHandlers.has(eventType)) {
-      return;
-    }
-    
-    const handlers = this.eventHandlers.get(eventType)!;
-    const index = handlers.indexOf(handler);
-    
-    if (index !== -1) {
-      handlers.splice(index, 1);
+    if (eventType === 'message') {
+      const messageType = 'default';
+      this.messageHandlers.get(messageType)?.delete(handler);
+    } else if (eventType === 'connect') {
+      this.connectHandlers.delete(handler);
+    } else if (eventType === 'disconnect') {
+      this.disconnectHandlers.delete(handler);
+    } else if (eventType === 'error') {
+      this.errorHandlers.delete(handler);
     }
   }
 
   /**
-   * Send a message to the server
-   * @param eventType The event type
-   * @param data The data to send
+   * Remove a handler for a specific message type
+   * @param messageType The message type to remove
+   * @param handler The handler function to remove
    */
-  public send(eventType: string, data?: any): void {
-    if (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
-      console.warn('Cannot send message, WebSocket is not connected');
-      
-      // Only show the notification if we haven't shown an error notification recently
-      const now = Date.now();
-      if (now - this.lastErrorTime > this.errorNotificationDebounce) {
-        this.lastErrorTime = now;
-        
-        // Show warning notification
+  public offMessageType(messageType: string, handler: WebSocketEventHandler): void {
+    this.messageHandlers.get(messageType)?.delete(handler);
+  }
+
+  /**
+   * Handle WebSocket open event
+   */
+  private handleOpen(): void {
+    console.log('WebSocket connected to', this.url);
+    this.connected = true;
+    this.reconnectAttempts = 0;
+    
+    // Notify all connect handlers
+    this.connectHandlers.forEach(handler => handler());
+    
+    // Show toast notification
         safeShowToast({
-          message: "Cannot send message, not connected to server",
-          intent: Intent.WARNING,
-          icon: "offline",
+      message: 'Connected to game server',
+      intent: Intent.SUCCESS,
+      icon: 'tick-circle',
           timeout: 3000
         });
       }
       
-      return;
-    }
-
-    const message = {
-      type: eventType,
-      data: data || null,
-      timestamp: Date.now()
-    };
-
+  /**
+   * Handle WebSocket message event
+   */
+  private handleMessage(event: MessageEvent): void {
     try {
-      this.socket.send(JSON.stringify(message));
-    } catch (error) {
-      console.error('Error sending message:', error);
+      const message = JSON.parse(event.data);
+      const { event: eventType, payload } = message;
       
-      // Only show the notification if we haven't shown an error notification recently
-      const now = Date.now();
-      if (now - this.lastErrorTime > this.errorNotificationDebounce) {
-        this.lastErrorTime = now;
-        
-        // Show send error notification
-        safeShowToast({
-          message: "Failed to send message to server",
-          intent: Intent.DANGER,
-          icon: "warning-sign",
-          timeout: 3000
-        });
+      // If we have handlers for this specific message type, call them
+      if (eventType && this.messageHandlers.has(eventType)) {
+        this.messageHandlers.get(eventType)?.forEach(handler => handler(payload));
       }
+      
+      // Also call default message handlers
+      if (this.messageHandlers.has('default')) {
+        this.messageHandlers.get('default')?.forEach(handler => handler(message));
+      }
+    } catch (error) {
+      console.error('Error parsing WebSocket message:', error, event.data);
     }
   }
 
   /**
-   * Check if the WebSocket is connected
+   * Handle WebSocket close event
    */
-  public isConnected(): boolean {
-    return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
-  }
-
-  /**
-   * Get the current connection state
-   */
-  public getState(): number {
-    if (!this.socket) {
-      return WebSocket.CLOSED;
+  private handleClose(event: CloseEvent): void {
+    this.connected = false;
+    
+    // Store close information for diagnostics
+    this.lastCloseCode = event.code;
+    this.lastCloseReason = event.reason || (event.code === 1006 ? 'Abnormal closure (no close frame received)' : null);
+    
+    console.log(`WebSocket connection closed: ${event.code}${event.reason ? ' - ' + event.reason : ''}`);
+    
+    // Notify all disconnect handlers
+    this.disconnectHandlers.forEach(handler => handler(event));
+    
+    // Attempt to reconnect if the close wasn't intentional
+    if (!event.wasClean && this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.attemptReconnect();
+    } else {
+      safeShowToast({
+        message: `Disconnected from game server (Code: ${event.code})`,
+        intent: Intent.WARNING,
+        icon: 'offline',
+        timeout: 3000
+      });
     }
-    return this.socket.readyState;
   }
 
   /**
-   * Dispatch an event to all registered handlers
-   * @param eventType The event type
-   * @param data The event data
+   * Handle WebSocket error event
    */
-  private dispatchEvent(eventType: string, data?: any): void {
-    if (!this.eventHandlers.has(eventType as WebSocketEventType)) {
-      return;
+  private handleError(error?: any): void {
+    console.error('WebSocket error', error);
+    
+    // Store diagnostics
+    this.lastCloseCode = 1006; // Assuming abnormal closure on error
+    this.lastCloseReason = error?.message || 'Connection error';
+    
+    // Notify all error handlers
+    this.errorHandlers.forEach(handler => handler(error));
+    
+    // Show toast notification
+    safeShowToast({
+      message: 'Error connecting to game server',
+      intent: Intent.DANGER,
+      icon: 'error',
+      timeout: 5000
+    });
+  }
+
+  /**
+   * Attempt to reconnect to the WebSocket server
+   */
+  private attemptReconnect(): void {
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer);
     }
     
-    const handlers = this.eventHandlers.get(eventType as WebSocketEventType)!;
+    this.reconnectAttempts++;
+    const delay = this.reconnectDelay * Math.pow(1.5, this.reconnectAttempts - 1);
     
-    for (const handler of handlers) {
-      try {
-        handler(data);
-      } catch (error) {
-        console.error(`Error in WebSocket event handler for '${eventType}':`, error);
+    console.log(`Attempting to reconnect in ${delay}ms (Attempt ${this.reconnectAttempts} of ${this.maxReconnectAttempts})`);
+    
+    this.reconnectTimer = setTimeout(async () => {
+      console.log(`Reconnecting to WebSocket (Attempt ${this.reconnectAttempts} of ${this.maxReconnectAttempts})`);
+      
+      // If we've had multiple failed attempts, try to find a working path
+      if (this.reconnectAttempts > 2) {
+        this.connectionPath = await this.testConnectivity();
       }
-    }
+      
+      // Connect with the determined path
+      this.connect();
+    }, delay);
+    
+    safeShowToast({
+      message: `Reconnecting to server in ${Math.round(delay / 1000)}s (Attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+      intent: Intent.PRIMARY,
+      icon: 'refresh',
+      timeout: delay
+    });
   }
 }
 
-// Create a singleton instance
-export const websocketClient = new WebSocketClient();
+// Export the singleton instance
+export const websocketClient = WebSocketClient.getInstance();
 
 export default websocketClient; 

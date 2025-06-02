@@ -1,23 +1,18 @@
-# PowerShell script to reset and set up the StoryGateRPG server environment
+# PowerShell script to reset and set up the server environment
+Write-Host "Setting up server environment..." -ForegroundColor Yellow
 
-Write-Host "Resetting and creating a fresh virtual environment..." -ForegroundColor Yellow
-
-if (Test-Path "venv") {
-    Write-Host "Removing existing virtual environment..." -ForegroundColor Red
-    Remove-Item -Recurse -Force venv
+# Check if virtual environment exists
+if (-not (Test-Path -Path ".\venv")) {
+    Write-Host "Creating virtual environment..." -ForegroundColor Green
+    python -m venv venv
 }
 
-# Create a new virtual environment
-Write-Host "Creating new virtual environment..." -ForegroundColor Green
-python -m venv venv
-
-# Activate the virtual environment
+# Activate virtual environment
 Write-Host "Activating virtual environment..." -ForegroundColor Green
 & .\venv\Scripts\Activate.ps1
 
-# Install dependencies
-Write-Host "Installing dependencies..." -ForegroundColor Green
-pip install -r minimal_requirements.txt
+# Install required packages
+Write-Host "Installing required packages..." -ForegroundColor Green
+pip install -r requirements.txt
 
-Write-Host "Setup complete!" -ForegroundColor Green
-Write-Host "To run the server, use: .\run_server.ps1 or .\run_minimal_server.ps1" -ForegroundColor Cyan 
+Write-Host "Server setup complete!" -ForegroundColor Green 

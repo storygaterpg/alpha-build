@@ -81,7 +81,7 @@ export interface ChatMessage {
   sender: string;
   content: string;
   timestamp: number;
-  type: 'system' | 'player' | 'npc' | 'enemy';
+  type: 'in-character' | 'out-of-character' | 'system' | 'npc' | 'enemy';
 }
 
 export interface LogEntry {
@@ -131,4 +131,22 @@ export interface GameState {
   turnState: TurnState;
   sheetModal: ModalState;
   error: string | null;
+}
+
+export interface Player {
+  id: string;
+  name: string;
+  position: {
+    x: number;
+    y: number;
+  };
+}
+
+export interface GameState {
+  playerName: string;
+  player: Player | null;
+  chat: {
+    messages: ChatMessage[];
+    unread: number;
+  };
 } 

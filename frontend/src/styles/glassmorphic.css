@@ -594,4 +594,69 @@ body {
 .game-grid-panel:hover {
   box-shadow: var(--glass-shadow), var(--glass-glow-effect);
   border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Connection Status */
+.app-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 16px;
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(80, 80, 80, 0.5);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.connection-status-icon {
+  animation: pulse 2s infinite;
+}
+
+.connection-status-icon.reconnecting {
+  animation: spin 1.2s linear infinite;
+}
+
+.connection-status-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.connection-status-tooltip .bp4-popover-content {
+  padding: 8px 12px;
+  max-width: 250px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 } 

@@ -1,9 +1,6 @@
-# PowerShell script to run the StoryGateRPG server
-
-# Activate the virtual environment
+# PowerShell script to run the main server
 Write-Host "Activating virtual environment..." -ForegroundColor Green
-& .\venv\Scripts\Activate.ps1
+.\venv\Scripts\Activate.ps1
 
-# Run the server
-Write-Host "Starting server..." -ForegroundColor Green
+Write-Host "Starting main server on port 8000..." -ForegroundColor Green
 python server.py 

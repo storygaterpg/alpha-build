@@ -11,35 +11,25 @@ This is the server component for the StoryGateRPG game. It provides a WebSocket 
 
 #### Windows (using batch files)
 1. Double-click on `setup.bat` to create a virtual environment and install dependencies
-2. After setup completes, you can run either:
-   - `run_server.bat` to start the full featured server (port 8000)
-   - `run_minimal_server.bat` to start the simplified server (port 8000)
+2. After setup completes, run `run_server.bat` to start the server (port 8000)
 
 #### Windows (using PowerShell)
 1. Open PowerShell in the server directory
 2. Run `.\setup.ps1` to create a virtual environment and install dependencies
-3. Run one of:
-   - `.\run_server.ps1` to start the full featured server
-   - `.\run_minimal_server.ps1` to start the simplified server
+3. Run `.\run_server.ps1` to start the server
 
-## Server Options
+## Server Features
 
-### Full Server (server.py)
+### Adaptive Server (server.py)
 - Complete implementation with all game features
 - Includes game logic, turn management, rules engine
+- Automatically falls back to simplified mode with mock data if core modules cannot be imported
 - WebSocket endpoint: `/ws`
 - Default port: 8000
-
-### Minimal Server (minimal_server.py)
-- Simplified implementation for testing frontend connections
-- Provides basic WebSocket functionality with mock data
-- WebSocket endpoint: `/ws`
-- Default port: 8000
-- Use this if you encounter issues with the full server
 
 ## Server API
 
-Both servers implement the following WebSocket events:
+The server implements the following WebSocket events:
 
 ### Client to Server
 - `requestMap`: Request the game map
@@ -65,17 +55,16 @@ If you encounter module import errors (e.g., `ModuleNotFoundError: No module nam
    ```
 
 2. These scripts will:
-   - Delete the existing virtual environment
-   - Create a new one
-   - Install the minimal dependencies needed for the server
+   - Create a new virtual environment if one doesn't exist
+   - Install the required dependencies needed for the server
 
 ### Other Common Issues
 1. Make sure you have Python 3.8+ installed
 2. Check that you've activated the virtual environment before running the server
-3. Try running the minimal server if the full server has issues
+3. The server will automatically use mock data if it cannot import core modules
 4. If dependencies fail to install, try running:
    ```
    pip install --upgrade pip
-   pip install -r minimal_requirements.txt
+   pip install -r requirements.txt
    ```
 5. Check server logs for error messages 

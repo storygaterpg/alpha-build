@@ -26,6 +26,7 @@ import LogView from '../components/LogView';
 import CharacterSheet from '../components/CharacterSheet';
 import VideoGrid from '../components/VideoGrid';
 import LayoutControls from '../components/LayoutControls';
+import ConnectionStatus from '../components/ConnectionStatus';
 
 // Extended Item type to include equipped property
 interface ExtendedItem extends Item {
@@ -207,13 +208,16 @@ const Game: React.FC = () => {
       }}>
         <LayoutControls />
         
-        <button 
-          className="glass-btn" 
-          onClick={debugLayout}
-          style={{ marginLeft: '8px' }}
-        >
-          Debug
-        </button>
+        <div className="game-header-right">
+          <ConnectionStatus />
+          <button 
+            className="glass-btn" 
+            onClick={debugLayout}
+            style={{ marginLeft: '8px' }}
+          >
+            Debug
+          </button>
+        </div>
       </div>
       
       {/* Mosaic Layout - With fixed resize options */}

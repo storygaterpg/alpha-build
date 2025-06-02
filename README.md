@@ -4,6 +4,18 @@ A React-based RPG game with a Python backend server. This project allows you to 
 
 ## Quick Start
 
+### Using npm scripts
+```
+npm run setup    # First-time setup
+npm run start    # Start both server and frontend
+```
+
+Or run components separately:
+```
+npm run dev:server    # Start just the server
+npm run dev:frontend  # Start just the frontend
+```
+
 ### Windows with Batch Files
 Double-click on `start_game.bat` to launch both the server and frontend together.
 
@@ -22,11 +34,9 @@ cd server
 .\setup.bat     # Windows batch
 .\setup.ps1     # PowerShell
 
-# Then run either:
-.\run_server.bat        # Full server (batch)
-.\run_minimal_server.bat # Minimal server (batch)
-.\run_server.ps1        # Full server (PowerShell)
-.\run_minimal_server.ps1 # Minimal server (PowerShell)
+# Then run:
+.\run_server.bat        # Server (batch)
+.\run_server.ps1        # Server (PowerShell)
 ```
 
 ### 2. Start the Frontend
@@ -43,14 +53,19 @@ npm install  # Only needed first time
 npm run dev
 ```
 
-## Server Options
+## Architecture
 
-The project includes two server implementations:
+The project consists of two main components:
 
-1. **Full Server** (server.py): Complete implementation with all game features
-2. **Minimal Server** (minimal_server.py): Simplified implementation for testing frontend connections
+1. **Server** (server.py): Python FastAPI server that handles game logic and WebSocket communication
+   - Runs on port 8000
+   - Provides WebSocket endpoint at /ws
+   - Falls back to mock data if core game modules can't be imported
 
-If you encounter issues with the full server, try using the minimal server instead.
+2. **Frontend** (Vite + React): User interface for the game
+   - Runs on port 5173
+   - Connects to the server via WebSocket
+   - Built with React, Redux, and Phaser
 
 ## Troubleshooting
 
