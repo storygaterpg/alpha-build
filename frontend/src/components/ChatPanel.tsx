@@ -18,6 +18,41 @@ const safeShowToast = (props: any) => {
   }
 };
 
+// Toggle component for debug logging
+const DebugToggle: React.FC = () => {
+  const [isVerbose, setIsVerbose] = useState(() => {
+    return localStorage.getItem('verbose_logging') === 'true';
+  });
+
+  const toggleVerbose = () => {
+    const newValue = !isVerbose;
+    setIsVerbose(newValue);
+    localStorage.setItem('verbose_logging', newValue ? 'true' : 'false');
+  };
+
+  // Only show in development mode
+  if (process.env.NODE_ENV !== 'development') {
+    return null;
+  }
+
+  return (
+    <div style={{ 
+      position: 'absolute', 
+      bottom: '10px', 
+      left: '10px',
+      zIndex: 10,
+      opacity: 0.6,
+      fontSize: '10px',
+      padding: '4px',
+      background: 'rgba(0,0,0,0.1)',
+      borderRadius: '4px',
+      cursor: 'pointer'
+    }} onClick={toggleVerbose}>
+      {isVerbose ? '🔊 Debug' : '🔇 Debug'}
+    </div>
+  );
+};
+
 /**
  * ChatPanel component
  * 
@@ -82,14 +117,17 @@ const ChatPanel: React.FC = () => {
   
   // Add debugging to check messages from Redux
   useEffect(() => {
-    console.log('ChatPanel: messages from Redux:', messages);
-    console.log('ChatPanel: local messages:', localMessages);
-    console.log('ChatPanel: unique messages:', uniqueMessages);
+    // Only log in development mode with verbose logging enabled
+    if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+      console.log('ChatPanel: messages from Redux:', messages);
+      console.log('ChatPanel: local messages:', localMessages);
+      console.log('ChatPanel: unique messages:', uniqueMessages);
     
-    // Check for invalid messages and log them
-    const invalidMessages = uniqueMessages.filter(msg => !msg || !msg.id || !msg.content);
-    if (invalidMessages.length > 0) {
-      console.warn('Found invalid messages:', invalidMessages);
+      // Check for invalid messages and log them
+      const invalidMessages = uniqueMessages.filter(msg => !msg || !msg.id || !msg.content);
+      if (invalidMessages.length > 0) {
+        console.warn('Found invalid messages:', invalidMessages);
+      }
     }
     
     // Force a re-render when messages change
@@ -100,12 +138,14 @@ const ChatPanel: React.FC = () => {
   
   // Debug render - log when component renders
   useEffect(() => {
-    console.log('ChatPanel rendered, connected:', socketConnected);
-    console.log('Chat state:', {
-      messageCount: messages.length,
-      playerName,
-      socketConnected
-    });
+    if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+      console.log('ChatPanel rendered, connected:', socketConnected);
+      console.log('Chat state:', {
+        messageCount: messages.length,
+        playerName,
+        socketConnected
+      });
+    }
   }, []);
   
   // Fallback: Listen for WebSocket messages directly if Redux is failing
@@ -114,14 +154,18 @@ const ChatPanel: React.FC = () => {
     const handleMessage = (event: MessageEvent) => {
       try {
         const message = JSON.parse(event.data);
-        console.log("Direct WebSocket message:", message);
+        if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+          console.log("Direct WebSocket message:", message);
+        }
         
         if (message.event === 'chat_message' && message.payload) {
           const messageId = message.payload.id || `local_${Date.now()}_${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 15)}`;
           
           // Check if this message already exists in our ID map
           if (messageIdMap.current[messageId]) {
-            console.log("Message already exists in ID map, skipping local add:", messageId);
+            if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+              console.log("Message already exists in ID map, skipping local add:", messageId);
+            }
             return;
           }
           
@@ -144,7 +188,9 @@ const ChatPanel: React.FC = () => {
           );
           
           if (contentDuplicate) {
-            console.log("Content-based duplicate detected, skipping local add:", content);
+            if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+              console.log("Content-based duplicate detected, skipping local add:", content);
+            }
             return;
           }
           
@@ -159,7 +205,9 @@ const ChatPanel: React.FC = () => {
           // Add to ID map
           messageIdMap.current[messageId] = true;
           
-          console.log("Adding local message:", chatMsg);
+          if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+            console.log("Adding local message:", chatMsg);
+          }
           setLocalMessages(prev => [...prev, chatMsg]);
         }
       } catch (error) {
@@ -254,11 +302,13 @@ const ChatPanel: React.FC = () => {
     }
     
     try {
-      console.log("Sending chat message:", { 
-        content: inputValue, 
-        messageMode,
-        characterId: player?.id
-      });
+      if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+        console.log("Sending chat message:", { 
+          content: inputValue, 
+          messageMode,
+          characterId: player?.id
+        });
+      }
       
       // Record this as the last sent message
       setLastSentMessage({
@@ -302,7 +352,7 @@ const ChatPanel: React.FC = () => {
       
       // Directly manipulate the input value to include a space
       const newValue = inputValue + ' ';
-      console.log('Space key pressed, setting value to:', newValue);
+      // Don't log normal space key presses
       setInputValue(newValue);
     }
   };
@@ -326,7 +376,7 @@ const ChatPanel: React.FC = () => {
       // Add a direct event listener to handle spaces via DOM
       const handleRawKeyDown = (e: KeyboardEvent) => {
         if (e.key === ' ') {
-          console.log('Space key captured by direct DOM listener');
+          // Don't log every space key press
           e.preventDefault();
           
           // Set a small timeout to ensure the React state gets the space
@@ -379,6 +429,9 @@ const ChatPanel: React.FC = () => {
       zIndex: 2,
       pointerEvents: 'auto'
     }}>
+      {/* Add debug toggle in dev mode */}
+      <DebugToggle />
+      
       <div 
         className="scrollable-content message-list" 
         ref={messageListRef}
@@ -552,18 +605,13 @@ const ChatPanel: React.FC = () => {
           onChange={(e) => {
             // Allow all characters including spaces
             const newValue = e.target.value;
-            console.log('Input changed:', newValue);
             
+            // Don't log every input change
             // Check if a space was added compared to previous value
             const hadSpaceAdded = newValue.length > inputValue.length && 
                                  newValue.charAt(newValue.length - 1) === ' ';
             
             setInputValue(newValue);
-            
-            // If a space was added, log it for debugging
-            if (hadSpaceAdded) {
-              console.log('Space detected in onChange');
-            }
           }}
           onKeyDown={handleKeyDown}
           inputRef={inputRef}

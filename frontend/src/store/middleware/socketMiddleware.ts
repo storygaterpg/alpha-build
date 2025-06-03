@@ -339,7 +339,9 @@ const setupSocketListeners = (
     const code = closeInfo.code || event?.code;
     
     // Debug information
-    console.log(`Socket disconnected: ${wasClean ? 'Clean' : 'Unclean'} close, code ${code}${reason ? ': ' + reason : ''}`);
+    if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+      console.log(`Socket disconnected: ${wasClean ? 'Clean' : 'Unclean'} close, code ${code}${reason ? ': ' + reason : ''}`);
+    }
     
     if (wasClean || code === 1000) {
       // Clean disconnection (e.g. user navigated away)
@@ -430,7 +432,9 @@ const setupSocketListeners = (
   
   // Chat messages
   websocketClient.onMessageType('chat_message', (data) => {
-    console.log('Received chat_message:', data);
+    if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+      console.log('Received chat_message:', data);
+    }
     
     // Ensure the message has all required fields for a ChatMessage
     const message = {
@@ -441,11 +445,15 @@ const setupSocketListeners = (
       type: data.type || 'system'
     };
     
-    console.log('Formatted chat message for Redux:', message);
+    if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+      console.log('Formatted chat message for Redux:', message);
+    }
     
     // Check if this is a duplicate message
     if (isMessageDuplicate(message)) {
-      console.log('Duplicate message detected, skipping dispatch:', message.id);
+      if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+        console.log('Duplicate message detected, skipping dispatch:', message.id);
+      }
       return;
     }
     
@@ -457,7 +465,9 @@ const setupSocketListeners = (
       // Only dispatch one action to prevent duplication
       // We'll use the primary Redux action creator
       dispatch(messageReceived(message));
-      console.log('Successfully dispatched messageReceived action');
+      if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+        console.log('Successfully dispatched messageReceived action');
+      }
       
       // Don't dispatch the secondary action that was causing duplication
       // dispatch(chatReceiveAction(message));
@@ -471,7 +481,9 @@ const setupSocketListeners = (
           type: CHAT_RECEIVE,
           payload: message
         });
-        console.log('Successfully dispatched CHAT_RECEIVE action');
+        if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+          console.log('Successfully dispatched CHAT_RECEIVE action');
+        }
       } catch (fallbackError) {
         console.error('Even fallback dispatch failed:', fallbackError);
       }

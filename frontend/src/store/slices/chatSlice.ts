@@ -93,7 +93,9 @@ const chatSlice = createSlice({
   reducers: {
     // Handle a new message received from the server
     messageReceived: (state, action: PayloadAction<ChatMessage>) => {
-      console.log('Chat message received in reducer:', action.payload);
+      if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+        console.log('Chat message received in reducer:', action.payload);
+      }
       
       // Ensure we have a valid message with required fields and unique ID
       const normalizedMessage = ensureUniqueMessageId(action.payload);
@@ -105,14 +107,18 @@ const chatSlice = createSlice({
       
       // Check if this is a duplicate using our enhanced detection
       if (isDuplicateMessage(normalizedMessage)) {
-        console.log('Duplicate message detected in reducer, skipping:', normalizedMessage.id);
+        if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+          console.log('Duplicate message detected in reducer, skipping:', normalizedMessage.id);
+        }
         return;
       }
       
       state.messages.push(normalizedMessage);
       state.unreadCount += 1;
       
-      console.log('Updated chat state, messages count:', state.messages.length);
+      if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+        console.log('Updated chat state, messages count:', state.messages.length);
+      }
       
       // Clear typing indicator for this user if they sent a message
       if (normalizedMessage.sender && state.isTyping[normalizedMessage.sender]) {
@@ -170,7 +176,9 @@ const chatSlice = createSlice({
   extraReducers: (builder) => {
     // Handle CHAT_RECEIVE action explicitly using the typed action creator
     builder.addCase(chatReceiveAction, (state, action) => {
-      console.log('CHAT_RECEIVE action received:', action.payload);
+      if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+        console.log('CHAT_RECEIVE action received:', action.payload);
+      }
       
       // Ensure we have a valid message with required fields and unique ID
       const normalizedMessage = ensureUniqueMessageId(action.payload);
@@ -182,14 +190,18 @@ const chatSlice = createSlice({
       
       // Check if this is a duplicate using our enhanced detection
       if (isDuplicateMessage(normalizedMessage)) {
-        console.log('Duplicate message detected in CHAT_RECEIVE, skipping:', normalizedMessage.id);
+        if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+          console.log('Duplicate message detected in CHAT_RECEIVE, skipping:', normalizedMessage.id);
+        }
         return;
       }
       
       state.messages.push(normalizedMessage);
       state.unreadCount += 1;
       
-      console.log('Updated chat state from CHAT_RECEIVE, messages count:', state.messages.length);
+      if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+        console.log('Updated chat state from CHAT_RECEIVE, messages count:', state.messages.length);
+      }
     });
   }
 });
