@@ -242,8 +242,19 @@ const Game: React.FC = () => {
                     <div className="drag-handle" />
                   </div>
                 )} // Mini toolbar with drag handle
+                additionalControls={[
+                  <div key="pointer-fix" style={{ pointerEvents: 'none', position: 'absolute' }} />
+                ]}
               >
-                {renderTileContent(id)}
+                <div style={{ 
+                  height: '100%', 
+                  width: '100%',
+                  position: 'relative',
+                  zIndex: 1,
+                  pointerEvents: 'auto' // Ensure pointer events pass through
+                }}>
+                  {renderTileContent(id)}
+                </div>
               </MosaicWindow>
             )}
             value={effectiveLayout}

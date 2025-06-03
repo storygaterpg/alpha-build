@@ -6,9 +6,10 @@ import {
   socketDisconnect,
   socketDisconnected,
   socketError,
-  messageReceived
+  messageReceived as socketMessageReceived
 } from '../slices/socketSlice';
 import { RootState } from '../rootReducer';
+import { messageReceived, chatReceiveAction } from '../slices/chatSlice';
 import {
   MAP_REQUEST,
   MAP_RECEIVE,
@@ -43,13 +44,94 @@ import {
 } from '../slices/connectionSlice';
 import { showError } from '../slices/notificationSlice';
 
+// Message cache to prevent duplicate dispatches
+interface MessageCache {
+  [key: string]: {
+    content: string;
+    sender: string;
+    timestamp: number;
+    lastSeen: number;
+  }
+}
+
+// Max reconnect attempts before showing critical error
+const MAX_RECONNECT_ATTEMPTS = 5;
+// How long to keep messages in the cache (5 seconds)
+const MESSAGE_CACHE_TTL = 5000;
+
+// Global message cache for deduplication
+const messageCache: MessageCache = {};
+
+/**
+ * Check if a message is a duplicate
+ */
+const isMessageDuplicate = (message: any): boolean => {
+  if (!message) return false;
+  
+  // Check by ID first
+  if (message.id && messageCache[message.id]) {
+    return true;
+  }
+  
+  // Then check by content + sender + time window
+  const content = message.content || '';
+  const sender = message.sender || '';
+  const timestamp = message.timestamp || Date.now();
+  
+  // Look for a similar message in the cache
+  for (const cachedId in messageCache) {
+    const cached = messageCache[cachedId];
+    
+    // If content and sender match, and the message was seen recently
+    if (cached.content === content && 
+        cached.sender === sender && 
+        Math.abs(cached.timestamp - timestamp) < 3000) {
+      return true;
+    }
+  }
+  
+  return false;
+};
+
+/**
+ * Add a message to the cache
+ */
+const cacheMessage = (message: any): void => {
+  if (!message) return;
+  
+  const id = message.id || `temp_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  const content = message.content || '';
+  const sender = message.sender || '';
+  const timestamp = message.timestamp || Date.now();
+  
+  messageCache[id] = {
+    content,
+    sender,
+    timestamp,
+    lastSeen: Date.now()
+  };
+  
+  // Clean old items from cache
+  cleanMessageCache();
+};
+
+/**
+ * Remove old messages from the cache
+ */
+const cleanMessageCache = (): void => {
+  const now = Date.now();
+  
+  Object.keys(messageCache).forEach(id => {
+    if (now - messageCache[id].lastSeen > MESSAGE_CACHE_TTL) {
+      delete messageCache[id];
+    }
+  });
+};
+
 // Types of messages our socket middleware will handle
 export type MessageHandlers = {
   [key: string]: (data: any, dispatch: Dispatch<AnyAction>, getState: () => RootState) => void;
 };
-
-// Max reconnect attempts before showing critical error
-const MAX_RECONNECT_ATTEMPTS = 5;
 
 /**
  * Get diagnostic information about WebSocket connection
@@ -348,10 +430,52 @@ const setupSocketListeners = (
   
   // Chat messages
   websocketClient.onMessageType('chat_message', (data) => {
-    dispatch({
-      type: CHAT_RECEIVE,
-      payload: data
-    });
+    console.log('Received chat_message:', data);
+    
+    // Ensure the message has all required fields for a ChatMessage
+    const message = {
+      id: data.id || `msg_${Date.now()}_${Math.random().toString(36).substring(2, 15)}_${Math.random().toString(36).substring(2, 15)}`,
+      sender: data.sender || 'Unknown',
+      content: data.content || '',
+      timestamp: data.timestamp || Date.now(),
+      type: data.type || 'system'
+    };
+    
+    console.log('Formatted chat message for Redux:', message);
+    
+    // Check if this is a duplicate message
+    if (isMessageDuplicate(message)) {
+      console.log('Duplicate message detected, skipping dispatch:', message.id);
+      return;
+    }
+    
+    // Add to cache to prevent future duplicates
+    cacheMessage(message);
+    
+    // Add additional debugging
+    try {
+      // Only dispatch one action to prevent duplication
+      // We'll use the primary Redux action creator
+      dispatch(messageReceived(message));
+      console.log('Successfully dispatched messageReceived action');
+      
+      // Don't dispatch the secondary action that was causing duplication
+      // dispatch(chatReceiveAction(message));
+      // console.log('Successfully dispatched chatReceiveAction');
+    } catch (error) {
+      console.error('Failed to dispatch chat message:', error);
+      
+      // Fallback to plain action if the dispatch fails
+      try {
+        dispatch({
+          type: CHAT_RECEIVE,
+          payload: message
+        });
+        console.log('Successfully dispatched CHAT_RECEIVE action');
+      } catch (fallbackError) {
+        console.error('Even fallback dispatch failed:', fallbackError);
+      }
+    }
   });
   
   // Game logs
@@ -368,7 +492,7 @@ const setupSocketListeners = (
       const { type, data } = message;
       
       // Dispatch a generic message received action
-      dispatch(messageReceived({ type, data }));
+      dispatch(socketMessageReceived({ type, data }));
       
       // Handle specific message types using the provided handlers
       if (type && messageHandlers[type]) {

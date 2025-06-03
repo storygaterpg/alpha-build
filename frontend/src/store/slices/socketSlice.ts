@@ -4,33 +4,22 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 export interface SocketState {
   connected: boolean;
   connecting: boolean;
-  error: { 
-    message: string; 
-    code?: number;
-    timestamp?: number;
-  } | null;
-  lastMessage: {
-    type: string;
-    data: any;
-  } | null;
-  connectionInfo: {
-    url: string | null;
-    path: string | null;
-    reconnectAttempts: number;
+  error: {
+    message: string | null;
+    code: number | null;
   };
+  lastMessage: any | null;
 }
 
 // Initial state
 const initialState: SocketState = {
   connected: false,
   connecting: false,
-  error: null,
-  lastMessage: null,
-  connectionInfo: {
-    url: null,
-    path: null,
-    reconnectAttempts: 0
-  }
+  error: {
+    message: null,
+    code: null
+  },
+  lastMessage: null
 };
 
 // Create the socket slice
@@ -41,18 +30,11 @@ const socketSlice = createSlice({
     // Connection actions
     socketConnect: (state, action: PayloadAction<{ url?: string; path?: string }>) => {
       state.connecting = true;
-      if (action.payload?.url) {
-        state.connectionInfo.url = action.payload.url;
-      }
-      if (action.payload?.path) {
-        state.connectionInfo.path = action.payload.path;
-      }
     },
     socketConnected: (state) => {
       state.connected = true;
       state.connecting = false;
-      state.error = null;
-      state.connectionInfo.reconnectAttempts = 0;
+      state.error = { message: null, code: null };
     },
     socketDisconnect: (state) => {
       state.connecting = false;
@@ -62,33 +44,17 @@ const socketSlice = createSlice({
       state.connecting = false;
     },
     socketError: (state, action: PayloadAction<{ message: string; code?: number }>) => {
+      state.connected = false;
+      state.connecting = false;
       state.error = {
         message: action.payload.message,
-        code: action.payload.code,
-        timestamp: Date.now()
+        code: action.payload.code || null
       };
-      state.connecting = false;
-    },
-    socketReconnectAttempt: (state, action: PayloadAction<number>) => {
-      state.connectionInfo.reconnectAttempts = action.payload;
     },
 
     // Message actions
     messageReceived: (state, action: PayloadAction<{ type: string; data: any }>) => {
       state.lastMessage = action.payload;
-    },
-    
-    // Reset state
-    resetSocketState: (state) => {
-      state.connected = false;
-      state.connecting = false;
-      state.error = null;
-      state.lastMessage = null;
-      state.connectionInfo = {
-        url: null,
-        path: null,
-        reconnectAttempts: 0
-      };
     }
   }
 });
@@ -100,9 +66,7 @@ export const {
   socketDisconnect,
   socketDisconnected,
   socketError,
-  socketReconnectAttempt,
-  messageReceived,
-  resetSocketState
+  messageReceived
 } = socketSlice.actions;
 
 // Export the reducer

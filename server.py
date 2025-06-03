@@ -9,6 +9,7 @@ import json
 import asyncio
 import sys
 import os
+import time
 from typing import Dict, List, Any, Optional, Union
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
 from fastapi.responses import JSONResponse
@@ -23,6 +24,32 @@ logging.basicConfig(
 logger = logging.getLogger("server")
 
 app = FastAPI()
+
+# Define a MockAIService class that will be used if the real AIService isn't available
+class MockAIService:
+    """Simple mock implementation of AIService for testing"""
+    def chat(self, message, msg_type="in-character"):
+        """Generate a mock response to a chat message"""
+        logger.info(f"MockAIService: Generating response for: {message}")
+        
+        # Create basic mock response
+        response = {
+            "sender": "Dungeon Master",
+            "text": f"I acknowledge your message: '{message[:30]}...' Please continue your adventure!",
+        }
+        
+        # Add some variety based on message content
+        if "hello" in message.lower() or "hi" in message.lower():
+            response["text"] = "Greetings, adventurer! Welcome to the realm of StoryGate!"
+        elif "help" in message.lower():
+            response["text"] = "What do you need help with? I'm the Dungeon Master, at your service."
+        elif "attack" in message.lower() or "fight" in message.lower():
+            response["text"] = "You ready your weapon. What would you like to attack?"
+        elif "look" in message.lower() or "where" in message.lower():
+            response["text"] = "You find yourself in a mysterious tavern. The air is thick with stories untold."
+            
+        logger.info(f"MockAIService: Generated response: {response}")
+        return response
 
 # Try to import core engine modules
 # If they fail, use mock implementations for testing
@@ -53,6 +80,9 @@ except ImportError as e:
     logger.warning(f"Could not import core modules: {e}")
     logger.warning("Using mock data for testing. Some features will be limited.")
     USING_MOCK_DATA = True
+    
+    # Create mock AI service
+    ai_service = MockAIService()
     
     # Mock data for testing when modules aren't available
     MOCK_ACTORS = [
@@ -198,14 +228,72 @@ async def handle_event(ws: WebSocket, event: str, payload: dict):
                     "text": text
                 })
                 
-                # Send an NPC response after a short delay
-                await asyncio.sleep(1)
-                await broadcast("chat", {
-                    "sender": "NPC",
-                    "text": f"You said: {text}"
-                })
+            # Handle chat messages using AIService
+            elif event == 'chat_message':
+                content = payload.get('content', '')
+                msg_type = payload.get('type', 'in-character')
+                character_id = payload.get('characterId', 'player1')
+                
+                # Get the character name
+                character_name = "Player"
+                for actor in MOCK_ACTORS:
+                    if actor['id'] == character_id:
+                        character_name = actor['name']
+                        break
+                
+                # Log the received message
+                logger.info(f"Chat message from {character_name}: {content}")
+                
+                # Create a unique ID for the user message - do this BEFORE any try/except
+                user_msg_id = f"msg_{int(time.time())}_{id(content)}"
+                
+                # First broadcast the original message - do this BEFORE any try/except to ensure it always happens
+                user_msg = {
+                    "id": user_msg_id,
+                    "sender": character_name,
+                    "content": content,
+                    "timestamp": time.time(),
+                    "type": msg_type
+                }
+                logger.info(f"Broadcasting user message: {user_msg}")
+                await broadcast("chat_message", user_msg)
+                
+                # Now try to generate an AI response
+                try:
+                    # Generate response using AI service (will work with both real and mock implementation)
+                    logger.info(f"Generating AI response for message: {content}")
+                    response = ai_service.chat(content, msg_type)
+                    logger.info(f"AI response generated: {response}")
+                    
+                    # Create a unique ID for the AI response
+                    ai_msg_id = f"msg_{int(time.time())}_{id(response)}"
+                    
+                    # Then broadcast AI response
+                    ai_msg = {
+                        "id": ai_msg_id,
+                        "sender": response["sender"],
+                        "content": response["text"],
+                        "timestamp": time.time(),
+                        "type": "system"
+                    }
+                    logger.info(f"Broadcasting AI response: {ai_msg}")
+                    await broadcast("chat_message", ai_msg)
+                    
+                except Exception as e:
+                    logger.exception(f"Error generating AI response: {e}")
+                    # Send error message if something goes wrong
+                    error_msg = {
+                        "id": f"err_{int(time.time())}",
+                        "sender": "System",
+                        "content": f"Error processing message: {str(e)}",
+                        "timestamp": time.time(),
+                        "type": "system"
+                    }
+                    await broadcast("chat_message", error_msg)
+                
             else:
-                logger.warning(f"Unhandled event in mock mode: {event}")
+                if USING_MOCK_DATA:
+                    logger.warning(f"Unhandled event in mock mode: {event}")
                 
         else:
             # Handle events with real game engine
@@ -349,4 +437,4 @@ async def generic_exception_handler(request: Request, exc: Exception):
 if __name__ == '__main__':
     mode = "MOCK MODE" if USING_MOCK_DATA else "FULL ENGINE MODE"
     logger.info(f"Starting server on port 8000 in {mode}")
-    uvicorn.run(app, host='0.0.0.0', port=8000, log_level='info')
+    uvicorn.run(app, host='0.0.0.0', port=8000, log_level='info') 

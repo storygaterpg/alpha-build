@@ -3,14 +3,19 @@
  * Modern, clean design with glass-like effects
  */
 
-/* Global reset to remove all outlines and focus rings */
-*:focus,
-*:focus-visible,
-*:active,
-*:focus-within {
+/* Reset outlines for non-interactive elements while preserving them for form controls */
+*:not(input):not(textarea):not(select):not(button):focus,
+*:not(input):not(textarea):not(select):not(button):focus-visible,
+*:not(input):not(textarea):not(select):not(button):focus-within {
   outline: none !important;
   box-shadow: none !important;
   -webkit-focus-ring-color: transparent !important;
+}
+
+/* Preserve focus states for interactive elements but style them appropriately */
+input:focus, textarea:focus, select:focus, button:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--glass-primary) !important;
 }
 
 /* Additional selectors to target any possible dotted outlines */
@@ -31,6 +36,12 @@
   outline-style: none !important;
   box-shadow: none !important;
   -webkit-focus-ring-color: transparent !important;
+}
+
+/* Exception for form elements in Blueprint components */
+[class*="bp3-"] input, [class*="bp3-"] textarea, [class*="bp3-"] select,
+[class*="bp4-"] input, [class*="bp4-"] textarea, [class*="bp4-"] select {
+  pointer-events: auto !important;
 }
 
 :root {

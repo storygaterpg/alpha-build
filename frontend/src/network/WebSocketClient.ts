@@ -417,14 +417,38 @@ class WebSocketClient {
       const message = JSON.parse(event.data);
       const { event: eventType, payload } = message;
       
+      // Debug logging to help diagnose message format issues
+      console.log(`Received WebSocket message: event=${eventType}`, payload);
+      
+      // Normalize payload if it's not an object
+      const normalizedPayload = typeof payload === 'object' ? payload : { data: payload };
+      
+      // Add safety checks to ensure we have valid message data
+      if (!eventType) {
+        console.warn('Received WebSocket message with no event type:', message);
+      return;
+    }
+
       // If we have handlers for this specific message type, call them
       if (eventType && this.messageHandlers.has(eventType)) {
-        this.messageHandlers.get(eventType)?.forEach(handler => handler(payload));
+        this.messageHandlers.get(eventType)?.forEach(handler => {
+          try {
+            handler(normalizedPayload);
+          } catch (handlerError) {
+            console.error(`Error in handler for ${eventType}:`, handlerError);
+          }
+        });
       }
       
       // Also call default message handlers
       if (this.messageHandlers.has('default')) {
-        this.messageHandlers.get('default')?.forEach(handler => handler(message));
+        this.messageHandlers.get('default')?.forEach(handler => {
+          try {
+            handler(message);
+          } catch (handlerError) {
+            console.error('Error in default message handler:', handlerError);
+          }
+        });
       }
     } catch (error) {
       console.error('Error parsing WebSocket message:', error, event.data);
