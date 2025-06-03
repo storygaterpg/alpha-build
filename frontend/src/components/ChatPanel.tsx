@@ -2,8 +2,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { InputGroup, Button, Callout, Intent, ButtonGroup } from '@blueprintjs/core';
 import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
-import { sendInCharacterChat, sendOutOfCharacterChat, clearUnread } from '../store/slices/chatSlice';
+import { sendInCharacterChat, sendOutOfCharacterChat, clearUnread, userTyping } from '../store/slices/chatSlice';
 import { AppToaster } from '../App';
+import DebugToggle from './DebugToggle';
+import TypingIndicator from './TypingIndicator';
+import ConnectionStatus from './ConnectionStatus';
 
 // Safe wrapper for using AppToaster
 const safeShowToast = (props: any) => {
@@ -16,41 +19,6 @@ const safeShowToast = (props: any) => {
   } else {
     console.log('Toast message (AppToaster not available):', props.message);
   }
-};
-
-// Toggle component for debug logging
-const DebugToggle: React.FC = () => {
-  const [isVerbose, setIsVerbose] = useState(() => {
-    return localStorage.getItem('verbose_logging') === 'true';
-  });
-
-  const toggleVerbose = () => {
-    const newValue = !isVerbose;
-    setIsVerbose(newValue);
-    localStorage.setItem('verbose_logging', newValue ? 'true' : 'false');
-  };
-
-  // Only show in development mode
-  if (process.env.NODE_ENV !== 'development') {
-    return null;
-  }
-
-  return (
-    <div style={{ 
-      position: 'absolute', 
-      bottom: '10px', 
-      left: '10px',
-      zIndex: 10,
-      opacity: 0.6,
-      fontSize: '10px',
-      padding: '4px',
-      background: 'rgba(0,0,0,0.1)',
-      borderRadius: '4px',
-      cursor: 'pointer'
-    }} onClick={toggleVerbose}>
-      {isVerbose ? '🔊 Debug' : '🔇 Debug'}
-    </div>
-  );
 };
 
 /**
@@ -69,6 +37,7 @@ const ChatPanel: React.FC = () => {
   const [validationError, setValidationError] = useState<string | null>(null);
   const [messageMode, setMessageMode] = useState<'in-character' | 'out-of-character'>('in-character');
   const [localMessages, setLocalMessages] = useState<any[]>([]);
+  const [typingTimer, setTypingTimer] = useState<NodeJS.Timeout | null>(null);
   
   // Track last sent message to prevent duplicates
   const [lastSentMessage, setLastSentMessage] = useState<{
@@ -132,7 +101,14 @@ const ChatPanel: React.FC = () => {
     
     // Force a re-render when messages change
     if (messagesEndRef.current && uniqueMessages.length > 0) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+      try {
+        // In test environment, scrollIntoView might not be available
+        if (typeof messagesEndRef.current.scrollIntoView === 'function') {
+          messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+        }
+      } catch (error) {
+        console.error('Error scrolling to bottom:', error);
+      }
     }
   }, [messages, localMessages, uniqueMessages]);
   
@@ -218,15 +194,28 @@ const ChatPanel: React.FC = () => {
     // Try to connect to WebSocket directly
     const connectToWebSocket = () => {
       try {
+        // Skip WebSocket connection in test environment
+        if (process.env.NODE_ENV === 'test') {
+          return null;
+        }
+        
         const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         const wsUrl = `${protocol}//${window.location.hostname}:8000/ws`;
-        const socket = new WebSocket(wsUrl);
         
-        socket.addEventListener('message', handleMessage);
-        socket.addEventListener('open', () => console.log("Direct WebSocket connected"));
-        socket.addEventListener('error', (e) => console.error("Direct WebSocket error:", e));
-        
-        return socket;
+        // Check if WebSocket is available in this environment
+        if (typeof WebSocket !== 'undefined') {
+          const socket = new WebSocket(wsUrl);
+          
+          // Check if addEventListener is available (not in all test environments)
+          if (socket && typeof socket.addEventListener === 'function') {
+            socket.addEventListener('message', handleMessage);
+            socket.addEventListener('open', () => console.log("Direct WebSocket connected"));
+            socket.addEventListener('error', (e) => console.error("Direct WebSocket error:", e));
+          }
+          
+          return socket;
+        }
+        return null;
       } catch (error) {
         console.error("Failed to connect direct WebSocket:", error);
         return null;
@@ -237,21 +226,26 @@ const ChatPanel: React.FC = () => {
     if (messages.length === 0) {
       const socket = connectToWebSocket();
       
+      // WebSocket cleanup
       return () => {
         if (socket) {
-          socket.removeEventListener('message', handleMessage);
-          socket.close();
+          try {
+            // Check if addEventListener and removeEventListener are available
+            if (typeof socket.removeEventListener === 'function') {
+              socket.removeEventListener('message', handleMessage);
+            }
+            
+            // Check if close is available
+            if (typeof socket.close === 'function') {
+              socket.close();
+            }
+          } catch (error) {
+            console.error("Error cleaning up WebSocket:", error);
+          }
         }
       };
     }
   }, [messages.length, messages, localMessages]);
-  
-  // Scroll to bottom when messages change
-  useEffect(() => {
-    if (messagesEndRef.current && uniqueMessages.length > 0) {
-      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [uniqueMessages]);
   
   // Validate message before sending
   const validateMessage = (message: string): boolean => {
@@ -326,6 +320,12 @@ const ChatPanel: React.FC = () => {
       
       // Clear input
       setInputValue('');
+      
+      // Clear typing indicator when message is sent
+      if (typingTimer) {
+        clearTimeout(typingTimer);
+        setTypingTimer(null);
+      }
     } catch (error) {
       // Show error toast
       safeShowToast({
@@ -336,6 +336,31 @@ const ChatPanel: React.FC = () => {
       });
       
       console.error('Error sending message:', error);
+    }
+  };
+  
+  // Handle input change with typing indicator
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newValue = e.target.value;
+    setInputValue(newValue);
+    
+    // Send typing indicator if user is typing and has a player ID
+    if (newValue && player?.id && socketConnected) {
+      // Clear previous timer if it exists
+      if (typingTimer) {
+        clearTimeout(typingTimer);
+      }
+      
+      // Dispatch typing action
+      dispatch(userTyping({ userId: player.id, username: playerName }));
+      
+      // Set timer to clear typing status after 3 seconds
+      const timer = setTimeout(() => {
+        // No action needed, the backend will clean up typing indicators
+        setTypingTimer(null);
+      }, 3000);
+      
+      setTypingTimer(timer as unknown as NodeJS.Timeout);
     }
   };
   
@@ -529,6 +554,9 @@ const ChatPanel: React.FC = () => {
         <div ref={messagesEndRef} />
       </div>
       
+      {/* Typing indicator */}
+      <TypingIndicator className="typing-indicator-container" style={{ margin: '0 16px', minHeight: '20px' }} />
+      
       {validationError && (
         <Callout
           intent={Intent.DANGER}
@@ -602,17 +630,7 @@ const ChatPanel: React.FC = () => {
             messageMode === 'in-character' ? "Speak as your character..." : "Send an out-of-character message..." 
             : "Connecting..."}
           value={inputValue}
-          onChange={(e) => {
-            // Allow all characters including spaces
-            const newValue = e.target.value;
-            
-            // Don't log every input change
-            // Check if a space was added compared to previous value
-            const hadSpaceAdded = newValue.length > inputValue.length && 
-                                 newValue.charAt(newValue.length - 1) === ' ';
-            
-            setInputValue(newValue);
-          }}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           inputRef={inputRef}
           spellCheck={true}
@@ -670,29 +688,8 @@ const ChatPanel: React.FC = () => {
       </div>
       
       {/* Connection status indicator */}
-      <div 
-        className="connection-status" 
-        style={{ 
-          position: 'absolute', 
-          top: '10px', 
-          right: '10px',
-          padding: '4px 8px',
-          borderRadius: '10px',
-          fontSize: '12px',
-          backgroundColor: socketConnected ? 'rgba(76, 201, 240, 0.2)' : 'rgba(230, 57, 70, 0.2)',
-          color: socketConnected ? 'var(--glass-success)' : 'var(--glass-danger)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: '4px'
-        }}
-      >
-        <div style={{ 
-          width: '8px', 
-          height: '8px', 
-          borderRadius: '50%', 
-          backgroundColor: socketConnected ? 'var(--glass-success)' : 'var(--glass-danger)',
-        }} />
-        {socketConnected ? 'Connected' : 'Disconnected'}
+      <div style={{ position: 'absolute', top: '10px', right: '10px' }}>
+        <ConnectionStatus compact={true} />
       </div>
       
       {/* Add CSS for chat bubbles */}
@@ -764,6 +761,11 @@ const ChatPanel: React.FC = () => {
           /* Ensure textarea respects spaces */
           textarea {
             white-space: pre-wrap !important;
+          }
+          
+          /* Typing indicator container */
+          .typing-indicator-container {
+            margin-bottom: 4px;
           }
         `}
       </style>

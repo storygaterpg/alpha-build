@@ -1,5 +1,6 @@
 import React from 'react';
 import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
 import ConnectionStatus from '../../components/ConnectionStatus';
@@ -22,102 +23,220 @@ jest.mock('../../components/ConnectionStatus', () => {
 // Create mock store
 const mockStore = configureStore([]);
 
+// Mock the timer functions
+jest.useFakeTimers();
+
 describe('ConnectionStatus Component', () => {
-  let store: any;
-  
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-  
-  it('should render online status', () => {
-    // Create mock store with online connection state
-    store = mockStore({
-      connection: {
-        online: true,
-        reconnecting: false,
-        lastConnected: Date.now(),
-        latency: 50,
-        error: null
+  // Default connected state
+  const connectedState = {
+    socket: {
+      connected: true,
+      error: {
+        message: null,
+        code: null
       }
-    });
+    },
+    connection: {
+      reconnecting: false,
+      disconnectReason: null
+    }
+  };
+  
+  // Disconnected state
+  const disconnectedState = {
+    socket: {
+      connected: false,
+      error: {
+        message: null,
+        code: null
+      }
+    },
+    connection: {
+      reconnecting: false,
+      disconnectReason: 'User disconnected'
+    }
+  };
+  
+  // Reconnecting state
+  const reconnectingState = {
+    socket: {
+      connected: false,
+      error: {
+        message: null,
+        code: null
+      }
+    },
+    connection: {
+      reconnecting: true,
+      disconnectReason: 'Connection lost'
+    }
+  };
+  
+  // Error state
+  const errorState = {
+    socket: {
+      connected: false,
+      error: {
+        message: 'Failed to connect',
+        code: 1006
+      }
+    },
+    connection: {
+      reconnecting: false,
+      disconnectReason: 'Connection error'
+    }
+  };
+  
+  test('renders connected state in compact mode', () => {
+    const store = mockStore(connectedState);
     
-    render(
+    const { container } = render(
       <Provider store={store}>
-        <ConnectionStatus />
+        <ConnectionStatus compact={true} />
       </Provider>
     );
     
-    // Check that online status is shown
-    expect(screen.getByText(/online/i)).toBeInTheDocument();
-    // Don't test for latency as it might not appear in the component
+    // Should have the green indicator dot
+    const statusDot = container.querySelector('div[style*="var(--glass-success)"]');
+    expect(statusDot).toBeInTheDocument();
+    
+    // Should not display reconnecting icon
+    const reconnectIcon = container.querySelector('svg[data-icon="refresh"]');
+    expect(reconnectIcon).not.toBeInTheDocument();
   });
   
-  it('should render offline status', () => {
-    // Create mock store with offline connection state
-    store = mockStore({
-      connection: {
-        online: false,
-        reconnecting: false,
-        lastConnected: Date.now() - 60000, // 1 minute ago
-        error: 'Connection lost',
-        latency: null
-      }
-    });
+  test('renders disconnected state in compact mode', () => {
+    const store = mockStore(disconnectedState);
     
-    render(
+    const { container } = render(
       <Provider store={store}>
-        <ConnectionStatus />
+        <ConnectionStatus compact={true} />
       </Provider>
     );
     
-    // Check that offline status is shown
-    expect(screen.getByText(/offline/i)).toBeInTheDocument();
+    // Should have the red indicator dot
+    const statusDot = container.querySelector('div[style*="var(--glass-danger)"]');
+    expect(statusDot).toBeInTheDocument();
   });
   
-  it('should render reconnecting status', () => {
-    // Create mock store with reconnecting state
-    store = mockStore({
-      connection: {
-        online: false,
-        reconnecting: true,
-        lastConnected: Date.now() - 30000, // 30 seconds ago
-        error: null,
-        latency: null
-      }
-    });
+  test('renders reconnecting state in compact mode', () => {
+    const store = mockStore(reconnectingState);
     
-    render(
+    const { container } = render(
       <Provider store={store}>
-        <ConnectionStatus />
+        <ConnectionStatus compact={true} />
       </Provider>
     );
     
-    // Check that reconnecting status is shown
-    expect(screen.getByText(/reconnecting/i)).toBeInTheDocument();
+    // Should have the yellow indicator dot
+    const statusDot = container.querySelector('div[style*="var(--glass-warning)"]');
+    expect(statusDot).toBeInTheDocument();
+    
+    // Should display reconnecting icon
+    const reconnectIcon = container.querySelector('svg[data-icon="refresh"]');
+    expect(reconnectIcon).toBeInTheDocument();
   });
   
-  it('should render error status', () => {
-    // Create mock store with error state
-    store = mockStore({
-      connection: {
-        online: false,
-        reconnecting: false,
-        lastConnected: Date.now() - 120000, // 2 minutes ago
-        error: 'Connection failed (Code: 1006)',
-        latency: null
-      }
-    });
+  test('renders full connection status when not in compact mode', () => {
+    const store = mockStore(connectedState);
     
     render(
       <Provider store={store}>
-        <ConnectionStatus />
+        <ConnectionStatus compact={false} />
       </Provider>
     );
     
-    // Check that offline status is shown
-    expect(screen.getByText(/offline/i)).toBeInTheDocument();
+    // Should display "Connected" text
+    expect(screen.getByText('Connected')).toBeInTheDocument();
+  });
+  
+  test('renders full disconnected status when not in compact mode', () => {
+    const store = mockStore(disconnectedState);
     
-    // Check if the component renders
-    expect(screen.getByTestId('connection-status')).toBeInTheDocument();
+    render(
+      <Provider store={store}>
+        <ConnectionStatus compact={false} />
+      </Provider>
+    );
+    
+    // Should display "Disconnected" text
+    expect(screen.getByText('Disconnected')).toBeInTheDocument();
+  });
+  
+  test('renders full reconnecting status when not in compact mode', () => {
+    const store = mockStore(reconnectingState);
+    
+    render(
+      <Provider store={store}>
+        <ConnectionStatus compact={false} />
+      </Provider>
+    );
+    
+    // Should display "Reconnecting..." text
+    expect(screen.getByText('Reconnecting...')).toBeInTheDocument();
+  });
+  
+  test('simulates ping time updates', () => {
+    const store = mockStore(connectedState);
+    
+    jest.spyOn(global.Math, 'random').mockReturnValue(0.5);
+    
+    render(
+      <Provider store={store}>
+        <ConnectionStatus compact={false} />
+      </Provider>
+    );
+    
+    // Initially should show ping time (110ms based on our Math.random mock)
+    expect(screen.getByText('110ms')).toBeInTheDocument();
+    
+    // Fast-forward 10 seconds to trigger next ping update
+    jest.advanceTimersByTime(10000);
+    
+    // Should still show 110ms (same random value)
+    expect(screen.getByText('110ms')).toBeInTheDocument();
+    
+    // Restore Math.random
+    (global.Math.random as jest.Mock).mockRestore();
+  });
+  
+  test('applies custom className', () => {
+    const store = mockStore(connectedState);
+    
+    const { container } = render(
+      <Provider store={store}>
+        <ConnectionStatus className="custom-class" />
+      </Provider>
+    );
+    
+    // Check if custom class is applied
+    const statusElement = container.querySelector('.connection-status.custom-class');
+    expect(statusElement).toBeInTheDocument();
+  });
+  
+  test('clears ping time when disconnected', () => {
+    // Start with connected state
+    const store = mockStore(connectedState);
+    
+    const { rerender } = render(
+      <Provider store={store}>
+        <ConnectionStatus compact={false} />
+      </Provider>
+    );
+    
+    // Should show ping time
+    expect(screen.getByText(/\d+ms/)).toBeInTheDocument();
+    
+    // Now update to disconnected state
+    const newStore = mockStore(disconnectedState);
+    
+    rerender(
+      <Provider store={newStore}>
+        <ConnectionStatus compact={false} />
+      </Provider>
+    );
+    
+    // Should not show ping time anymore
+    expect(screen.queryByText(/\d+ms/)).not.toBeInTheDocument();
   });
 }); 

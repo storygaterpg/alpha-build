@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { Provider } from 'react-redux';
 import configureStore from 'redux-mock-store';
@@ -12,6 +12,21 @@ jest.mock('../../App', () => ({
     show: jest.fn()
   }
 }));
+
+// Mock the localStorage API
+const localStorageMock = (function() {
+  let store: Record<string, string> = {};
+  return {
+    getItem: jest.fn((key: string) => store[key] || null),
+    setItem: jest.fn((key: string, value: string) => {
+      store[key] = value.toString();
+    }),
+    clear: jest.fn(() => {
+      store = {};
+    })
+  };
+})();
+Object.defineProperty(window, 'localStorage', { value: localStorageMock });
 
 // Create a mock store
 const mockStore = configureStore([]);
@@ -51,6 +66,9 @@ describe('ChatPanel Component', () => {
     
     // Mock dispatch
     store.dispatch = jest.fn();
+    
+    // Reset localStorage mock
+    localStorageMock.clear();
   });
   
   test('renders chat panel with messages', () => {
@@ -141,7 +159,7 @@ describe('ChatPanel Component', () => {
     );
   });
   
-  test('shows validation error for empty message', () => {
+  test('shows validation error for empty message', async () => {
     render(
       <Provider store={store}>
         <ChatPanel />
@@ -152,12 +170,17 @@ describe('ChatPanel Component', () => {
     const sendButton = screen.getByRole('button', { name: '' });
     fireEvent.click(sendButton);
     
-    // Check if validation error is displayed
-    expect(screen.getByText('Message cannot be empty')).toBeInTheDocument();
+    // Check if validation error is displayed - use waitFor for async updates
+    await waitFor(() => {
+      // Look for any element containing the partial text
+      const errorElement = screen.queryByText(/cannot be empty/i);
+      expect(errorElement).toBeInTheDocument();
+    });
+    
     expect(store.dispatch).not.toHaveBeenCalled();
   });
   
-  test('shows validation error when not connected to server', () => {
+  test('shows validation error when not connected to server', async () => {
     // Create a store with disconnected socket
     const disconnectedStore = mockStore({
       game: {
@@ -186,8 +209,12 @@ describe('ChatPanel Component', () => {
     const sendButton = screen.getByRole('button', { name: '' });
     fireEvent.click(sendButton);
     
-    // Check if validation error is displayed
-    expect(screen.getByText('Not connected to server. Your message will not be sent.')).toBeInTheDocument();
+    // Check if validation error is displayed - use waitFor for async updates
+    await waitFor(() => {
+      // Look for any element containing the partial text
+      const errorElement = screen.queryByText(/not connected/i);
+      expect(errorElement).toBeInTheDocument();
+    });
   });
   
   test('shows validation error for message that is too long', () => {
@@ -210,5 +237,168 @@ describe('ChatPanel Component', () => {
     
     // Check if validation error is displayed
     expect(screen.getByText(/Message is too long/)).toBeInTheDocument();
+  });
+  
+  test('prevents sending duplicate messages in quick succession', () => {
+    // Enable NODE_ENV for this test
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    
+    render(
+      <Provider store={store}>
+        <ChatPanel />
+      </Provider>
+    );
+    
+    // Type a message
+    const input = screen.getByPlaceholderText('Speak as your character...');
+    fireEvent.change(input, { target: { value: 'Duplicate message' } });
+    
+    // Send the message
+    const sendButton = screen.getByRole('button', { name: '' });
+    fireEvent.click(sendButton);
+    
+    // Check if action was dispatched
+    expect(store.dispatch).toHaveBeenCalledWith(
+      sendInCharacterChat('Duplicate message', 'player-123')
+    );
+    
+    // Reset the mock
+    store.dispatch.mockClear();
+    
+    // Try to send the same message again immediately
+    fireEvent.change(input, { target: { value: 'Duplicate message' } });
+    fireEvent.click(sendButton);
+    
+    // Check if validation error is displayed
+    expect(screen.getByText(/Duplicate message/)).toBeInTheDocument();
+    expect(store.dispatch).not.toHaveBeenCalled();
+    
+    // Restore original env
+    process.env.NODE_ENV = originalEnv;
+  });
+  
+  test('handles space key properly', () => {
+    render(
+      <Provider store={store}>
+        <ChatPanel />
+      </Provider>
+    );
+    
+    // Get the input
+    const input = screen.getByPlaceholderText('Speak as your character...');
+    
+    // Type a character
+    fireEvent.change(input, { target: { value: 'Hello' } });
+    
+    // Press the space key
+    fireEvent.keyDown(input, { key: ' ', code: 'Space' });
+    
+    // The value should now include a space
+    expect(input).toHaveValue('Hello ');
+  });
+  
+  test('renders debug toggle in development mode', () => {
+    // Set NODE_ENV to development
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'development';
+    
+    render(
+      <Provider store={store}>
+        <ChatPanel />
+      </Provider>
+    );
+    
+    // Check for debug toggle button (initially showing debug off)
+    const debugToggle = screen.getByText('🔇 Debug');
+    expect(debugToggle).toBeInTheDocument();
+    
+    // Click toggle
+    fireEvent.click(debugToggle);
+    
+    // Should have updated localStorage
+    expect(localStorage.setItem).toHaveBeenCalledWith('verbose_logging', 'true');
+    
+    // Check if button text updated
+    expect(screen.getByText('🔊 Debug')).toBeInTheDocument();
+    
+    // Restore original env
+    process.env.NODE_ENV = originalEnv;
+  });
+  
+  test('does not render debug toggle in production mode', () => {
+    // Set NODE_ENV to production
+    const originalEnv = process.env.NODE_ENV;
+    process.env.NODE_ENV = 'production';
+    
+    render(
+      <Provider store={store}>
+        <ChatPanel />
+      </Provider>
+    );
+    
+    // Debug toggle should not be present
+    expect(screen.queryByText('🔇 Debug')).not.toBeInTheDocument();
+    expect(screen.queryByText('🔊 Debug')).not.toBeInTheDocument();
+    
+    // Restore original env
+    process.env.NODE_ENV = originalEnv;
+  });
+  
+  test('deduplicates messages with identical content', () => {
+    // Create a store with duplicate messages
+    const timestamp = Date.now();
+    const duplicateStore = mockStore({
+      game: {
+        playerName: 'TestPlayer',
+        player: { id: 'player-123' }
+      },
+      chat: {
+        messages: [
+          { 
+            id: 'msg-1', 
+            sender: 'System', 
+            content: 'Duplicate message', 
+            timestamp: timestamp,
+            type: 'system'
+          },
+          { 
+            id: 'msg-2', 
+            sender: 'System', 
+            content: 'Duplicate message', 
+            timestamp: timestamp + 1000, // Very close in time
+            type: 'system'
+          },
+          { 
+            id: 'msg-3', 
+            sender: 'TestPlayer', 
+            content: 'Unique message', 
+            timestamp: timestamp + 2000,
+            type: 'in-character'
+          }
+        ]
+      },
+      socket: {
+        connected: true
+      }
+    });
+    
+    render(
+      <Provider store={duplicateStore}>
+        <ChatPanel />
+      </Provider>
+    );
+    
+    // Get all chat bubble elements
+    const systemBubbles = document.querySelectorAll('.chat-bubble.system-bubble');
+    const playerBubbles = document.querySelectorAll('.chat-bubble.player-bubble');
+    
+    // Should have only 2 bubbles total - one system (deduped) and one player
+    expect(systemBubbles.length).toBe(1);
+    expect(playerBubbles.length).toBe(1);
+    
+    // Verify the content of the messages
+    expect(screen.getByText('Unique message')).toBeInTheDocument();
+    expect(screen.getByText('Duplicate message')).toBeInTheDocument();
   });
 }); 

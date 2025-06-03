@@ -8,10 +8,11 @@ import {
   socketError,
   messageReceived
 } from '../../store/slices/socketSlice';
+import { messageReceived as chatMessageReceived } from '../../store/slices/chatSlice';
 import { setOnline, setOffline } from '../../store/slices/connectionSlice';
 import { showError } from '../../store/slices/notificationSlice';
 import { configureStore } from '@reduxjs/toolkit';
-import { CONNECTION_OFFLINE } from '../../store/actionTypes';
+import { CHAT_RECEIVE, CONNECTION_OFFLINE } from '../../store/actionTypes';
 
 // Mock the WebSocketClient module
 jest.mock('../../network/WebSocketClient', () => ({
@@ -32,6 +33,16 @@ jest.mock('../../network/WebSocketClient', () => ({
   }
 }));
 
+// Mock chatSlice's messageReceived action creator
+const mockChatMessageReceived = jest.fn().mockImplementation((message) => ({
+  type: 'chat/messageReceived',
+  payload: message
+}));
+
+jest.mock('../../store/slices/chatSlice', () => ({
+  messageReceived: (message: any) => mockChatMessageReceived(message)
+}));
+
 describe('socketMiddleware', () => {
   let store: any;
   let middleware: ReturnType<typeof createSocketMiddleware>;
@@ -50,8 +61,27 @@ describe('socketMiddleware', () => {
     }
   };
   
+  // Helper to simulate message type events
+  const simulateMessageTypeEvent = (messageType: string, data?: any) => {
+    // Find the event handler registered for this message type
+    const eventHandler = (websocketClient.onMessageType as jest.Mock).mock.calls.find(
+      call => call[0] === messageType
+    );
+    
+    if (eventHandler && eventHandler[1]) {
+      eventHandler[1](data);
+    }
+  };
+  
   beforeEach(() => {
+    // Clear all mocks
     jest.clearAllMocks();
+    
+    // Make sure mockChatMessageReceived implementation is restored
+    mockChatMessageReceived.mockImplementation((message) => ({
+      type: 'chat/messageReceived',
+      payload: message
+    }));
     
     // Mock store with dispatch and getState
     store = {
@@ -200,5 +230,177 @@ describe('socketMiddleware', () => {
       { data: 'test' }
     );
     expect(next).toHaveBeenCalled();
+  });
+  
+  // New tests for chat message handling and deduplication
+  
+  it('should process incoming chat messages', () => {
+    // Setup the middleware
+    middleware(store);
+    
+    // Create a chat message
+    const chatMessage = {
+      id: 'msg-123',
+      sender: 'TestUser',
+      content: 'Hello world',
+      timestamp: Date.now(),
+      type: 'in-character'
+    };
+    
+    // Simulate receiving a chat message
+    simulateMessageTypeEvent('chat_message', chatMessage);
+    
+    // Should have dispatched the messageReceived action
+    expect(mockChatMessageReceived).toHaveBeenCalledWith(expect.objectContaining({
+      id: chatMessage.id,
+      sender: chatMessage.sender,
+      content: chatMessage.content
+    }));
+    
+    expect(store.dispatch).toHaveBeenCalled();
+  });
+  
+  it('should assign an ID to messages without one', () => {
+    // Setup the middleware
+    middleware(store);
+    
+    // Create a chat message without an ID
+    const chatMessage = {
+      sender: 'TestUser',
+      content: 'Message without ID',
+      timestamp: Date.now(),
+      type: 'in-character'
+    };
+    
+    // Simulate receiving a chat message
+    simulateMessageTypeEvent('chat_message', chatMessage);
+    
+    // Should have assigned an ID
+    expect(mockChatMessageReceived).toHaveBeenCalledWith(expect.objectContaining({
+      id: expect.any(String),
+      sender: chatMessage.sender,
+      content: chatMessage.content
+    }));
+    
+    // ID should be in the expected format
+    const calledWith = mockChatMessageReceived.mock.calls[0][0];
+    expect(calledWith.id).toMatch(/^msg_\d+_[a-z0-9]+_[a-z0-9]+$/);
+  });
+  
+  it('should deduplicate identical messages', () => {
+    // Setup the middleware
+    middleware(store);
+    
+    // Create a chat message
+    const chatMessage = {
+      id: 'duplicate-id',
+      sender: 'TestUser',
+      content: 'Duplicate message',
+      timestamp: Date.now(),
+      type: 'in-character'
+    };
+    
+    // Simulate receiving the same message twice
+    simulateMessageTypeEvent('chat_message', chatMessage);
+    simulateMessageTypeEvent('chat_message', chatMessage);
+    
+    // Should only dispatch once
+    expect(mockChatMessageReceived).toHaveBeenCalledTimes(1);
+  });
+  
+  it('should deduplicate messages with similar content', () => {
+    // Setup the middleware
+    middleware(store);
+    
+    // Create a timestamp
+    const timestamp = Date.now();
+    
+    // Create two messages with different IDs but same content and close timestamps
+    const message1 = {
+      id: 'msg-1',
+      sender: 'TestUser',
+      content: 'Similar content message',
+      timestamp: timestamp,
+      type: 'in-character'
+    };
+    
+    const message2 = {
+      id: 'msg-2', // Different ID
+      sender: 'TestUser',
+      content: 'Similar content message', // Same content
+      timestamp: timestamp + 1000, // Close in time
+      type: 'in-character'
+    };
+    
+    // Simulate receiving both messages
+    simulateMessageTypeEvent('chat_message', message1);
+    simulateMessageTypeEvent('chat_message', message2);
+    
+    // Should only dispatch once
+    expect(mockChatMessageReceived).toHaveBeenCalledTimes(1);
+  });
+  
+  it('should not deduplicate messages with different content', () => {
+    // Setup the middleware
+    middleware(store);
+    
+    // Create a timestamp
+    const timestamp = Date.now();
+    
+    // Create two messages with different content
+    const message1 = {
+      id: 'msg-1',
+      sender: 'TestUser',
+      content: 'First message',
+      timestamp: timestamp,
+      type: 'in-character'
+    };
+    
+    const message2 = {
+      id: 'msg-2',
+      sender: 'TestUser',
+      content: 'Second message', // Different content
+      timestamp: timestamp + 1000,
+      type: 'in-character'
+    };
+    
+    // Simulate receiving both messages
+    simulateMessageTypeEvent('chat_message', message1);
+    simulateMessageTypeEvent('chat_message', message2);
+    
+    // Should dispatch twice
+    expect(mockChatMessageReceived).toHaveBeenCalledTimes(2);
+  });
+  
+  it('should not deduplicate messages from different senders', () => {
+    // Setup the middleware
+    middleware(store);
+    
+    // Create a timestamp
+    const timestamp = Date.now();
+    
+    // Create two messages with same content but different senders
+    const message1 = {
+      id: 'msg-1',
+      sender: 'User1',
+      content: 'Same content', 
+      timestamp: timestamp,
+      type: 'in-character'
+    };
+    
+    const message2 = {
+      id: 'msg-2',
+      sender: 'User2', // Different sender
+      content: 'Same content',
+      timestamp: timestamp + 1000,
+      type: 'in-character'
+    };
+    
+    // Simulate receiving both messages
+    simulateMessageTypeEvent('chat_message', message1);
+    simulateMessageTypeEvent('chat_message', message2);
+    
+    // Should dispatch twice
+    expect(mockChatMessageReceived).toHaveBeenCalledTimes(2);
   });
 }); 

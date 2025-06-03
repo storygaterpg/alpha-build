@@ -11,7 +11,8 @@
     "icons": "node scripts/generate-icons.js",
     "pwa-check": "workbox-cli wizard",
     "test": "jest",
-    "test:watch": "jest --watch"
+    "test:watch": "jest --watch",
+    "test:chat": "jest --verbose ./src/__tests__/components/ChatPanel.test.tsx ./src/__tests__/components/DebugToggle.test.tsx ./src/__tests__/store/chatSlice.test.ts ./src/__tests__/middleware/socketMiddleware.test.ts ./src/__tests__/integration/chatDeduplication.test.tsx"
   },
   "dependencies": {
     "@blueprintjs/core": "^5.10.0",

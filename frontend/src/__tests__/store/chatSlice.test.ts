@@ -7,7 +7,7 @@ import chatReducer, {
   sendInCharacterChat,
   sendOutOfCharacterChat
 } from '../../store/slices/chatSlice';
-import { CHAT_SEND_IN_CHARACTER, CHAT_SEND_OUT_OF_CHARACTER } from '../../store/actionTypes';
+import { CHAT_RECEIVE, CHAT_SEND_IN_CHARACTER, CHAT_SEND_OUT_OF_CHARACTER } from '../../store/actionTypes';
 import { ChatMessage } from '../../store/types';
 
 describe('Chat Slice', () => {
@@ -127,5 +127,109 @@ describe('Chat Slice', () => {
         type: 'out-of-character'
       }
     });
+  });
+  
+  // New tests for message deduplication
+  
+  test('should deduplicate messages with same ID', () => {
+    const message: ChatMessage = {
+      id: 'duplicate-id',
+      sender: 'TestUser',
+      content: 'Hello world',
+      timestamp: Date.now(),
+      type: 'in-character'
+    };
+    
+    // Add the message once
+    const firstState = chatReducer(initialState, messageReceived(message));
+    expect(firstState.messages).toHaveLength(1);
+    
+    // Try to add the same message again
+    const secondState = chatReducer(firstState, messageReceived(message));
+    
+    // Should still only have 1 message
+    expect(secondState.messages).toHaveLength(1);
+    expect(secondState.unreadCount).toBe(1); // Unread count shouldn't increase
+  });
+  
+  test('should deduplicate messages with same content and sender', () => {
+    const timestamp = Date.now();
+    
+    // First message
+    const message1: ChatMessage = {
+      id: 'id-1',
+      sender: 'TestUser',
+      content: 'Duplicate content',
+      timestamp: timestamp,
+      type: 'in-character'
+    };
+    
+    // Second message with different ID but same content, sender, and close timestamp
+    const message2: ChatMessage = {
+      id: 'id-2', // Different ID
+      sender: 'TestUser',
+      content: 'Duplicate content',
+      timestamp: timestamp + 1000, // Within deduplication time window
+      type: 'in-character'
+    };
+    
+    // Add first message
+    const firstState = chatReducer(initialState, messageReceived(message1));
+    expect(firstState.messages).toHaveLength(1);
+    
+    // Try to add similar message
+    const secondState = chatReducer(firstState, messageReceived(message2));
+    
+    // Should still only have 1 message
+    expect(secondState.messages).toHaveLength(1);
+  });
+  
+  test('should not deduplicate messages with same content but different senders', () => {
+    const timestamp = Date.now();
+    
+    // First message
+    const message1: ChatMessage = {
+      id: 'id-1',
+      sender: 'User1',
+      content: 'Same content',
+      timestamp: timestamp,
+      type: 'in-character'
+    };
+    
+    // Second message with different sender
+    const message2: ChatMessage = {
+      id: 'id-2',
+      sender: 'User2', // Different sender
+      content: 'Same content',
+      timestamp: timestamp + 1000,
+      type: 'in-character'
+    };
+    
+    // Add first message
+    const firstState = chatReducer(initialState, messageReceived(message1));
+    expect(firstState.messages).toHaveLength(1);
+    
+    // Add second message from different sender
+    const secondState = chatReducer(firstState, messageReceived(message2));
+    
+    // Should have 2 messages
+    expect(secondState.messages).toHaveLength(2);
+  });
+  
+  test('should handle message with no ID by generating a unique one', () => {
+    const messageWithoutId: Omit<ChatMessage, 'id'> = {
+      sender: 'TestUser',
+      content: 'Hello world',
+      timestamp: Date.now(),
+      type: 'in-character'
+    };
+    
+    // @ts-ignore - Intentionally passing message without ID
+    const newState = chatReducer(initialState, messageReceived(messageWithoutId));
+    
+    expect(newState.messages).toHaveLength(1);
+    expect(newState.messages[0].id).toBeDefined();
+    expect(typeof newState.messages[0].id).toBe('string');
+    expect(newState.messages[0].id.length).toBeGreaterThan(10); // Should be a reasonably long ID
   });
 }); 

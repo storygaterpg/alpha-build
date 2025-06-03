@@ -16,6 +16,9 @@ from fastapi.responses import JSONResponse
 import uvicorn
 import logging
 
+# Add server directory to Python path
+sys.path.append(os.path.join(os.path.dirname(__file__), 'server'))
+
 # Setup logging
 logging.basicConfig(
     level=logging.INFO,
