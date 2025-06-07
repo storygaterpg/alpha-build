@@ -10,6 +10,17 @@
 import { Intent } from '@blueprintjs/core';
 import { AppToaster } from '../App';
 
+// Add ENV interface to window
+declare global {
+  interface Window {
+    ENV?: {
+      WEBSOCKET_PORT?: string;
+      WEBSOCKET_URL?: string;
+      [key: string]: string | undefined;
+    };
+  }
+}
+
 // Define event types for type safety
 export type WebSocketEventType = 
   | 'connect'      // Connection established
@@ -41,6 +52,12 @@ const isTestEnvironment = (): boolean => {
 
 // Get environment variables in a way that works in both browser and test environments
 const getEnvVar = (name: string, defaultValue: string = ''): string => {
+  // First check window.ENV if available (set in index.html)
+  if (typeof window !== 'undefined' && window.ENV && window.ENV[name.replace('VITE_', '')]) {
+    const value = window.ENV[name.replace('VITE_', '')];
+    return value || defaultValue;
+  }
+  
   if (isTestEnvironment()) {
     // In test environment, use the mock values from setupTests.js
     return (global as any).import?.meta?.env?.[name] || defaultValue;
@@ -62,8 +79,8 @@ function getWebSocketUrl(customPath?: string): string {
   if (wsUrl) {
     url = wsUrl;
   } else {
-    // Second priority: Use the backend port from environment or default to 8000
-    const serverPort = getEnvVar('VITE_WEBSOCKET_PORT', '8000');
+    // Second priority: Use the backend port from environment or default to 8001
+    const serverPort = getEnvVar('VITE_WEBSOCKET_PORT', '8001');
     
     // Determine protocol
     const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -184,11 +201,27 @@ class WebSocketClient {
    * @returns Promise resolving to the best working URL or undefined if none work
    */
   public async testConnectivity(): Promise<string | undefined> {
-    // Paths to try in order - prioritize /ws which is the main server endpoint
+    // Paths to try in order - prioritize /ws on port 8001 which is the main server endpoint
     const pathsToTry = ['/ws', '', '/socket', '/socket.io'];
     
     console.log('Testing WebSocket connectivity to multiple paths...');
     
+    // First, try port 8001 which is where our server is running
+    for (const path of pathsToTry) {
+      const url = `ws://localhost:8001${path}`;
+      console.log(`Testing connection to: ${url}`);
+      
+      const result = await testWebSocketConnection(url, 5000);
+      
+      if (result.success) {
+        console.log(`✓ Successfully connected to ${url}`);
+        return path;
+      } else {
+        console.log(`✗ Failed to connect to ${url}: ${result.message}`);
+      }
+    }
+    
+    // If port 8001 fails, try the default port detection
     for (const path of pathsToTry) {
       const url = getWebSocketUrl(path);
       console.log(`Testing connection to: ${url}`);
@@ -243,6 +276,11 @@ class WebSocketClient {
       
       // Determine URL - provided URL takes precedence over auto-determined URL
       this.url = url || getWebSocketUrl(this.connectionPath);
+      
+      // If no explicit URL provided and no working path found, try port 8001 with /ws first
+      if (!url && !this.connectionPath) {
+        this.url = 'ws://localhost:8001/ws';
+      }
       
       console.log('WebSocket connecting to:', this.url);
       

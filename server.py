@@ -122,7 +122,9 @@ except ImportError as e:
         "width": 15,
         "height": 15,
         "tiles": [[{"type": "normal", "walkable": True} for _ in range(15)] for _ in range(15)],
-        "startPosition": {"x": 5, "y": 5}
+        "startPosition": {"x": 5, "y": 5},
+        "backgroundImage": "/assets/maps/test-map2.png",
+        "gridSize": 64
     }
 
 # Manage connections and player characters
@@ -439,5 +441,6 @@ async def generic_exception_handler(request: Request, exc: Exception):
 
 if __name__ == '__main__':
     mode = "MOCK MODE" if USING_MOCK_DATA else "FULL ENGINE MODE"
-    logger.info(f"Starting server on port 8000 in {mode}")
-    uvicorn.run(app, host='0.0.0.0', port=8000, log_level='info') 
+    port = int(os.environ.get('PORT', 8000))
+    logger.info(f"Starting server on port {port} in {mode}")
+    uvicorn.run(app, host='0.0.0.0', port=port, log_level='info') 

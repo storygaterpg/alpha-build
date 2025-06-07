@@ -21,6 +21,8 @@ class MainScene extends Phaser.Scene {
   private map: Phaser.Tilemaps.Tilemap | null = null;
   private layers: Record<string, Phaser.Tilemaps.TilemapLayer> = {};
   private currentMapKey: string = '';
+  private backgroundImage: Phaser.GameObjects.Image | null = null;
+  private gridImage: Phaser.GameObjects.TileSprite | null = null;
   
   // Game objects
   private gameObjects: Map<string, GameObject> = new Map();
@@ -28,6 +30,22 @@ class MainScene extends Phaser.Scene {
   
   // Input
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
+  
+  // Camera controls
+  private isDragging: boolean = false;
+  private dragStartPoint: Phaser.Math.Vector2 = new Phaser.Math.Vector2();
+  private lastPointerPosition: Phaser.Math.Vector2 = new Phaser.Math.Vector2();
+  private zoomKeys: any = {};
+  private panKeys: any = {};
+  private controlsText: Phaser.GameObjects.Text | null = null;
+  
+  // Camera settings
+  private readonly MIN_ZOOM = 0.25;
+  private readonly MAX_ZOOM = 4.0;
+  private readonly ZOOM_SPEED = 0.05;
+  private readonly PAN_SPEED = 200;
+  private readonly ZOOM_SMOOTH_FACTOR = 0.1;
+  private readonly PAN_SMOOTH_FACTOR = 0.05;
   
   // Event callbacks
   private onActorMove: ((actorId: string, position: Position) => void) | null = null;
@@ -56,14 +74,19 @@ class MainScene extends Phaser.Scene {
       this.load.image(AssetKeys.TILESET_DUNGEON, 'images/dungeon_tileset.png');
       this.load.image(AssetKeys.TILESET_TOWN, 'images/town_tileset.png');
       
+      // Load background images
+      this.load.image(AssetKeys.BACKGROUND_FANTASY_MAP, 'images/backgrounds/fantasy_map.svg');
+      this.load.image(AssetKeys.BACKGROUND_GRID, 'images/backgrounds/grid_tile.svg');
+      this.load.image('test_map_bg', 'maps/test-map2.png');
+      
       // Load sprites
-      this.load.spritesheet(AssetKeys.SPRITE_PLAYER, 'sprites/player.png', { 
+      this.load.spritesheet(AssetKeys.SPRITE_PLAYER, 'sprites/characters/player.svg', { 
         frameWidth: 32, 
-        frameHeight: 48 
+        frameHeight: 32 
       });
-      this.load.spritesheet(AssetKeys.SPRITE_NPC, 'sprites/npc.png', { 
+      this.load.spritesheet(AssetKeys.SPRITE_NPC, 'sprites/characters/npc.svg', { 
         frameWidth: 32, 
-        frameHeight: 48 
+        frameHeight: 32 
       });
       this.load.spritesheet(AssetKeys.SPRITE_ENEMY, 'sprites/enemy.png', { 
         frameWidth: 32, 
@@ -90,9 +113,30 @@ class MainScene extends Phaser.Scene {
     // Setup keyboard input
     if (this.input && this.input.keyboard) {
       this.cursors = this.input.keyboard.createCursorKeys();
+      
+      // Setup zoom and pan keys
+      this.zoomKeys = {
+        zoomIn: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.PLUS),
+        zoomInAlt: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_ADD), // For keyboards with numpad
+        zoomOut: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.MINUS),
+        zoomOutAlt: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.NUMPAD_SUBTRACT)
+      };
+      
+      this.panKeys = {
+        panLeft: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.A),
+        panRight: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.D),
+        panUp: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
+        panDown: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S)
+      };
     } else {
       console.error('Input or keyboard is not available');
     }
+    
+    // Setup camera controls
+    this.setupCameraControls();
+    
+    // Create controls info UI
+    this.createControlsInfo();
     
     // Create a default map if none is loaded yet
     if (!this.map) {
@@ -101,6 +145,9 @@ class MainScene extends Phaser.Scene {
 
     // Create animations
     this.createAnimations();
+    
+    // Setup resize handling
+    this.setupResizeHandling();
     
     // Set up custom performance panel for entity count
     if (this.isDevMode) {
@@ -112,7 +159,232 @@ class MainScene extends Phaser.Scene {
     }
     
     // Log that the scene is ready
-    console.log('MainScene created');
+    console.log('MainScene created with camera controls');
+  }
+
+  /**
+   * Setup camera zoom and pan controls
+   */
+  private setupCameraControls(): void {
+    const camera = this.cameras.main;
+    
+    // Setup mouse wheel zoom
+    this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
+      // Use smaller zoom step for mouse wheel for more granular control
+      const wheelZoomSpeed = this.ZOOM_SPEED * 0.5; // Even smaller steps for wheel
+      this.handleZoom(deltaY > 0 ? -wheelZoomSpeed : wheelZoomSpeed, pointer);
+    });
+    
+    // Setup mouse drag panning
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.primaryDown) {
+        this.isDragging = true;
+        this.dragStartPoint.set(pointer.x, pointer.y);
+        this.lastPointerPosition.set(pointer.x, pointer.y);
+        
+        // Stop following player when manually panning
+        if (camera.deadzone) {
+          camera.stopFollow();
+        }
+      }
+    });
+    
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.isDragging && pointer.primaryDown) {
+        this.handlePan(
+          this.lastPointerPosition.x - pointer.x,
+          this.lastPointerPosition.y - pointer.y
+        );
+        this.lastPointerPosition.set(pointer.x, pointer.y);
+      }
+    });
+    
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (!pointer.primaryDown) {
+        this.isDragging = false;
+      }
+    });
+    
+    // Setup touch gestures for mobile
+    this.setupTouchControls();
+    
+    console.log('Camera controls setup complete');
+  }
+  
+  /**
+   * Setup touch controls for mobile devices
+   */
+  private setupTouchControls(): void {
+    let initialDistance = 0;
+    let initialZoom = 1;
+    
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.input.pointer1.isDown && this.input.pointer2.isDown) {
+        // Two fingers down - setup pinch to zoom
+        const distance = Phaser.Math.Distance.Between(
+          this.input.pointer1.x, this.input.pointer1.y,
+          this.input.pointer2.x, this.input.pointer2.y
+        );
+        initialDistance = distance;
+        initialZoom = this.cameras.main.zoom;
+      }
+    });
+    
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (this.input.pointer1.isDown && this.input.pointer2.isDown) {
+        // Two fingers moving - pinch to zoom
+        const distance = Phaser.Math.Distance.Between(
+          this.input.pointer1.x, this.input.pointer1.y,
+          this.input.pointer2.x, this.input.pointer2.y
+        );
+        
+        if (initialDistance > 0) {
+          const scale = distance / initialDistance;
+          const newZoom = Phaser.Math.Clamp(
+            initialZoom * scale,
+            this.MIN_ZOOM,
+            this.MAX_ZOOM
+          );
+          
+          // Get center point between fingers
+          const centerX = (this.input.pointer1.x + this.input.pointer2.x) / 2;
+          const centerY = (this.input.pointer1.y + this.input.pointer2.y) / 2;
+          
+          this.cameras.main.setZoom(newZoom);
+        }
+      }
+    });
+  }
+  
+  /**
+   * Handle zoom functionality
+   * @param zoomDelta The amount to zoom (positive = zoom in, negative = zoom out)
+   * @param pointer Optional pointer for zoom center point
+   */
+  private handleZoom(zoomDelta: number, pointer?: Phaser.Input.Pointer): void {
+    const camera = this.cameras.main;
+    const currentZoom = camera.zoom;
+    const newZoom = Phaser.Math.Clamp(
+      currentZoom + zoomDelta,
+      this.MIN_ZOOM,
+      this.MAX_ZOOM
+    );
+    
+    if (newZoom !== currentZoom) {
+      if (pointer) {
+        // Zoom towards mouse position
+        const worldPoint = camera.getWorldPoint(pointer.x, pointer.y);
+        
+        // Set the new zoom
+        camera.setZoom(newZoom);
+        
+        // Calculate the new world point after zoom
+        const newWorldPoint = camera.getWorldPoint(pointer.x, pointer.y);
+        
+        // Adjust camera position to keep the pointer position stable
+        camera.scrollX += (worldPoint.x - newWorldPoint.x);
+        camera.scrollY += (worldPoint.y - newWorldPoint.y);
+      } else {
+        // Zoom towards center of current view - calculate center BEFORE zoom change
+        const viewportCenterX = camera.width / 2;
+        const viewportCenterY = camera.height / 2;
+        const worldCenterPoint = camera.getWorldPoint(viewportCenterX, viewportCenterY);
+        
+        // Set the new zoom
+        camera.setZoom(newZoom);
+        
+        // Calculate the new world point at the same viewport center
+        const newWorldCenterPoint = camera.getWorldPoint(viewportCenterX, viewportCenterY);
+        
+        // Adjust camera position to keep the center point stable
+        camera.scrollX += (worldCenterPoint.x - newWorldCenterPoint.x);
+        camera.scrollY += (worldCenterPoint.y - newWorldCenterPoint.y);
+      }
+      
+      // Ensure camera stays within bounds
+      this.enforceCameraBounds();
+    }
+  }
+  
+  /**
+   * Handle pan functionality
+   * @param deltaX Horizontal pan amount
+   * @param deltaY Vertical pan amount
+   */
+  private handlePan(deltaX: number, deltaY: number): void {
+    const camera = this.cameras.main;
+    
+    // Apply pan with zoom compensation
+    const zoomFactor = 1 / camera.zoom;
+    camera.scrollX += deltaX * zoomFactor;
+    camera.scrollY += deltaY * zoomFactor;
+    
+    // Ensure camera stays within bounds
+    this.enforceCameraBounds();
+  }
+  
+  /**
+   * Ensure camera stays within map bounds
+   */
+  private enforceCameraBounds(): void {
+    const camera = this.cameras.main;
+    
+    if (camera.getBounds()) {
+      const bounds = camera.getBounds();
+      const worldView = camera.worldView;
+      
+      // Clamp camera position to bounds
+      if (worldView.x < bounds.x) {
+        camera.scrollX = bounds.x;
+      } else if (worldView.right > bounds.right) {
+        camera.scrollX = bounds.right - worldView.width;
+      }
+      
+      if (worldView.y < bounds.y) {
+        camera.scrollY = bounds.y;
+      } else if (worldView.bottom > bounds.bottom) {
+        camera.scrollY = bounds.bottom - worldView.height;
+      }
+    }
+  }
+  
+  /**
+   * Center camera on a specific position
+   * @param x World X coordinate
+   * @param y World Y coordinate
+   * @param zoom Optional zoom level
+   */
+  public centerCameraOn(x: number, y: number, zoom?: number): void {
+    const camera = this.cameras.main;
+    
+    if (zoom !== undefined) {
+      camera.setZoom(Phaser.Math.Clamp(zoom, this.MIN_ZOOM, this.MAX_ZOOM));
+    }
+    
+    camera.centerOn(x, y);
+    this.enforceCameraBounds();
+  }
+  
+  /**
+   * Reset camera to default position and zoom
+   */
+  public resetCamera(): void {
+    const camera = this.cameras.main;
+    camera.setZoom(1);
+    
+    if (this.player && this.player.sprite) {
+      // Center on player if available
+      camera.centerOn(this.player.sprite.x, this.player.sprite.y);
+      camera.startFollow(this.player.sprite, true, this.PAN_SMOOTH_FACTOR, this.PAN_SMOOTH_FACTOR);
+    } else {
+      // Center on map
+      const bounds = camera.getBounds();
+      if (bounds) {
+        camera.centerOn(bounds.centerX, bounds.centerY);
+      }
+    }
+    
+    this.enforceCameraBounds();
   }
 
   update() {
@@ -121,8 +393,14 @@ class MainScene extends Phaser.Scene {
       performanceMonitor.begin();
     }
     
-    // Update player movement if player exists
-    if (this.player && this.player.sprite) {
+    // Handle keyboard zoom controls
+    this.handleKeyboardZoom();
+    
+    // Handle keyboard pan controls
+    this.handleKeyboardPan();
+    
+    // Update player movement if player exists and camera is not being manually controlled
+    if (this.player && this.player.sprite && !this.isDragging) {
       this.updatePlayerMovement();
     }
     
@@ -147,6 +425,53 @@ class MainScene extends Phaser.Scene {
       performanceMonitor.end();
     }
   }
+  
+  /**
+   * Handle keyboard zoom controls
+   */
+  private handleKeyboardZoom(): void {
+    if (this.zoomKeys.zoomIn.isDown || this.zoomKeys.zoomInAlt.isDown) {
+      this.handleZoom(this.ZOOM_SPEED);
+    } else if (this.zoomKeys.zoomOut.isDown || this.zoomKeys.zoomOutAlt.isDown) {
+      this.handleZoom(-this.ZOOM_SPEED);
+    }
+  }
+  
+  /**
+   * Handle keyboard pan controls
+   */
+  private handleKeyboardPan(): void {
+    const camera = this.cameras.main;
+    let panX = 0;
+    let panY = 0;
+    
+    if (this.panKeys.panLeft.isDown) {
+      panX = -this.PAN_SPEED;
+    } else if (this.panKeys.panRight.isDown) {
+      panX = this.PAN_SPEED;
+    }
+    
+    if (this.panKeys.panUp.isDown) {
+      panY = -this.PAN_SPEED;
+    } else if (this.panKeys.panDown.isDown) {
+      panY = this.PAN_SPEED;
+    }
+    
+    if (panX !== 0 || panY !== 0) {
+      // Stop following player when manually panning
+      if (camera.deadzone) {
+        camera.stopFollow();
+      }
+      
+      // Apply pan with frame time compensation
+      const deltaTime = this.game.loop.delta / 1000; // Convert to seconds
+      const zoomFactor = 1 / camera.zoom;
+      camera.scrollX += panX * deltaTime * zoomFactor;
+      camera.scrollY += panY * deltaTime * zoomFactor;
+      
+      this.enforceCameraBounds();
+    }
+  }
 
   /**
    * Set the callback for actor movement
@@ -157,51 +482,192 @@ class MainScene extends Phaser.Scene {
   }
 
   /**
-   * Load a tilemap
-   * @param key The key of the tilemap to load
-   * @param tilesetKey The key of the tileset to use
+   * Load a map from map data
+   * @param mapData The map data to load
    */
-  loadMap(key: string, tilesetKey: string): void {
-    // Destroy the current map if it exists
-    if (this.map) {
-      this.map.destroy();
-      this.layers = {};
-    }
-    
-    // Create the new map
-    this.map = this.make.tilemap({ key });
-    const tileset = this.map.addTilesetImage('tileset', tilesetKey);
-    
-    if (!tileset) {
-      console.error(`Failed to load tileset for map ${key}`);
-      return;
-    }
-    
-    // Create layers
-    const groundLayer = this.map.createLayer('ground', tileset);
-    const obstaclesLayer = this.map.createLayer('obstacles', tileset);
-    const overlayLayer = this.map.createLayer('overlay', tileset);
-    
-    if (groundLayer && obstaclesLayer && overlayLayer) {
+  loadMapFromData(mapData: any): void {
+    try {
+      console.log('Loading map from data:', mapData);
+      
+      // Calculate dimensions in pixels
+      const mapWidth = mapData.width * TILE_SIZE;
+      const mapHeight = mapData.height * TILE_SIZE;
+      const gridSize = mapData.gridSize || TILE_SIZE;
+      
+      // Set background image if available
+      if (mapData.backgroundImage) {
+        // If it's the test-map2.png, use it directly
+        if (mapData.backgroundImage.includes('test-map2.png')) {
+          console.log('Using preloaded test map 2 background');
+          this.setBackgroundImage('test_map_bg', mapWidth, mapHeight);
+        }
+        // If it's the old test-map.png, also use test-map2.png
+        else if (mapData.backgroundImage.includes('test-map.png')) {
+          console.log('Using preloaded test map 2 background (legacy fallback)');
+          this.setBackgroundImage('test_map_bg', mapWidth, mapHeight);
+        }
+        // Else if it's a path to an external image
+        else if (mapData.backgroundImage.startsWith('/')) {
+          // Use the path directly
+          const backgroundKey = 'bg_' + mapData.id;
+          
+          // Check if the image is already loaded
+          if (!this.textures.exists(backgroundKey)) {
+            // Load the image first
+            this.load.image(backgroundKey, mapData.backgroundImage);
+            this.load.once('complete', () => {
+              this.setBackgroundImage(backgroundKey, mapWidth, mapHeight);
+            });
+            this.load.start();
+          } else {
+            this.setBackgroundImage(backgroundKey, mapWidth, mapHeight);
+          }
+        } else {
+          // Use a predefined key
+          this.setBackgroundImage(mapData.backgroundImage, mapWidth, mapHeight);
+        }
+      } else {
+        // Always use test-map2.png as default instead of fantasy-map.svg
+        console.log('No background image specified, using test-map2.png as default');
+        this.setBackgroundImage('test_map_bg', mapWidth, mapHeight);
+      }
+      
+      // Create grid overlay with high transparency
+      this.createGridOverlay(mapWidth, mapHeight, gridSize);
+      
+      // Destroy existing map if it exists
+      if (this.map) {
+        this.map.destroy();
+        this.layers = {};
+      }
+      
+      // Create a new blank map
+      this.map = this.make.tilemap({
+        width: mapData.width,
+        height: mapData.height,
+        tileWidth: TILE_SIZE,
+        tileHeight: TILE_SIZE
+      });
+      
+      // Add a placeholder tileset
+      const tileset = this.map.addTilesetImage('placeholder', AssetKeys.TILESET_DUNGEON);
+      
+      if (!tileset) {
+        console.error('Failed to create map tileset');
+        return;
+      }
+      
+      // Create layers
+      const groundLayer = this.map.createBlankLayer('ground', tileset);
+      const obstaclesLayer = this.map.createBlankLayer('obstacles', tileset);
+      const overlayLayer = this.map.createBlankLayer('overlay', tileset);
+      
+      if (!groundLayer || !obstaclesLayer || !overlayLayer) {
+        console.error('Failed to create map layers');
+        return;
+      }
+      
       this.layers[LayerType.GROUND] = groundLayer;
       this.layers[LayerType.OBSTACLES] = obstaclesLayer;
       this.layers[LayerType.OVERLAY] = overlayLayer;
       
-      // Set collision on obstacles layer
+      // Set transparency on all layers to make them very transparent
+      groundLayer.setAlpha(0.1);
+      obstaclesLayer.setAlpha(0.3);
+      overlayLayer.setAlpha(0.2);
+      
+      // Set collisions
       this.layers[LayerType.OBSTACLES].setCollisionByProperty({ collides: true });
       
-      // Set the current map key
-      this.currentMapKey = key;
+      // Process tile data
+      if (mapData.tiles) {
+        for (let y = 0; y < mapData.height; y++) {
+          for (let x = 0; x < mapData.width; x++) {
+            const tile = mapData.tiles[y] && mapData.tiles[y][x];
+            if (tile) {
+              // Ground layer - all tiles are ground
+              this.layers[LayerType.GROUND].putTileAt(1, x, y);
+              
+              // Add obstacles for non-walkable tiles
+              if (!tile.walkable) {
+                this.layers[LayerType.OBSTACLES].putTileAt(2, x, y);
+              }
+            }
+          }
+        }
+      }
       
-      // Set world bounds
-      this.physics.world.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+      // Set world and camera bounds
+      this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
+      this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
       
-      // Set camera bounds
-      this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
+      // Reset camera to default view
+      this.resetCamera();
       
-      console.log(`Map ${key} loaded`);
-    } else {
-      console.error(`Failed to create layers for map ${key}`);
+      console.log(`Map loaded with camera controls: ${mapData.name} (${mapData.width}x${mapData.height})`);
+    } catch (error) {
+      console.error('Error loading map from data:', error);
+    }
+  }
+
+  /**
+   * Set the background image for the map
+   * @param key The key of the background image to use
+   * @param width Width of the background
+   * @param height Height of the background
+   */
+  setBackgroundImage(key: string, width: number, height: number): void {
+    // Clear any existing background
+    if (this.backgroundImage) {
+      this.backgroundImage.destroy();
+      this.backgroundImage = null;
+    }
+    
+    try {
+      // Create the background image
+      this.backgroundImage = this.add.image(0, 0, key);
+      
+      // Set the origin to the top-left corner
+      this.backgroundImage.setOrigin(0, 0);
+      
+      // Resize to fit the map dimensions
+      if (width && height) {
+        this.backgroundImage.displayWidth = width;
+        this.backgroundImage.displayHeight = height;
+      }
+      
+      // Move to the back (behind other game objects)
+      this.backgroundImage.setDepth(-10);
+      
+      console.log(`Background image set: ${key}`);
+    } catch (error) {
+      console.error(`Failed to set background image ${key}:`, error);
+    }
+  }
+  
+  /**
+   * Create a grid overlay for the map
+   * @param width Width of the grid
+   * @param height Height of the grid
+   * @param cellSize Size of each grid cell
+   */
+  createGridOverlay(width: number, height: number, cellSize: number = 64): void {
+    // Clear any existing grid
+    if (this.gridImage) {
+      this.gridImage.destroy();
+      this.gridImage = null;
+    }
+    
+    try {
+      // Use the grid tile as a repeating pattern
+      this.gridImage = this.add.tileSprite(0, 0, width, height, AssetKeys.BACKGROUND_GRID);
+      this.gridImage.setOrigin(0, 0);
+      this.gridImage.setDepth(-5); // Above background but below other objects
+      this.gridImage.setAlpha(0.3); // Make grid more transparent
+      
+      console.log(`Grid overlay created: ${width}x${height}, cell size: ${cellSize}`);
+    } catch (error) {
+      console.error('Failed to create grid overlay:', error);
     }
   }
 
@@ -209,6 +675,12 @@ class MainScene extends Phaser.Scene {
    * Create a default map for testing
    */
   createDefaultMap(): void {
+    // Set a background image first - use test-map2.png instead of fantasy-map.svg
+    const mapWidth = 20 * TILE_SIZE;
+    const mapHeight = 15 * TILE_SIZE;
+    this.setBackgroundImage('test_map_bg', mapWidth, mapHeight);
+    this.createGridOverlay(mapWidth, mapHeight, TILE_SIZE);
+    
     // Create a simple map data
     const mapData = {
       width: 20,
@@ -283,7 +755,10 @@ class MainScene extends Phaser.Scene {
       // Set camera bounds
       this.cameras.main.setBounds(0, 0, mapData.width * mapData.tileWidth, mapData.height * mapData.tileHeight);
       
-      console.log('Default map created');
+      // Reset camera to default view
+      this.resetCamera();
+      
+      console.log('Default map created with camera controls');
     } else {
       console.error('Failed to create default map layers');
     }
@@ -376,8 +851,8 @@ class MainScene extends Phaser.Scene {
     if (objectType === ObjectType.PLAYER && !this.player) {
       this.player = actorObject;
       
-      // Make camera follow the player
-      this.cameras.main.startFollow(sprite);
+      // Make camera follow the player with smooth movement
+      this.cameras.main.startFollow(sprite, true, this.PAN_SMOOTH_FACTOR, this.PAN_SMOOTH_FACTOR);
     }
     
     return actorObject;
@@ -699,6 +1174,65 @@ class MainScene extends Phaser.Scene {
       frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_ENEMY, { start: 3, end: 5 }),
       frameRate: 10,
       repeat: 0
+    });
+  }
+
+  /**
+   * Create controls information UI
+   */
+  private createControlsInfo(): void {
+    const controlsInfo = [
+      'Camera Controls:',
+      '• Mouse wheel: Zoom in/out',
+      '• Click + drag: Pan map',
+      '• +/- keys: Zoom in/out',
+      '• WASD keys: Pan map',
+      '• Touch: Pinch to zoom, drag to pan'
+    ].join('\n');
+    
+    this.controlsText = this.add.text(10, 10, controlsInfo, {
+      fontSize: '12px',
+      color: '#ffffff',
+      backgroundColor: 'rgba(0, 0, 0, 0.7)',
+      padding: { x: 8, y: 6 }
+    });
+    this.controlsText.setDepth(1000); // Ensure it's on top
+    this.controlsText.setScrollFactor(0); // Keep it fixed to camera
+    
+    // Auto-hide after 10 seconds
+    this.time.delayedCall(10000, () => {
+      if (this.controlsText) {
+        this.controlsText.setVisible(false);
+      }
+    });
+    
+    // Allow toggling with 'H' key
+    if (this.input && this.input.keyboard) {
+      const helpKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.H);
+      helpKey.on('down', () => {
+        if (this.controlsText) {
+          this.controlsText.setVisible(!this.controlsText.visible);
+        }
+      });
+    }
+  }
+
+  /**
+   * Setup resize handling for responsive canvas
+   */
+  private setupResizeHandling(): void {
+    // Listen for scale manager resize events
+    this.scale.on('resize', (gameSize: any) => {
+      // Update UI elements that need to stay in fixed positions
+      if (this.controlsText) {
+        // Controls text stays in top-left corner
+        this.controlsText.setPosition(10, 10);
+      }
+      
+      // Update camera bounds if needed
+      this.enforceCameraBounds();
+      
+      console.log(`Game resized to: ${gameSize.width}x${gameSize.height}`);
     });
   }
 }

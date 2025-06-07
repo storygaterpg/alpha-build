@@ -38,34 +38,40 @@ export enum LayerType {
 
 // Asset keys
 export enum AssetKeys {
-  // Tilemaps
+  // Maps
   TILEMAP_DUNGEON = 'tilemap_dungeon',
   TILEMAP_TOWN = 'tilemap_town',
-  TILEMAP_FOREST = 'tilemap_forest',
   
   // Tilesets
   TILESET_DUNGEON = 'tileset_dungeon',
   TILESET_TOWN = 'tileset_town',
-  TILESET_FOREST = 'tileset_forest',
   
   // Sprites
   SPRITE_PLAYER = 'sprite_player',
   SPRITE_NPC = 'sprite_npc',
   SPRITE_ENEMY = 'sprite_enemy',
-  SPRITE_ITEM = 'sprite_item',
   
   // UI
   UI_HEALTHBAR_BG = 'ui_healthbar_bg',
   UI_HEALTHBAR_FILL = 'ui_healthbar_fill',
+  
+  // Backgrounds
+  BACKGROUND_FANTASY_MAP = 'background_fantasy_map',
+  BACKGROUND_GRID = 'background_grid'
 }
 
 // Map data interface
 export interface TilemapData {
   key: string;
   tilesetKey: string;
-  file: string;
-  tileWidth: number;
-  tileHeight: number;
+  layers: string[];
+}
+
+export interface MapBackgroundData {
+  key: string;
+  path: string;
+  width: number;
+  height: number;
 }
 
 // Animation data interface

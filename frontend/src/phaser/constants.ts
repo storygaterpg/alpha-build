@@ -4,8 +4,8 @@
 
 import { TilemapData, AssetKeys } from './types';
 
-// Tile size
-export const TILE_SIZE = 32;
+// Tile size in pixels
+export const TILE_SIZE = 64;
 
 // Game dimensions
 export const GAME_WIDTH = 800;
@@ -23,31 +23,23 @@ export const ENEMY_SPEED = 120;
 // Health bar dimensions
 export const HEALTH_BAR_WIDTH = 40;
 export const HEALTH_BAR_HEIGHT = 6;
-export const HEALTH_BAR_OFFSET_Y = -20;
+export const HEALTH_BAR_OFFSET_Y = 24;
 
-// Tilemap data
+// Default animation frame rate
+export const DEFAULT_FRAME_RATE = 10;
+
+// Map data
 export const TILEMAPS: Record<string, TilemapData> = {
   dungeon: {
     key: AssetKeys.TILEMAP_DUNGEON,
     tilesetKey: AssetKeys.TILESET_DUNGEON,
-    file: 'tilemaps/dungeon.json',
-    tileWidth: TILE_SIZE,
-    tileHeight: TILE_SIZE,
+    layers: ['ground', 'obstacles', 'overlay']
   },
   town: {
     key: AssetKeys.TILEMAP_TOWN,
     tilesetKey: AssetKeys.TILESET_TOWN,
-    file: 'tilemaps/town.json',
-    tileWidth: TILE_SIZE,
-    tileHeight: TILE_SIZE,
-  },
-  forest: {
-    key: AssetKeys.TILEMAP_FOREST,
-    tilesetKey: AssetKeys.TILESET_FOREST,
-    file: 'tilemaps/forest.json',
-    tileWidth: TILE_SIZE,
-    tileHeight: TILE_SIZE,
-  },
+    layers: ['ground', 'obstacles', 'overlay']
+  }
 };
 
 // Animation keys

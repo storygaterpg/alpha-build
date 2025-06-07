@@ -1,8 +1,9 @@
 import React, { useRef, useEffect, useCallback, useState } from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { H2, Spinner } from '@blueprintjs/core';
 import { RootState } from '../store';
 import { Game as PhaserGame } from '../phaser/game';
+import MainScene from '../phaser/scenes/MainScene';
 
 interface MapPanelProps {
   onGameInitialized?: (game: PhaserGame) => void;
@@ -14,11 +15,18 @@ interface MapPanelProps {
  * Wraps the Phaser canvas in a styled container
  */
 const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
+  const dispatch = useDispatch();
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const phaserGameRef = useRef<PhaserGame | null>(null);
   const gameInitializedRef = useRef<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Get map data from Redux
+  const currentMapId = useSelector((state: RootState) => state.game.currentMapId);
+  const maps = useSelector((state: RootState) => state.game.maps);
+  const currentMap = currentMapId ? maps[currentMapId] : null;
+  const actors = useSelector((state: RootState) => state.game.actors);
   
   // Store the callback in a ref to prevent dependency issues
   const callbackRef = useRef(onGameInitialized);
@@ -38,8 +46,6 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
         // Create the game instance
         const newGame = new PhaserGame({
           parent: gameContainerRef.current.id,
-          width: gameContainerRef.current.clientWidth,
-          height: gameContainerRef.current.clientHeight,
         });
         
         phaserGameRef.current = newGame;
@@ -84,18 +90,55 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
     };
   }, []); // Empty dependency array ensures this only runs once
 
-  // Handle resize
+  // Handle map data changes
+  useEffect(() => {
+    if (phaserGameRef.current && currentMap) {
+      try {
+        const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
+        if (mainScene && typeof mainScene.loadMapFromData === 'function') {
+          mainScene.loadMapFromData(currentMap);
+        }
+      } catch (error) {
+        console.error('Error loading map data into Phaser:', error);
+      }
+    }
+  }, [currentMap]);
+  
+  // Handle actor changes
+  useEffect(() => {
+    if (phaserGameRef.current && actors) {
+      try {
+        const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
+        if (mainScene) {
+          // Clear existing actors
+          Object.values(actors).forEach(actor => {
+            // First try to remove in case it already exists
+            if (typeof mainScene.removeActor === 'function') {
+              mainScene.removeActor(actor.id);
+            }
+            
+            // Then add the actor
+            if (typeof mainScene.addActor === 'function') {
+              mainScene.addActor(actor);
+            }
+          });
+        }
+      } catch (error) {
+        console.error('Error updating actors in Phaser:', error);
+      }
+    }
+  }, [actors]);
+
+  // Handle resize - enhanced for better responsiveness
   useEffect(() => {
     const handleResize = () => {
       if (phaserGameRef.current && gameContainerRef.current) {
         try {
           // Get the Phaser game instance
           const phaserInstance = phaserGameRef.current.getGameInstance();
-          if (phaserInstance) {
-            // Update canvas size
-            const width = gameContainerRef.current.clientWidth;
-            const height = gameContainerRef.current.clientHeight;
-            phaserInstance.scale.resize(width, height);
+          if (phaserInstance && phaserInstance.scale) {
+            // Force refresh the scale manager
+            phaserInstance.scale.refresh();
           }
         } catch (resizeError) {
           console.error("Error resizing game:", resizeError);
@@ -103,12 +146,38 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
       }
     };
 
+    // Initial resize to ensure proper sizing
+    const initialResize = () => {
+      setTimeout(handleResize, 100); // Small delay to ensure DOM is ready
+    };
+
     window.addEventListener('resize', handleResize);
+    initialResize();
+    
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
   return (
-    <div className="map-panel" style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div className="map-panel" style={{ 
+      height: '100%', 
+      width: '100%',
+      display: 'flex', 
+      flexDirection: 'column',
+      position: 'relative'
+    }}>
+      <style>{`
+        .phaser-container canvas {
+          width: 100% !important;
+          height: 100% !important;
+          object-fit: contain;
+          display: block;
+        }
+        
+        .phaser-container {
+          width: 100%;
+          height: 100%;
+        }
+      `}</style>
       <div 
         id="phaser-game" 
         ref={gameContainerRef} 
@@ -116,14 +185,13 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
         style={{ 
           backgroundColor: 'rgba(18, 18, 31, 0.6)',
           flex: 1,
+          width: '100%',
           height: '100%',
           borderRadius: '12px',
           overflow: 'hidden',
           border: '1px solid var(--glass-border)',
           position: 'relative',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center'
+          display: 'block' // Changed from flex to block for better canvas handling
         }}
       >
         {isLoading && (

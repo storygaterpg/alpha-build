@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- Player character - simple knight design -->
+  <circle cx="16" cy="10" r="6" fill="#4287f5" stroke="#000" stroke-width="1" />
+  <path d="M10,16 L22,16 L22,26 L10,26 Z" fill="#4287f5" stroke="#000" stroke-width="1" />
+  <rect x="14" y="26" width="4" height="4" fill="#8b4513" />
+  <path d="M11,8 L14,5 L18,5 L21,8" stroke="#fff" stroke-width="1" fill="none" />
+</svg> 

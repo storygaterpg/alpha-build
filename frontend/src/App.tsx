@@ -1,10 +1,13 @@
 import React, { useRef, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { Position, Toaster } from '@blueprintjs/core';
+import { Position, Toaster, ThemeProvider } from '@blueprintjs/core';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import 'react-mosaic-component/react-mosaic-component.css';
 import { useDispatch } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
+import { BrowserRouter as Router } from 'react-router-dom';
+import websocketClient from './network/WebSocketClient';
 
 // Import pages
 import Home from './pages/Home';
@@ -167,6 +170,22 @@ const SocketManager: React.FC = () => {
       };
     }
   }, [location.pathname, dispatch]);
+  
+  // Force connect to port 8001
+  useEffect(() => {
+    // Connect to the WebSocket server with the specific port
+    websocketClient.connect('ws://localhost:8001/ws')
+      .then(success => {
+        if (success) {
+          console.log('Successfully connected to WebSocket server on port 8001');
+        } else {
+          console.error('Failed to connect to WebSocket server on port 8001');
+        }
+      })
+      .catch(error => {
+        console.error('Error connecting to WebSocket server:', error);
+      });
+  }, []);
   
   return null;
 };

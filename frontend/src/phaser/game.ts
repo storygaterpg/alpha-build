@@ -3,19 +3,24 @@ import MainScene from './scenes/MainScene';
 
 export interface GameConfig {
   parent: string;
-  width: number;
-  height: number;
+  width?: number;
+  height?: number;
 }
 
 export class Game {
   private game: Phaser.Game | null = null;
 
   constructor(config: GameConfig) {
+    // Get parent element to determine initial size
+    const parentElement = document.getElementById(config.parent);
+    const initialWidth = parentElement?.clientWidth || 800;
+    const initialHeight = parentElement?.clientHeight || 600;
+
     this.game = new Phaser.Game({
       type: Phaser.AUTO,
       parent: config.parent,
-      width: config.width,
-      height: config.height,
+      width: initialWidth,
+      height: initialHeight,
       backgroundColor: '#000000',
       physics: {
         default: 'arcade',
@@ -27,10 +32,38 @@ export class Game {
       scene: [MainScene],
       pixelArt: true,
       scale: {
-        mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.RESIZE,
         autoCenter: Phaser.Scale.CENTER_BOTH,
+        parent: config.parent,
+        expandParent: false,
+        fullscreenTarget: config.parent
       },
+      render: {
+        antialias: false,
+        pixelArt: true,
+        roundPixels: true
+      },
+      autoFocus: true
     });
+
+    // Set up resize listener
+    this.setupResizeListener();
+  }
+
+  private setupResizeListener(): void {
+    const resizeObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        if (this.game && this.game.scale) {
+          const { width, height } = entry.contentRect;
+          this.game.scale.resize(width, height);
+        }
+      }
+    });
+
+    const parentElement = document.getElementById(this.game?.config.parent as string);
+    if (parentElement) {
+      resizeObserver.observe(parentElement);
+    }
   }
 
   /**

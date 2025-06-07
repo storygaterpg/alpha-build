@@ -1,174 +1,290 @@
 import Phaser from 'phaser';
 import { AssetKeys } from './types';
+import { TILE_SIZE } from './constants';
 
 /**
- * AssetPreloader
+ * AssetPreloader class
  * 
- * A utility class that generates placeholder assets for development
- * when actual assets aren't available.
+ * Utility class to create placeholder assets for development/testing
+ * when real assets fail to load
  */
-export class AssetPreloader {
+class AssetPreloader {
   /**
-   * Create a placeholder tileset image
-   * @param scene The Phaser scene
-   * @param key The key to store the texture under
-   * @param color The base color for the tileset
-   */
-  static createPlaceholderTileset(scene: Phaser.Scene, key: string, color: number = 0x3498db): void {
-    // Create a 128x128 canvas with 4x4 tiles (32x32 each)
-    const graphics = scene.make.graphics({ x: 0, y: 0 });
-    
-    // Draw the base color
-    graphics.fillStyle(color);
-    graphics.fillRect(0, 0, 128, 128);
-    
-    // Draw grid lines
-    graphics.lineStyle(1, 0x000000, 0.3);
-    
-    // Vertical lines
-    for (let x = 32; x < 128; x += 32) {
-      graphics.beginPath();
-      graphics.moveTo(x, 0);
-      graphics.lineTo(x, 128);
-      graphics.closePath();
-      graphics.strokePath();
-    }
-    
-    // Horizontal lines
-    for (let y = 32; y < 128; y += 32) {
-      graphics.beginPath();
-      graphics.moveTo(0, y);
-      graphics.lineTo(128, y);
-      graphics.closePath();
-      graphics.strokePath();
-    }
-    
-    // Add some tile variations
-    // Tile 1: Empty/Floor (already has the base color)
-    
-    // Tile 2: Wall/obstacle
-    graphics.fillStyle(0x2c3e50);
-    graphics.fillRect(32, 0, 32, 32);
-    
-    // Tile 3: Special
-    graphics.fillStyle(0xe74c3c);
-    graphics.fillRect(64, 0, 32, 32);
-    
-    // Tile 4: Water
-    graphics.fillStyle(0x3498db);
-    graphics.fillRect(96, 0, 32, 32);
-    
-    // Add some pattern to each tile
-    graphics.fillStyle(0xffffff, 0.1);
-    graphics.fillRect(4, 4, 24, 24);
-    graphics.fillRect(36, 4, 24, 24);
-    graphics.fillRect(68, 4, 24, 24);
-    graphics.fillRect(100, 4, 24, 24);
-    
-    // Generate the texture
-    graphics.generateTexture(key, 128, 128);
-    graphics.destroy();
-  }
-  
-  /**
-   * Create a placeholder sprite sheet
-   * @param scene The Phaser scene
-   * @param key The key to store the texture under
-   * @param color The base color for the sprite
-   */
-  static createPlaceholderSpritesheet(scene: Phaser.Scene, key: string, color: number = 0x27ae60): void {
-    // Create a spritesheet with 4 frames (32x48 each)
-    const width = 128; // 4 frames
-    const height = 48;
-    const frameWidth = 32;
-    
-    const graphics = scene.make.graphics({ x: 0, y: 0 });
-    
-    // Draw the base color for each frame
-    graphics.fillStyle(color);
-    
-    // Draw 4 frames
-    for (let i = 0; i < 4; i++) {
-      // Base shape for character
-      const x = i * frameWidth;
-      graphics.fillRect(x, 0, frameWidth, height);
-      
-      // Add some details to differentiate frames
-      graphics.fillStyle(0x000000, 0.2);
-      
-      // Different pattern for each frame to simulate animation
-      switch (i) {
-        case 0: // Frame 1: Standing
-          graphics.fillRect(x + 8, 38, 16, 10);
-          break;
-        case 1: // Frame 2: Walking 1
-          graphics.fillRect(x + 12, 38, 16, 10);
-          break;
-        case 2: // Frame 3: Standing (duplicate of 1 for testing)
-          graphics.fillRect(x + 8, 38, 16, 10);
-          break;
-        case 3: // Frame 4: Walking 2
-          graphics.fillRect(x + 4, 38, 16, 10);
-          break;
-      }
-      
-      // Add character head
-      graphics.fillStyle(0xecf0f1);
-      graphics.fillCircle(x + 16, 12, 8);
-      
-      // Add character body
-      graphics.fillStyle(0xecf0f1, 0.8);
-      graphics.fillRect(x + 10, 20, 12, 18);
-    }
-    
-    // Generate the texture
-    graphics.generateTexture(key, width, height);
-    graphics.destroy();
-  }
-  
-  /**
-   * Create a placeholder UI image
-   * @param scene The Phaser scene
-   * @param key The key to store the texture under
-   * @param width The width of the image
-   * @param height The height of the image
-   * @param color The color of the image
-   */
-  static createPlaceholderUI(scene: Phaser.Scene, key: string, width: number, height: number, color: number): void {
-    const graphics = scene.make.graphics({ x: 0, y: 0 });
-    
-    // Draw the base shape
-    graphics.fillStyle(color);
-    graphics.fillRect(0, 0, width, height);
-    
-    // Add a border
-    graphics.lineStyle(1, 0x000000, 0.5);
-    graphics.strokeRect(0, 0, width, height);
-    
-    // Generate the texture
-    graphics.generateTexture(key, width, height);
-    graphics.destroy();
-  }
-  
-  /**
-   * Preload all placeholder assets
-   * @param scene The Phaser scene
+   * Create all placeholder assets
+   * @param scene The scene to add the assets to
    */
   static preloadAllPlaceholders(scene: Phaser.Scene): void {
-    // Create tileset placeholders
-    this.createPlaceholderTileset(scene, AssetKeys.TILESET_DUNGEON, 0x34495e);
-    this.createPlaceholderTileset(scene, AssetKeys.TILESET_TOWN, 0x2ecc71);
+    this.createPlaceholderTileset(scene, AssetKeys.TILESET_DUNGEON);
+    this.createPlaceholderTileset(scene, AssetKeys.TILESET_TOWN);
+    this.createPlaceholderBackground(scene, AssetKeys.BACKGROUND_FANTASY_MAP);
+    this.createPlaceholderGrid(scene, AssetKeys.BACKGROUND_GRID);
+    this.createPlaceholderCharacter(scene, AssetKeys.SPRITE_PLAYER, '#4287f5');
+    this.createPlaceholderCharacter(scene, AssetKeys.SPRITE_NPC, '#28a745');
+    this.createPlaceholderCharacter(scene, AssetKeys.SPRITE_ENEMY, '#dc3545');
+    this.createPlaceholderUI(scene, AssetKeys.UI_HEALTHBAR_BG, '#333333');
+    this.createPlaceholderUI(scene, AssetKeys.UI_HEALTHBAR_FILL, '#00ff00');
+  }
+
+  /**
+   * Create a placeholder tileset
+   * @param scene The scene to add the tileset to
+   * @param key The key to use for the tileset
+   */
+  static createPlaceholderTileset(scene: Phaser.Scene, key: string): void {
+    if (scene.textures.exists(key)) return;
+
+    const tileSize = TILE_SIZE;
+    const canvas = scene.textures.createCanvas(key, tileSize * 4, tileSize * 4);
+    if (!canvas) {
+      console.error(`Failed to create canvas for ${key}`);
+      return;
+    }
+    const ctx = canvas.context;
+
+    // Create a 4x4 tileset with transparent tiles and visible borders
+    const colors = [
+      'rgba(0,0,0,0)', // Transparent
+      'rgba(0,0,0,0.1)', // Very light gray (obstacles)
+      'rgba(0,0,0,0)', // Transparent
+      'rgba(0,0,0,0)', // Transparent
+    ];
+
+    // Fill the canvas with transparent tiles
+    for (let y = 0; y < 4; y++) {
+      for (let x = 0; x < 4; x++) {
+        const index = y * 4 + x;
+        const color = colors[index % colors.length];
+        
+        // Clear area first to ensure transparency
+        ctx.clearRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        
+        // Draw colored square (mostly transparent)
+        ctx.fillStyle = color;
+        ctx.fillRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        
+        // Draw border
+        ctx.strokeStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x * tileSize, y * tileSize, tileSize, tileSize);
+        
+        // Only draw index for debugging in development mode
+        if (process.env.NODE_ENV === 'development') {
+          ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+          ctx.font = '10px Arial';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(index.toString(), x * tileSize + tileSize / 2, y * tileSize + tileSize / 2);
+        }
+      }
+    }
+
+    canvas.refresh();
+  }
+
+  /**
+   * Create a placeholder background
+   * @param scene The scene to add the background to
+   * @param key The key to use for the background
+   */
+  static createPlaceholderBackground(scene: Phaser.Scene, key: string): void {
+    if (scene.textures.exists(key)) return;
+
+    const width = 1024;
+    const height = 768;
+    const canvas = scene.textures.createCanvas(key, width, height);
+    if (!canvas) {
+      console.error(`Failed to create canvas for ${key}`);
+      return;
+    }
+    const ctx = canvas.context;
+
+    // Create a transparent background instead of a patterned one
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, width, height);
     
-    // Create spritesheet placeholders
-    this.createPlaceholderSpritesheet(scene, AssetKeys.SPRITE_PLAYER, 0x3498db);
-    this.createPlaceholderSpritesheet(scene, AssetKeys.SPRITE_NPC, 0xe67e22);
-    this.createPlaceholderSpritesheet(scene, AssetKeys.SPRITE_ENEMY, 0xe74c3c);
+    // Add a very subtle grid for debugging if needed
+    if (process.env.NODE_ENV === 'development') {
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+      ctx.lineWidth = 1;
+      
+      // Draw horizontal lines
+      for (let y = 0; y <= height; y += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(width, y);
+        ctx.stroke();
+      }
+      
+      // Draw vertical lines
+      for (let x = 0; x <= width; x += TILE_SIZE) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, height);
+        ctx.stroke();
+      }
+      
+      // Text label
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+      ctx.font = '20px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Placeholder Background', width / 2, 50);
+    }
+
+    canvas.refresh();
+  }
+
+  /**
+   * Create a placeholder grid tile
+   * @param scene The scene to add the grid to
+   * @param key The key to use for the grid
+   */
+  static createPlaceholderGrid(scene: Phaser.Scene, key: string): void {
+    if (scene.textures.exists(key)) return;
+
+    const size = TILE_SIZE;
+    const canvas = scene.textures.createCanvas(key, size, size);
+    if (!canvas) {
+      console.error(`Failed to create canvas for ${key}`);
+      return;
+    }
+    const ctx = canvas.context;
+
+    // Draw a transparent background with grid lines
+    ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+    ctx.fillRect(0, 0, size, size);
     
-    // Create UI placeholders
-    this.createPlaceholderUI(scene, AssetKeys.UI_HEALTHBAR_BG, 64, 8, 0x7f8c8d);
-    this.createPlaceholderUI(scene, AssetKeys.UI_HEALTHBAR_FILL, 62, 6, 0xe74c3c);
+    // Draw grid lines
+    ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+    ctx.lineWidth = 1;
     
-    console.log('Placeholder assets created');
+    // Draw top and left edges
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(size, 0);
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.lineTo(0, size);
+    ctx.stroke();
+
+    canvas.refresh();
+  }
+
+  /**
+   * Create a placeholder character sprite
+   * @param scene The scene to add the character to
+   * @param key The key to use for the character
+   * @param color The color to use for the character
+   */
+  static createPlaceholderCharacter(scene: Phaser.Scene, key: string, color: string): void {
+    if (scene.textures.exists(key)) return;
+
+    const width = 32;
+    const height = 32;
+    const framesX = 3;
+    const framesY = 4;
+    const canvas = scene.textures.createCanvas(key, width * framesX, height * framesY);
+    if (!canvas) {
+      console.error(`Failed to create canvas for ${key}`);
+      return;
+    }
+    const ctx = canvas.context;
+
+    // Create frames for animation (4 directions x 3 frames each)
+    for (let y = 0; y < framesY; y++) {
+      for (let x = 0; x < framesX; x++) {
+        // Clear frame area
+        ctx.fillStyle = 'rgba(0, 0, 0, 0)';
+        ctx.fillRect(x * width, y * height, width, height);
+        
+        // Draw character body
+        ctx.fillStyle = color;
+        
+        // Head (circle)
+        ctx.beginPath();
+        ctx.arc(x * width + width / 2, y * height + height / 3, height / 5, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Body (rectangle)
+        ctx.fillRect(
+          x * width + width / 3, 
+          y * height + height / 2, 
+          width / 3, 
+          height / 3
+        );
+        
+        // Animation offset based on frame
+        const offsetX = (x % 3) - 1;
+        
+        // Legs
+        ctx.fillRect(
+          x * width + width / 3 - 2 + offsetX, 
+          y * height + height / 2 + height / 3, 
+          width / 6, 
+          height / 6
+        );
+        ctx.fillRect(
+          x * width + width / 3 + width / 6 + 2 - offsetX, 
+          y * height + height / 2 + height / 3, 
+          width / 6, 
+          height / 6
+        );
+        
+        // Eyes
+        ctx.fillStyle = '#000000';
+        
+        // Different eyes based on direction
+        switch (y) {
+          case 0: // Down
+            ctx.fillRect(x * width + width / 2 - 5, y * height + height / 3 - 2, 2, 2);
+            ctx.fillRect(x * width + width / 2 + 3, y * height + height / 3 - 2, 2, 2);
+            break;
+          case 1: // Left
+            ctx.fillRect(x * width + width / 2 - 6, y * height + height / 3 - 2, 2, 2);
+            break;
+          case 2: // Right
+            ctx.fillRect(x * width + width / 2 + 4, y * height + height / 3 - 2, 2, 2);
+            break;
+          case 3: // Up
+            ctx.fillRect(x * width + width / 2 - 5, y * height + height / 3 - 2, 2, 2);
+            ctx.fillRect(x * width + width / 2 + 3, y * height + height / 3 - 2, 2, 2);
+            break;
+        }
+      }
+    }
+
+    canvas.refresh();
+  }
+
+  /**
+   * Create a placeholder UI element
+   * @param scene The scene to add the UI element to
+   * @param key The key to use for the UI element
+   * @param color The color to use for the UI element
+   */
+  static createPlaceholderUI(scene: Phaser.Scene, key: string, color: string): void {
+    if (scene.textures.exists(key)) return;
+
+    const width = 64;
+    const height = 16;
+    const canvas = scene.textures.createCanvas(key, width, height);
+    if (!canvas) {
+      console.error(`Failed to create canvas for ${key}`);
+      return;
+    }
+    const ctx = canvas.context;
+
+    // Draw a simple UI element
+    ctx.fillStyle = color;
+    ctx.fillRect(0, 0, width, height);
+    
+    // Draw border
+    ctx.strokeStyle = '#000000';
+    ctx.lineWidth = 1;
+    ctx.strokeRect(0, 0, width, height);
+
+    canvas.refresh();
   }
 }
 

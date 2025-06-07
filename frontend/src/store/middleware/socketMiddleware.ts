@@ -376,11 +376,49 @@ const setupSocketListeners = (
   // Register message type handlers
   
   // Map data
-  websocketClient.onMessageType('map_data', (data) => {
+  websocketClient.onMessageType('mapData', (data) => {
+    if (process.env.NODE_ENV === 'development' && localStorage.getItem('verbose_logging') === 'true') {
+      console.log('Received map data:', data);
+    }
+    
+    // Process map data to ensure it has all required fields
+    const processedData = {
+      id: data.id || `map_${Date.now()}`,
+      name: data.name || 'Unnamed Map',
+      width: data.width || 15,
+      height: data.height || 15,
+      tiles: data.tiles || Array(data.height || 15).fill(Array(data.width || 15).fill({ type: 'normal', walkable: true })),
+      startPosition: data.startPosition || { x: 0, y: 0 },
+      backgroundImage: data.backgroundImage || null,
+      gridSize: data.gridSize || 64
+    };
+    
+    // Dispatch to the map reducer
     dispatch({
       type: MAP_RECEIVE,
-      payload: data
+      payload: processedData
     });
+    
+    // Also add/update the map in the game state
+    if (getState().game.maps[processedData.id]) {
+      dispatch({
+        type: 'game/updateMap',
+        payload: processedData
+      });
+    } else {
+      dispatch({
+        type: 'game/addMap',
+        payload: processedData
+      });
+    }
+    
+    // Set as current map if none is selected
+    if (!getState().game.currentMapId) {
+      dispatch({
+        type: 'game/setCurrentMap',
+        payload: processedData.id
+      });
+    }
   });
   
   // Actors data

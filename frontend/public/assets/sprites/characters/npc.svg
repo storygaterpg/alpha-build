@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <!-- NPC character - simple villager design -->
+  <circle cx="16" cy="10" r="6" fill="#28a745" stroke="#000" stroke-width="1" />
+  <path d="M10,16 L22,16 L20,26 L12,26 Z" fill="#28a745" stroke="#000" stroke-width="1" />
+  <rect x="14" y="26" width="4" height="4" fill="#8b4513" />
+  <circle cx="14" cy="9" r="1" fill="#000" />
+  <circle cx="18" cy="9" r="1" fill="#000" />
+  <path d="M14,12 L18,12" stroke="#000" stroke-width="1" fill="none" />
+</svg> 

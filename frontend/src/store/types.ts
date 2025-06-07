@@ -19,6 +19,8 @@ export interface MapData {
   height: number;
   tiles: Tile[][];
   startPosition: Position;
+  backgroundImage?: string; // Path to the map background image
+  gridSize?: number; // Optional grid cell size in pixels
 }
 
 // Actor Types
@@ -133,6 +135,7 @@ export interface GameState {
   error: string | null;
 }
 
+// Simplified Player type for specific contexts
 export interface Player {
   id: string;
   name: string;
@@ -140,13 +143,5 @@ export interface Player {
     x: number;
     y: number;
   };
-}
-
-export interface GameState {
-  playerName: string;
-  player: Player | null;
-  chat: {
-    messages: ChatMessage[];
-    unread: number;
-  };
+  imageUrl?: string;
 } 
