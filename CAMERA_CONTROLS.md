@@ -13,7 +13,7 @@ The game currently uses **test-map2.png** as the default background map, which f
   - Scroll up: Zoom in
   - Scroll down: Zoom out
   - Zooms towards cursor position for precise control
-  - **Granular control**: Small zoom steps for smooth experience
+  - **Ultra-fine control**: 0.5% zoom steps for extremely smooth experience
 
 - **Click + Drag**: Pan the map
   - Left-click and hold, then drag to move the camera
@@ -21,9 +21,10 @@ The game currently uses **test-map2.png** as the default background map, which f
 
 ### ⌨️ Keyboard Controls
 - **Zoom Controls**:
-  - `+` / `NumPad +`: Zoom in (centered)
-  - `-` / `NumPad -`: Zoom out (centered)
+  - `+` / `NumPad +`: Zoom in (centered) - 1% steps
+  - `-` / `NumPad -`: Zoom out (centered) - 1% steps
   - **Centered zoom**: Maintains current view center when using keyboard
+  - **Fine control**: 1% zoom increments for precise adjustments
 
 - **Pan Controls**:
   - `W`: Pan up

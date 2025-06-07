@@ -42,7 +42,7 @@ class MainScene extends Phaser.Scene {
   // Camera settings
   private readonly MIN_ZOOM = 0.25;
   private readonly MAX_ZOOM = 4.0;
-  private readonly ZOOM_SPEED = 0.05;
+  private readonly ZOOM_SPEED = 0.01;
   private readonly PAN_SPEED = 200;
   private readonly ZOOM_SMOOTH_FACTOR = 0.1;
   private readonly PAN_SMOOTH_FACTOR = 0.05;
@@ -170,8 +170,8 @@ class MainScene extends Phaser.Scene {
     
     // Setup mouse wheel zoom
     this.input.on('wheel', (pointer: Phaser.Input.Pointer, gameObjects: Phaser.GameObjects.GameObject[], deltaX: number, deltaY: number, deltaZ: number) => {
-      // Use smaller zoom step for mouse wheel for more granular control
-      const wheelZoomSpeed = this.ZOOM_SPEED * 0.5; // Even smaller steps for wheel
+      // Use very small zoom step for mouse wheel for ultra-granular control
+      const wheelZoomSpeed = 0.005; // 0.5% zoom steps for very fine control
       this.handleZoom(deltaY > 0 ? -wheelZoomSpeed : wheelZoomSpeed, pointer);
     });
     
