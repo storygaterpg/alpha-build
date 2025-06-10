@@ -1233,6 +1233,33 @@ class MainScene extends Phaser.Scene {
       console.log(`Game resized to: ${gameSize.width}x${gameSize.height}`);
     });
   }
+
+  /**
+   * Check if an actor exists in the scene
+   * @param actorId The ID of the actor to check
+   * @returns True if the actor exists, false otherwise
+   */
+  public hasActor(actorId: string): boolean {
+    return this.gameObjects.has(actorId);
+  }
+
+  /**
+   * Get all actor IDs currently in the scene
+   * @returns Array of actor IDs
+   */
+  public getActorIds(): string[] {
+    return Array.from(this.gameObjects.keys());
+  }
+
+  /**
+   * Get an actor object by ID
+   * @param actorId The ID of the actor
+   * @returns The actor object or null if not found
+   */
+  public getActor(actorId: string): ActorObject | null {
+    const obj = this.gameObjects.get(actorId);
+    return obj && 'actor' in obj ? obj as ActorObject : null;
+  }
 }
 
 export default MainScene; 

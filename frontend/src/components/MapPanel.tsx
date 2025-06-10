@@ -116,25 +116,51 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
         if (mainScene) {
           console.log('🎮 MapPanel: Updating actors in Phaser scene');
           
-          // Clear existing actors
+          // Get current actors in the scene
+          const existingActors = new Set();
+          
+          // Add or update actors
           Object.values(actors).forEach(actor => {
-            console.log(`🧹 Removing existing actor: ${actor.name} (${actor.id})`);
-            // First try to remove in case it already exists
-            if (typeof mainScene.removeActor === 'function') {
-              mainScene.removeActor(actor.id);
-            }
+            existingActors.add(actor.id);
             
-            console.log(`➕ Adding actor: ${actor.name} (${actor.id}) at position (${actor.position.x}, ${actor.position.y})`);
-            // Then add the actor
-            if (typeof mainScene.addActor === 'function') {
-              const result = mainScene.addActor(actor);
-              if (result) {
-                console.log(`✅ Successfully added actor: ${actor.name}`);
-              } else {
-                console.error(`❌ Failed to add actor: ${actor.name}`);
+            // Check if actor already exists in scene
+            const hasActor = mainScene.hasActor && mainScene.hasActor(actor.id);
+            const existingActor = mainScene.getActor && mainScene.getActor(actor.id);
+            
+            if (!hasActor) {
+              console.log(`➕ Adding new actor: ${actor.name} (${actor.id}) at position (${actor.position.x}, ${actor.position.y})`);
+              // Add new actor
+              if (typeof mainScene.addActor === 'function') {
+                const result = mainScene.addActor(actor);
+                if (result) {
+                  console.log(`✅ Successfully added actor: ${actor.name}`);
+                } else {
+                  console.error(`❌ Failed to add actor: ${actor.name}`);
+                }
+              }
+            } else if (existingActor) {
+              // Update existing actor position if needed
+              if (existingActor.position.x !== actor.position.x || existingActor.position.y !== actor.position.y) {
+                console.log(`🔄 Updating position for actor: ${actor.name} from (${existingActor.position.x}, ${existingActor.position.y}) to (${actor.position.x}, ${actor.position.y})`);
+                if (typeof mainScene.updateActorPosition === 'function') {
+                  mainScene.updateActorPosition(actor.id, actor.position);
+                }
               }
             }
           });
+          
+          // Remove actors that no longer exist in the data
+          if (mainScene.getActorIds) {
+            const sceneActorIds = mainScene.getActorIds();
+            sceneActorIds.forEach(actorId => {
+              if (!existingActors.has(actorId)) {
+                console.log(`🗑️ Removing deleted actor: ${actorId}`);
+                if (typeof mainScene.removeActor === 'function') {
+                  mainScene.removeActor(actorId);
+                }
+              }
+            });
+          }
           
           console.log(`🎭 MapPanel: Finished updating ${Object.keys(actors).length} actors`);
         } else {
