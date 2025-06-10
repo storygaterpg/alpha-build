@@ -10,6 +10,8 @@ export enum ObjectType {
   PLAYER = 'player',
   NPC = 'npc',
   ENEMY = 'enemy',
+  WARRIOR = 'warrior',
+  ROB = 'rob',
   ITEM = 'item',
   OBSTACLE = 'obstacle',
 }
@@ -50,6 +52,8 @@ export enum AssetKeys {
   SPRITE_PLAYER = 'sprite_player',
   SPRITE_NPC = 'sprite_npc',
   SPRITE_ENEMY = 'sprite_enemy',
+  SPRITE_WARRIOR = 'sprite_warrior',
+  SPRITE_ROB = 'sprite_rob',
   
   // UI
   UI_HEALTHBAR_BG = 'ui_healthbar_bg',

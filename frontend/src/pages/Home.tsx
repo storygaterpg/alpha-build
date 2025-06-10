@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import { Button, Card, H1, H3, FormGroup, InputGroup, Intent } from '@blueprintjs/core'
+import { Button, Card, H1, H3, FormGroup, InputGroup, Intent, ButtonGroup } from '@blueprintjs/core'
 import { setPlayerName } from '../store/slices/gameSlice'
 
 const Home: React.FC = () => {
@@ -114,21 +114,38 @@ const Home: React.FC = () => {
           </FormGroup>
         </div>
         
-        <Button 
-          className="glass-btn glass-btn-primary"
-          style={{
-            height: '50px',
-            width: '200px',
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            marginTop: '16px'
-          }}
-          onClick={handleStartAdventure}
-          disabled={!name.trim()}
-          large
-        >
-          Start Adventure
-        </Button>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'center' }}>
+          <Button 
+            className="glass-btn glass-btn-primary"
+            style={{
+              height: '50px',
+              width: '200px',
+              fontSize: '1.1rem',
+              fontWeight: 600,
+            }}
+            onClick={handleStartAdventure}
+            disabled={!name.trim()}
+            large
+          >
+            Start Adventure
+          </Button>
+          
+          <Button 
+            className="glass-btn"
+            style={{
+              height: '40px',
+              width: '150px',
+              fontSize: '1rem',
+              fontWeight: 500,
+              opacity: 0.8
+            }}
+            onClick={() => navigate('/settings')}
+            icon="cog"
+            minimal
+          >
+            Settings
+          </Button>
+        </div>
         
         <div style={{ 
           marginTop: '32px',

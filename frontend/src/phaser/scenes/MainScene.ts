@@ -62,6 +62,8 @@ class MainScene extends Phaser.Scene {
   }
 
   preload() {
+    console.log('🎮 MAIN SCENE PRELOAD STARTED');
+    
     // Attempt to load assets from server
     try {
       this.load.setBaseURL('/assets/');
@@ -79,25 +81,38 @@ class MainScene extends Phaser.Scene {
       this.load.image(AssetKeys.BACKGROUND_GRID, 'images/backgrounds/grid_tile.svg');
       this.load.image('test_map_bg', 'maps/test-map2.png');
       
-      // Load sprites
-      this.load.spritesheet(AssetKeys.SPRITE_PLAYER, 'sprites/characters/player.svg', { 
-        frameWidth: 32, 
-        frameHeight: 32 
-      });
-      this.load.spritesheet(AssetKeys.SPRITE_NPC, 'sprites/characters/npc.svg', { 
-        frameWidth: 32, 
-        frameHeight: 32 
-      });
+      // Load sprites with logging
+      console.log('🎨 Loading character sprites...');
+      this.load.image(AssetKeys.SPRITE_PLAYER, 'sprites/characters/player.svg');
+      this.load.image(AssetKeys.SPRITE_NPC, 'sprites/characters/npc.svg');
       this.load.spritesheet(AssetKeys.SPRITE_ENEMY, 'sprites/enemy.png', { 
         frameWidth: 32, 
         frameHeight: 48 
       });
+      this.load.image(AssetKeys.SPRITE_WARRIOR, 'sprites/characters/warrior.svg');
+      this.load.image(AssetKeys.SPRITE_ROB, 'sprites/characters/Rob.png');
       
       // Load UI elements
       this.load.image(AssetKeys.UI_HEALTHBAR_BG, 'images/healthbar_bg.png');
       this.load.image(AssetKeys.UI_HEALTHBAR_FILL, 'images/healthbar_fill.png');
+      
+      // Add load event listeners for debugging
+      this.load.on('filecomplete', (key: string) => {
+        console.log(`✅ Asset loaded: ${key}`);
+      });
+      
+      this.load.on('loaderror', (file: any) => {
+        console.error(`❌ Failed to load asset: ${file.key} from ${file.url}`);
+      });
+      
+      this.load.on('complete', () => {
+        console.log('🎮 ALL ASSETS LOADED SUCCESSFULLY');
+        // List all loaded textures
+        console.log('Available textures:', Object.keys(this.textures.list));
+      });
+      
     } catch (error) {
-      console.error('Error in preload:', error);
+      console.error('❌ Error in preload:', error);
     }
   }
 
@@ -370,19 +385,19 @@ class MainScene extends Phaser.Scene {
    */
   public resetCamera(): void {
     const camera = this.cameras.main;
-    camera.setZoom(1);
+    camera.setZoom(0.7); // Start zoomed out to show more of the map
     
-    if (this.player && this.player.sprite) {
-      // Center on player if available
-      camera.centerOn(this.player.sprite.x, this.player.sprite.y);
-      camera.startFollow(this.player.sprite, true, this.PAN_SMOOTH_FACTOR, this.PAN_SMOOTH_FACTOR);
+    // Always center on map center to show all actors, not just player
+    const bounds = camera.getBounds();
+    if (bounds) {
+      camera.centerOn(bounds.centerX, bounds.centerY);
     } else {
-      // Center on map
-      const bounds = camera.getBounds();
-      if (bounds) {
-        camera.centerOn(bounds.centerX, bounds.centerY);
-      }
+      // Fallback: center on middle of a typical map
+      camera.centerOn(7.5 * TILE_SIZE, 7.5 * TILE_SIZE);
     }
+    
+    // Don't automatically follow the player initially so we can see all actors
+    // Camera will follow player when they start moving
     
     this.enforceCameraBounds();
   }
@@ -770,6 +785,9 @@ class MainScene extends Phaser.Scene {
    * @returns The created actor object
    */
   addActor(actor: Actor): ActorObject | null {
+    console.log(`🏃‍♂️ ADDING ACTOR: ${actor.name} (${actor.id}) of type ${actor.type}`);
+    console.log('Actor data:', actor);
+    
     // Determine which sprite to use based on actor type
     let spriteKey = AssetKeys.SPRITE_PLAYER;
     let objectType = ObjectType.PLAYER;
@@ -787,30 +805,94 @@ class MainScene extends Phaser.Scene {
         spriteKey = AssetKeys.SPRITE_ENEMY;
         objectType = ObjectType.ENEMY;
         break;
+      case 'warrior':
+        spriteKey = AssetKeys.SPRITE_WARRIOR;
+        objectType = ObjectType.WARRIOR;
+        break;
+      case 'rob':
+        spriteKey = AssetKeys.SPRITE_ROB;
+        objectType = ObjectType.ROB;
+        break;
       default:
-        console.error(`Unknown actor type: ${actor.type}`);
+        console.error(`❌ Unknown actor type: ${actor.type}`);
         return null;
     }
     
+    console.log(`🎨 Using sprite key: ${spriteKey} for actor type: ${actor.type}`);
+    
+    // Check if texture exists
+    if (!this.textures.exists(spriteKey)) {
+      console.error(`❌ TEXTURE NOT FOUND: ${spriteKey}`);
+      console.log('Available textures:', Object.keys(this.textures.list));
+      return null;
+    } else {
+      console.log(`✅ Texture found: ${spriteKey}`);
+    }
+    
+    // Calculate world position
+    const worldX = actor.position.x * TILE_SIZE;
+    const worldY = actor.position.y * TILE_SIZE;
+    console.log(`🌍 World position: (${worldX}, ${worldY}) from tile (${actor.position.x}, ${actor.position.y})`);
+    
     // Create the sprite
-    const sprite = this.physics.add.sprite(
-      actor.position.x * TILE_SIZE,
-      actor.position.y * TILE_SIZE,
-      spriteKey
-    );
+    const sprite = this.physics.add.sprite(worldX, worldY, spriteKey);
     
     if (!sprite) {
-      console.error(`Failed to create sprite for actor ${actor.id}`);
+      console.error(`❌ FAILED TO CREATE SPRITE for actor ${actor.id}`);
       return null;
     }
     
+    console.log(`✅ Sprite created successfully for ${actor.name}`);
+    
     // Set sprite properties
     sprite.setOrigin(0.5, 0.5);
-    sprite.setDepth(10);
+    sprite.setDepth(1000); // Dramatically higher depth to ensure sprites are absolutely on top
+    
+    // Ensure consistent sprite size (some images like Rob.png might be very large)
+    sprite.setDisplaySize(TILE_SIZE, TILE_SIZE);
+    
+    console.log(`📏 Sprite size set to: ${TILE_SIZE}x${TILE_SIZE}`);
+    console.log(`🎯 Sprite depth set to: ${sprite.depth}`);
+    console.log(`👁️ Sprite visibility: ${sprite.visible}, alpha: ${sprite.alpha}`);
     
     // Enable physics
     this.physics.world.enable(sprite);
     sprite.body.setCollideWorldBounds(true);
+    
+    // Debug logging to verify sprite creation
+    console.log(`📍 Final sprite position: (${sprite.x}, ${sprite.y})`);
+    console.log(`📦 Sprite bounds: width=${sprite.displayWidth}, height=${sprite.displayHeight}`);
+    console.log(`🏷️ Sprite texture key: ${sprite.texture?.key}`);
+    
+    // Extra logging for Rob specifically
+    if (actor.type === 'rob') {
+      console.log(`🎯 ROB SPRITE CREATED!`);
+      console.log(`Rob sprite details:`, {
+        visible: sprite.visible,
+        alpha: sprite.alpha,
+        scaleX: sprite.scaleX,
+        scaleY: sprite.scaleY,
+        texture: sprite.texture?.key,
+        displayWidth: sprite.displayWidth,
+        displayHeight: sprite.displayHeight,
+        depth: sprite.depth,
+        x: sprite.x,
+        y: sprite.y
+      });
+      
+      // Force maximum visibility for Rob
+      sprite.setVisible(true);
+      sprite.setAlpha(1.0);
+      sprite.setDepth(2000); // Even higher depth for Rob specifically
+      
+      // Add a colored border around Rob for debugging
+      const robBorder = this.add.graphics();
+      robBorder.lineStyle(3, 0xFF0000, 1); // Red border
+      robBorder.strokeRect(sprite.x - TILE_SIZE/2 - 2, sprite.y - TILE_SIZE/2 - 2, TILE_SIZE + 4, TILE_SIZE + 4);
+      robBorder.setDepth(1999); // Just below Rob
+      
+      console.log(`🎯 ROB ENHANCED WITH RED BORDER AT POSITION (${sprite.x}, ${sprite.y})`);
+    }
     
     // Add collisions with obstacles if they exist
     if (this.layers[LayerType.OBSTACLES]) {
@@ -842,10 +924,29 @@ class MainScene extends Phaser.Scene {
       }
     );
     actorObject.nameText.setOrigin(0.5, 0.5);
-    actorObject.nameText.setDepth(20);
+    actorObject.nameText.setDepth(2000); // Even higher depth for text
     
     // Add to game objects
     this.gameObjects.set(actor.id, actorObject);
+    
+    // Set initial animation based on actor type
+    switch (actor.type) {
+      case 'player':
+        // Player uses static image, no animation needed
+        break;
+      case 'npc':
+        // NPC uses static image, no animation needed
+        break;
+      case 'enemy':
+        sprite.anims.play('enemy-idle-down', true);
+        break;
+      case 'warrior':
+        // Warrior uses static image, no animation needed
+        break;
+      case 'rob':
+        // Rob uses static image, no animation needed
+        break;
+    }
     
     // If this is a player, set as the main player
     if (objectType === ObjectType.PLAYER && !this.player) {
@@ -941,7 +1042,7 @@ class MainScene extends Phaser.Scene {
   private createHealthBar(actorObj: ActorObject): Phaser.GameObjects.Graphics {
     // Create the health bar graphics object
     const healthBar = this.add.graphics();
-    healthBar.setDepth(15);
+    healthBar.setDepth(1500); // Higher depth for health bars
     
     // Position the health bar
     healthBar.setPosition(
@@ -1014,49 +1115,19 @@ class MainScene extends Phaser.Scene {
     // Horizontal movement
     if (this.cursors.left.isDown) {
       body.setVelocityX(-speed);
-      this.player.sprite.anims.play('player-walk-left', true);
+      // No animation for static image
     } else if (this.cursors.right.isDown) {
       body.setVelocityX(speed);
-      this.player.sprite.anims.play('player-walk-right', true);
+      // No animation for static image
     }
     
     // Vertical movement
     if (this.cursors.up.isDown) {
       body.setVelocityY(-speed);
-      
-      // Only play the up animation if not moving horizontally
-      if (!this.cursors.left.isDown && !this.cursors.right.isDown) {
-        this.player.sprite.anims.play('player-walk-up', true);
-      }
+      // No animation for static image
     } else if (this.cursors.down.isDown) {
       body.setVelocityY(speed);
-      
-      // Only play the down animation if not moving horizontally
-      if (!this.cursors.left.isDown && !this.cursors.right.isDown) {
-        this.player.sprite.anims.play('player-walk-down', true);
-      }
-    }
-    
-    // Idle animations
-    if (body.velocity.x === 0 && body.velocity.y === 0) {
-      // Get the current animation key
-      const currentAnim = this.player.sprite.anims.currentAnim;
-      
-      if (currentAnim) {
-        // Set the appropriate idle animation based on the last movement
-        if (currentAnim.key === 'player-walk-left') {
-          this.player.sprite.anims.play('player-idle-left', true);
-        } else if (currentAnim.key === 'player-walk-right') {
-          this.player.sprite.anims.play('player-idle-right', true);
-        } else if (currentAnim.key === 'player-walk-up') {
-          this.player.sprite.anims.play('player-idle-up', true);
-        } else if (currentAnim.key === 'player-walk-down') {
-          this.player.sprite.anims.play('player-idle-down', true);
-        }
-      } else {
-        // Default to idle down if no animation is playing
-        this.player.sprite.anims.play('player-idle-down', true);
-      }
+      // No animation for static image
     }
     
     // Calculate the new tile position
@@ -1079,82 +1150,9 @@ class MainScene extends Phaser.Scene {
    * Create animations for sprites
    */
   private createAnimations(): void {
-    // Player animations
+    // Only create animations for sprites that are loaded as spritesheets
     
-    // Idle animations
-    this.anims.create({
-      key: 'player-idle-down',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 0, end: 0 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    this.anims.create({
-      key: 'player-idle-up',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 9, end: 9 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    this.anims.create({
-      key: 'player-idle-left',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 3, end: 3 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    this.anims.create({
-      key: 'player-idle-right',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 6, end: 6 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    // Walk animations
-    this.anims.create({
-      key: 'player-walk-down',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 0, end: 2 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    this.anims.create({
-      key: 'player-walk-up',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 9, end: 11 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    this.anims.create({
-      key: 'player-walk-left',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 3, end: 5 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    this.anims.create({
-      key: 'player-walk-right',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_PLAYER, { start: 6, end: 8 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    // NPC animations
-    this.anims.create({
-      key: 'npc-idle-down',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_NPC, { start: 0, end: 0 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    this.anims.create({
-      key: 'npc-walk-down',
-      frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_NPC, { start: 0, end: 2 }),
-      frameRate: 10,
-      repeat: -1
-    });
-    
-    // Enemy animations
+    // Enemy animations (still a spritesheet)
     this.anims.create({
       key: 'enemy-idle-down',
       frames: this.anims.generateFrameNumbers(AssetKeys.SPRITE_ENEMY, { start: 0, end: 0 }),

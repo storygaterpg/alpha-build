@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
-import { Position, Toaster, ThemeProvider } from '@blueprintjs/core';
+import { Position, Toaster } from '@blueprintjs/core';
 import '@blueprintjs/core/lib/css/blueprint.css';
 import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import 'react-mosaic-component/react-mosaic-component.css';
@@ -12,6 +12,7 @@ import websocketClient from './network/WebSocketClient';
 // Import pages
 import Home from './pages/Home';
 import Game from './pages/Game';
+import SettingsPage from './pages/SettingsPage';
 import './styles/glassmorphic.css';
 import './styles/mosaic.css';
 
@@ -154,37 +155,27 @@ function getWebSocketUrl(): string {
 // Socket connection manager
 const SocketManager: React.FC = () => {
   const dispatch = useDispatch();
-  const location = useLocation();
   
-  // Connect to WebSocket when entering the game page, disconnect when leaving
+  // Connect to WebSocket using port 8000 explicitly
   useEffect(() => {
-    const isGameRoute = location.pathname === '/game';
-    
-    if (isGameRoute) {
-      // Connect to WebSocket when entering game page
-      dispatch(socketConnect({}));
-      
-      // Disconnect when leaving game page
-      return () => {
-        dispatch(socketDisconnect());
-      };
-    }
-  }, [location.pathname, dispatch]);
-  
-  // Force connect to port 8001
-  useEffect(() => {
-    // Connect to the WebSocket server with the specific port
-    websocketClient.connect('ws://localhost:8001/ws')
+    // Connect to port 8000 to match server
+    console.log('Connecting to WebSocket on port 8000...');
+    websocketClient.connect('ws://localhost:8000/ws')
       .then(success => {
         if (success) {
-          console.log('Successfully connected to WebSocket server on port 8001');
+          console.log('Successfully connected to WebSocket server on port 8000');
         } else {
-          console.error('Failed to connect to WebSocket server on port 8001');
+          console.error('Failed to connect to WebSocket server on port 8000');
         }
       })
       .catch(error => {
         console.error('Error connecting to WebSocket server:', error);
       });
+      
+    // Disconnect when component unmounts
+    return () => {
+      websocketClient.disconnect();
+    };
   }, []);
   
   return null;
@@ -202,6 +193,7 @@ const App: React.FC = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/game" element={<Game />} />
+        <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </div>
   );

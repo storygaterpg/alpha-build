@@ -1,10 +1,22 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-  <!-- NPC character - simple villager design -->
-  <circle cx="16" cy="10" r="6" fill="#28a745" stroke="#000" stroke-width="1" />
-  <path d="M10,16 L22,16 L20,26 L12,26 Z" fill="#28a745" stroke="#000" stroke-width="1" />
-  <rect x="14" y="26" width="4" height="4" fill="#8b4513" />
-  <circle cx="14" cy="9" r="1" fill="#000" />
-  <circle cx="18" cy="9" r="1" fill="#000" />
-  <path d="M14,12 L18,12" stroke="#000" stroke-width="1" fill="none" />
+  <!-- Friendly NPC (Green Villager) -->
+  <circle cx="16" cy="8" r="4" fill="#50C878" stroke="#3A9B5C" stroke-width="1"/>
+  <!-- Body -->
+  <rect x="12" y="12" width="8" height="12" fill="#50C878" stroke="#3A9B5C" stroke-width="1" rx="2"/>
+  <!-- Arms -->
+  <rect x="8" y="14" width="4" height="8" fill="#50C878" stroke="#3A9B5C" stroke-width="1" rx="2"/>
+  <rect x="20" y="14" width="4" height="8" fill="#50C878" stroke="#3A9B5C" stroke-width="1" rx="2"/>
+  <!-- Legs -->
+  <rect x="13" y="24" width="3" height="6" fill="#50C878" stroke="#3A9B5C" stroke-width="1" rx="1"/>
+  <rect x="16" y="24" width="3" height="6" fill="#50C878" stroke="#3A9B5C" stroke-width="1" rx="1"/>
+  <!-- Eyes -->
+  <circle cx="14" cy="7" r="1" fill="#FFFFFF"/>
+  <circle cx="18" cy="7" r="1" fill="#FFFFFF"/>
+  <circle cx="14" cy="7" r="0.5" fill="#000000"/>
+  <circle cx="18" cy="7" r="0.5" fill="#000000"/>
+  <!-- Smile -->
+  <path d="M 13 9 Q 16 11 19 9" stroke="#000000" stroke-width="1" fill="none"/>
+  <!-- Hat -->
+  <ellipse cx="16" cy="4" rx="5" ry="2" fill="#8B4513" stroke="#654321" stroke-width="1"/>
+  <rect x="11" y="3" width="10" height="2" fill="#8B4513" stroke="#654321" stroke-width="1" rx="1"/>
 </svg> 

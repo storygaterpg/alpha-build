@@ -4,6 +4,7 @@ import { H2, Spinner } from '@blueprintjs/core';
 import { RootState } from '../store';
 import { Game as PhaserGame } from '../phaser/game';
 import MainScene from '../phaser/scenes/MainScene';
+import '../styles/phaser.css';
 
 interface MapPanelProps {
   onGameInitialized?: (game: PhaserGame) => void;
@@ -106,25 +107,48 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
   
   // Handle actor changes
   useEffect(() => {
+    console.log('🎭 MapPanel: Actor data changed:', actors);
+    console.log('🎭 MapPanel: Actor count:', Object.keys(actors || {}).length);
+    
     if (phaserGameRef.current && actors) {
       try {
         const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
         if (mainScene) {
+          console.log('🎮 MapPanel: Updating actors in Phaser scene');
+          
           // Clear existing actors
           Object.values(actors).forEach(actor => {
+            console.log(`🧹 Removing existing actor: ${actor.name} (${actor.id})`);
             // First try to remove in case it already exists
             if (typeof mainScene.removeActor === 'function') {
               mainScene.removeActor(actor.id);
             }
             
+            console.log(`➕ Adding actor: ${actor.name} (${actor.id}) at position (${actor.position.x}, ${actor.position.y})`);
             // Then add the actor
             if (typeof mainScene.addActor === 'function') {
-              mainScene.addActor(actor);
+              const result = mainScene.addActor(actor);
+              if (result) {
+                console.log(`✅ Successfully added actor: ${actor.name}`);
+              } else {
+                console.error(`❌ Failed to add actor: ${actor.name}`);
+              }
             }
           });
+          
+          console.log(`🎭 MapPanel: Finished updating ${Object.keys(actors).length} actors`);
+        } else {
+          console.error('❌ MapPanel: MainScene not found');
         }
       } catch (error) {
-        console.error('Error updating actors in Phaser:', error);
+        console.error('❌ MapPanel: Error updating actors in Phaser:', error);
+      }
+    } else {
+      if (!phaserGameRef.current) {
+        console.log('⏳ MapPanel: Phaser game not yet initialized');
+      }
+      if (!actors) {
+        console.log('👻 MapPanel: No actor data available');
       }
     }
   }, [actors]);
@@ -158,13 +182,7 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
   }, []);
 
   return (
-    <div className="map-panel" style={{ 
-      height: '100%', 
-      width: '100%',
-      display: 'flex', 
-      flexDirection: 'column',
-      position: 'relative'
-    }}>
+    <>
       <style>{`
         .phaser-container canvas {
           width: 100% !important;
@@ -178,53 +196,61 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
           height: 100%;
         }
       `}</style>
-      <div 
-        id="phaser-game" 
-        ref={gameContainerRef} 
-        className="phaser-container"
-        style={{ 
-          backgroundColor: 'rgba(18, 18, 31, 0.6)',
-          flex: 1,
-          width: '100%',
-          height: '100%',
-          borderRadius: '12px',
-          overflow: 'hidden',
-          border: '1px solid var(--glass-border)',
-          position: 'relative',
-          display: 'block' // Changed from flex to block for better canvas handling
-        }}
-      >
-        {isLoading && (
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-            <Spinner size={50} />
-          </div>
-        )}
-        
-        {error && (
-          <div 
-            style={{ 
-              position: 'absolute', 
-              top: '50%', 
-              left: '50%', 
-              transform: 'translate(-50%, -50%)',
-              background: 'rgba(0,0,0,0.7)',
-              padding: '20px',
-              borderRadius: '8px',
-              maxWidth: '80%',
-              textAlign: 'center'
-            }}
-          >
-            <p style={{ color: 'var(--glass-danger)' }}>{error}</p>
-            <button 
-              className="glass-btn glass-btn-primary" 
-              onClick={() => window.location.reload()}
+      <div className="map-panel" style={{ 
+        height: '100%', 
+        width: '100%',
+        display: 'flex', 
+        flexDirection: 'column',
+        position: 'relative'
+      }}>
+        <div 
+          id="phaser-game" 
+          ref={gameContainerRef} 
+          className="phaser-container"
+          style={{ 
+            backgroundColor: 'rgba(18, 18, 31, 0.6)',
+            flex: 1,
+            width: '100%',
+            height: '100%',
+            borderRadius: '12px',
+            overflow: 'hidden',
+            border: '1px solid var(--glass-border)',
+            position: 'relative',
+            display: 'block' // Changed from flex to block for better canvas handling
+          }}
+        >
+          {isLoading && (
+            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+              <Spinner size={50} />
+            </div>
+          )}
+          
+          {error && (
+            <div 
+              style={{ 
+                position: 'absolute', 
+                top: '50%', 
+                left: '50%', 
+                transform: 'translate(-50%, -50%)',
+                background: 'rgba(0,0,0,0.7)',
+                padding: '20px',
+                borderRadius: '8px',
+                maxWidth: '80%',
+                textAlign: 'center'
+              }}
             >
-              Reload
-            </button>
-          </div>
-        )}
+              <p style={{ color: 'var(--glass-danger)' }}>{error}</p>
+              <button 
+                className="glass-btn glass-btn-primary" 
+                onClick={() => window.location.reload()}
+              >
+                Reload
+              </button>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

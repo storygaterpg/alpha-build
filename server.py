@@ -92,7 +92,7 @@ except ImportError as e:
         {
             "id": "player1",
             "name": "Player Character",
-            "type": "PLAYER",
+            "type": "player",
             "position": {"x": 5, "y": 5},
             "stats": {
                 "health": 100,
@@ -101,18 +101,85 @@ except ImportError as e:
                 "maxMana": 50,
                 "strength": 15,
                 "dexterity": 12,
-                "intelligence": 10
-            }
+                "intelligence": 10,
+                "constitution": 14,
+                "wisdom": 13,
+                "charisma": 11
+            },
+            "skills": [],
+            "inventory": [],
+            "level": 1,
+            "experience": 0,
+            "nextLevelExperience": 1000
         },
         {
             "id": "npc1",
             "name": "Friendly NPC",
-            "type": "NPC",
+            "type": "npc",
             "position": {"x": 8, "y": 8},
             "stats": {
                 "health": 50,
-                "maxHealth": 50
-            }
+                "maxHealth": 50,
+                "mana": 20,
+                "maxMana": 20,
+                "strength": 10,
+                "dexterity": 10,
+                "intelligence": 12,
+                "constitution": 10,
+                "wisdom": 14,
+                "charisma": 16
+            },
+            "skills": [],
+            "inventory": [],
+            "level": 1,
+            "experience": 0,
+            "nextLevelExperience": 1000
+        },
+        {
+            "id": "warrior1",
+            "name": "Elite Warrior",
+            "type": "warrior",
+            "position": {"x": 3, "y": 7},
+            "stats": {
+                "health": 120,
+                "maxHealth": 120,
+                "mana": 30,
+                "maxMana": 30,
+                "strength": 18,
+                "dexterity": 14,
+                "intelligence": 8,
+                "constitution": 16,
+                "wisdom": 10,
+                "charisma": 12
+            },
+            "skills": [],
+            "inventory": [],
+            "level": 3,
+            "experience": 2500,
+            "nextLevelExperience": 4000
+        },
+        {
+            "id": "rob1",
+            "name": "Rob",
+            "type": "rob",
+            "position": {"x": 1, "y": 1},
+            "stats": {
+                "health": 85,
+                "maxHealth": 85,
+                "mana": 40,
+                "maxMana": 40,
+                "strength": 14,
+                "dexterity": 16,
+                "intelligence": 13,
+                "constitution": 12,
+                "wisdom": 15,
+                "charisma": 14
+            },
+            "skills": [],
+            "inventory": [],
+            "level": 2,
+            "experience": 1200,
+            "nextLevelExperience": 2000
         }
     ]
 

@@ -421,7 +421,56 @@ const setupSocketListeners = (
     }
   });
   
-  // Actors data
+  // Actors data - handle both 'actors' and 'actors_data' events
+  websocketClient.onMessageType('actors', (data) => {
+    console.log('Received actors data:', data);
+    
+    // Server sends actors as an array, but gameSlice expects object storage
+    const actorsArray = Array.isArray(data) ? data : data.actors || [];
+    
+    // Convert each actor to the proper structure and add to game state
+    actorsArray.forEach((actorData: any) => {
+      // Transform server actor format to client actor format
+      const actor = {
+        id: actorData.id,
+        name: actorData.name,
+        type: actorData.type,
+        position: actorData.position,
+        stats: {
+          health: actorData.stats?.health || actorData.health || 100,
+          maxHealth: actorData.stats?.maxHealth || actorData.maxHealth || 100,
+          mana: actorData.stats?.mana || 50,
+          maxMana: actorData.stats?.maxMana || 50,
+          strength: actorData.stats?.strength || actorData.strength || 10,
+          dexterity: actorData.stats?.dexterity || actorData.dexterity || 10,
+          intelligence: actorData.stats?.intelligence || actorData.intelligence || 10,
+          constitution: actorData.stats?.constitution || actorData.constitution || 10,
+          wisdom: actorData.stats?.wisdom || actorData.wisdom || 10,
+          charisma: actorData.stats?.charisma || actorData.charisma || 10
+        },
+        skills: actorData.skills || [],
+        inventory: actorData.inventory || [],
+        level: actorData.level || 1,
+        experience: actorData.experience || 0,
+        nextLevelExperience: actorData.nextLevelExperience || 100
+      };
+      
+      // Dispatch to gameSlice to add the actor
+      dispatch({
+        type: 'game/addActor',
+        payload: actor
+      });
+      
+      console.log(`Added actor ${actor.name} (${actor.id}) to game state`);
+    });
+    
+    // Also dispatch to actorsSlice for compatibility
+    dispatch({
+      type: ACTORS_RECEIVE,
+      payload: actorsArray
+    });
+  });
+  
   websocketClient.onMessageType('actors_data', (data) => {
     dispatch({
       type: ACTORS_RECEIVE,

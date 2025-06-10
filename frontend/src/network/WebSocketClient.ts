@@ -79,8 +79,8 @@ function getWebSocketUrl(customPath?: string): string {
   if (wsUrl) {
     url = wsUrl;
   } else {
-    // Second priority: Use the backend port from environment or default to 8001
-    const serverPort = getEnvVar('VITE_WEBSOCKET_PORT', '8001');
+    // Second priority: Use the backend port from environment or default to 8000
+    const serverPort = getEnvVar('VITE_WEBSOCKET_PORT', '8000');
     
     // Determine protocol
     const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'wss:' : 'ws:';
@@ -201,27 +201,43 @@ class WebSocketClient {
    * @returns Promise resolving to the best working URL or undefined if none work
    */
   public async testConnectivity(): Promise<string | undefined> {
-    // Paths to try in order - prioritize /ws on port 8001 which is the main server endpoint
-    const pathsToTry = ['/ws', '', '/socket', '/socket.io'];
-    
-    console.log('Testing WebSocket connectivity to multiple paths...');
-    
-    // First, try port 8001 which is where our server is running
+    // Paths to try in order - prioritize /ws on port 8000 which is the main server endpoint
+    const pathsToTry = [
+      '/ws',
+      '/websocket',
+      '',
+    ];
+    // First, try port 8000 which is where our server is running
     for (const path of pathsToTry) {
-      const url = `ws://localhost:8001${path}`;
-      console.log(`Testing connection to: ${url}`);
-      
-      const result = await testWebSocketConnection(url, 5000);
-      
-      if (result.success) {
-        console.log(`✓ Successfully connected to ${url}`);
-        return path;
-      } else {
-        console.log(`✗ Failed to connect to ${url}: ${result.message}`);
+      const url = `ws://localhost:8000${path}`;
+      try {
+        console.log(`Attempting to connect to: ${url}`);
+        const websocket = new WebSocket(url);
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(() => {
+            websocket.close();
+            reject(new Error('Connection timeout'));
+          }, 3000);
+          
+          websocket.onopen = () => {
+            clearTimeout(timeout);
+            resolve();
+          };
+          
+          websocket.onerror = (event) => {
+            clearTimeout(timeout);
+            reject(new Error(`WebSocket error: ${event}`));
+          };
+        });
+        
+        websocket.close();
+        return url;
+      } catch (error) {
+        console.warn(`Failed to connect to ${url}:`, error);
       }
     }
     
-    // If port 8001 fails, try the default port detection
+    // If port 8000 fails, try the default port detection
     for (const path of pathsToTry) {
       const url = getWebSocketUrl(path);
       console.log(`Testing connection to: ${url}`);
@@ -277,9 +293,9 @@ class WebSocketClient {
       // Determine URL - provided URL takes precedence over auto-determined URL
       this.url = url || getWebSocketUrl(this.connectionPath);
       
-      // If no explicit URL provided and no working path found, try port 8001 with /ws first
-      if (!url && !this.connectionPath) {
-        this.url = 'ws://localhost:8001/ws';
+      // If no explicit URL provided and no working path found, try port 8000 with /ws first
+      if (!url) {
+        this.url = 'ws://localhost:8000/ws';
       }
       
       console.log('WebSocket connecting to:', this.url);

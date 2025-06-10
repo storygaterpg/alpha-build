@@ -27,7 +27,9 @@ export interface MapData {
 export enum ActorType {
   PLAYER = 'player',
   NPC = 'npc',
-  ENEMY = 'enemy'
+  ENEMY = 'enemy',
+  WARRIOR = 'warrior',
+  ROB = 'rob'
 }
 
 export interface Stats {
