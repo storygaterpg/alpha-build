@@ -1,11 +1,6 @@
 import React, { useEffect } from 'react';
 import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { 
-  Toaster, 
-  Position, 
-  ToastProps, 
-  IconName 
-} from '@blueprintjs/core';
+import { Toaster, Position, ToastProps, IconName } from '@blueprintjs/core';
 import { removeNotification } from '../store/slices/notificationSlice';
 
 /**
@@ -19,7 +14,7 @@ export const NotificationsToaster = Toaster.create({
 
 /**
  * NotificationsDisplay
- * 
+ *
  * Component that monitors the notifications state and displays
  * toast notifications accordingly. Handles removal of notifications
  * after they're dismissed or their duration expires.

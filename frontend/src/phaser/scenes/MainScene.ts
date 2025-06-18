@@ -6,15 +6,11 @@ import {
   LayerType, 
   ObjectType 
 } from '../types';
-import { 
-  TILE_SIZE, 
-  HEALTH_BAR_WIDTH, 
-  HEALTH_BAR_HEIGHT, 
-  HEALTH_BAR_OFFSET_Y 
-} from '../constants';
-import { Actor, Position } from '../../store/types';
+import { TILE_SIZE } from '../constants';
+import { Actor, Position, ActorType } from '../../store/types';
 import { performanceMonitor } from '../../utils/PerformanceMonitor';
 import AssetPreloader from '../AssetPreloader';
+import GridEngine, { Direction } from 'grid-engine';
 
 class MainScene extends Phaser.Scene {
   // Map properties
@@ -49,10 +45,16 @@ class MainScene extends Phaser.Scene {
   
   // Event callbacks
   private onActorMove: ((actorId: string, position: Position) => void) | null = null;
+  // Movement control flag
+  private movementEnabled: boolean = false;
+  // Highlight rectangles for movement path
+  private highlightRects: Phaser.GameObjects.Rectangle[] = [];
   
   // Performance monitoring
   private entityCount: number = 0;
   private isDevMode: boolean = false;
+  // Grid Engine plugin instance (added for TypeScript)
+  private gridEngine!: any;
 
   constructor() {
     super({ key: 'MainScene' });
@@ -82,19 +84,18 @@ class MainScene extends Phaser.Scene {
       this.load.image('test_map_bg', 'maps/test-map2.png');
       
       // Load sprites with logging
-      console.log('🎨 Loading character sprites...');
-      this.load.image(AssetKeys.SPRITE_PLAYER, 'sprites/characters/player.svg');
-      this.load.image(AssetKeys.SPRITE_NPC, 'sprites/characters/npc.svg');
+      console.log('🎨 Loading test and existing character sprites...');
+      // Test character sprites
+      this.load.image('Nheme', 'sprites/characters/Nheme.png');
+      this.load.image('Nil', 'sprites/characters/Nil.png');
+      this.load.image('Seraphine', 'sprites/characters/Seraphine.png');
+      this.load.image('Torre', 'sprites/characters/Torre.png');
+      // Existing enemy and Rob sprites
       this.load.spritesheet(AssetKeys.SPRITE_ENEMY, 'sprites/enemy.png', { 
         frameWidth: 32, 
         frameHeight: 48 
       });
-      this.load.image(AssetKeys.SPRITE_WARRIOR, 'sprites/characters/warrior.svg');
       this.load.image(AssetKeys.SPRITE_ROB, 'sprites/characters/Rob.png');
-      
-      // Load UI elements
-      this.load.image(AssetKeys.UI_HEALTHBAR_BG, 'images/healthbar_bg.png');
-      this.load.image(AssetKeys.UI_HEALTHBAR_FILL, 'images/healthbar_fill.png');
       
       // Add load event listeners for debugging
       this.load.on('filecomplete', (key: string) => {
@@ -157,6 +158,37 @@ class MainScene extends Phaser.Scene {
     if (!this.map) {
       this.createDefaultMap();
     }
+
+    // Initialize GridEngine with all actors
+    const obstacleLayer = this.layers[LayerType.OBSTACLES];
+    if (!this.map || !obstacleLayer) {
+      console.warn('Cannot initialize GridEngine: missing map or obstacleLayer');
+    } else {
+      const characters = this.getActorIds().map(id => {
+        const actorObj = this.getActor(id)!;
+        return {
+          id,
+          sprite: actorObj.sprite!,
+          startPosition: { x: actorObj.position.x, y: actorObj.position.y }
+        };
+      });
+      // Pass the tilemap as the first argument per Grid Engine API
+      this.gridEngine.create(this.map, {
+        characters,
+        collision: { colliders: [obstacleLayer] },
+        grid: { tileWidth: TILE_SIZE, tileHeight: TILE_SIZE },
+        numberOfDirections: 8
+      });
+    }
+
+    // Click-to-move: click a tile to move there when in move-mode
+    this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (!this.movementEnabled || !this.player || !this.map) return;
+      // snap to floor to get integer tile coords
+      const tile = this.map.worldToTileXY(pointer.worldX, pointer.worldY, true);
+      if (!tile) return;
+      this.gridEngine.moveTo(this.player.id, { x: tile.x, y: tile.y });
+    });
 
     // Create animations
     this.createAnimations();
@@ -403,6 +435,8 @@ class MainScene extends Phaser.Scene {
   }
 
   update() {
+    console.log('[MainScene] update loop, movementEnabled:', this.movementEnabled, 'isDragging:', this.isDragging);
+    
     // Start performance monitoring for this frame
     if (this.isDevMode) {
       performanceMonitor.begin();
@@ -414,20 +448,31 @@ class MainScene extends Phaser.Scene {
     // Handle keyboard pan controls
     this.handleKeyboardPan();
     
-    // Update player movement if player exists and camera is not being manually controlled
-    if (this.player && this.player.sprite && !this.isDragging) {
-      this.updatePlayerMovement();
-    }
-    
-    // Update all game objects
-    this.gameObjects.forEach((obj) => {
-      if (obj.sprite) {
-        // Update health bars for actors
-        if ('actor' in obj && 'healthBar' in obj) {
-          this.updateHealthBar(obj as ActorObject);
-        }
+    // Arrow-key movement when in move-mode
+    if (this.movementEnabled && this.player) {
+      // Diagonal detection first
+      let dir: Direction | undefined;
+      if (this.cursors.left.isDown && this.cursors.up.isDown) {
+        dir = Direction.UP_LEFT;
+      } else if (this.cursors.left.isDown && this.cursors.down.isDown) {
+        dir = Direction.DOWN_LEFT;
+      } else if (this.cursors.right.isDown && this.cursors.up.isDown) {
+        dir = Direction.UP_RIGHT;
+      } else if (this.cursors.right.isDown && this.cursors.down.isDown) {
+        dir = Direction.DOWN_RIGHT;
+      } else if (this.cursors.left.isDown) {
+        dir = Direction.LEFT;
+      } else if (this.cursors.right.isDown) {
+        dir = Direction.RIGHT;
+      } else if (this.cursors.up.isDown) {
+        dir = Direction.UP;
+      } else if (this.cursors.down.isDown) {
+        dir = Direction.DOWN;
       }
-    });
+      if (dir) {
+        this.gridEngine.move(this.player.id, dir);
+      }
+    }
     
     // Update entity count for performance monitoring
     if (this.isDevMode) {
@@ -493,6 +538,7 @@ class MainScene extends Phaser.Scene {
    * @param callback Function to call when an actor moves
    */
   setOnActorMove(callback: (actorId: string, position: Position) => void): void {
+    console.log('[MainScene] setOnActorMove registered callback');
     this.onActorMove = callback;
   }
 
@@ -503,125 +549,25 @@ class MainScene extends Phaser.Scene {
   loadMapFromData(mapData: any): void {
     try {
       console.log('Loading map from data:', mapData);
-      
+
       // Calculate dimensions in pixels
       const mapWidth = mapData.width * TILE_SIZE;
       const mapHeight = mapData.height * TILE_SIZE;
       const gridSize = mapData.gridSize || TILE_SIZE;
-      
-      // Set background image if available
-      if (mapData.backgroundImage) {
-        // If it's the test-map2.png, use it directly
-        if (mapData.backgroundImage.includes('test-map2.png')) {
-          console.log('Using preloaded test map 2 background');
-          this.setBackgroundImage('test_map_bg', mapWidth, mapHeight);
-        }
-        // If it's the old test-map.png, also use test-map2.png
-        else if (mapData.backgroundImage.includes('test-map.png')) {
-          console.log('Using preloaded test map 2 background (legacy fallback)');
-          this.setBackgroundImage('test_map_bg', mapWidth, mapHeight);
-        }
-        // Else if it's a path to an external image
-        else if (mapData.backgroundImage.startsWith('/')) {
-          // Use the path directly
-          const backgroundKey = 'bg_' + mapData.id;
-          
-          // Check if the image is already loaded
-          if (!this.textures.exists(backgroundKey)) {
-            // Load the image first
-            this.load.image(backgroundKey, mapData.backgroundImage);
-            this.load.once('complete', () => {
-              this.setBackgroundImage(backgroundKey, mapWidth, mapHeight);
-            });
-            this.load.start();
-          } else {
-            this.setBackgroundImage(backgroundKey, mapWidth, mapHeight);
-          }
-        } else {
-          // Use a predefined key
-          this.setBackgroundImage(mapData.backgroundImage, mapWidth, mapHeight);
-        }
-      } else {
-        // Always use test-map2.png as default instead of fantasy-map.svg
-        console.log('No background image specified, using test-map2.png as default');
-        this.setBackgroundImage('test_map_bg', mapWidth, mapHeight);
-      }
-      
-      // Create grid overlay with high transparency
+
+      // Only overlay a grid, no tile layers or backgrounds
       this.createGridOverlay(mapWidth, mapHeight, gridSize);
-      
-      // Destroy existing map if it exists
-      if (this.map) {
-        this.map.destroy();
-        this.layers = {};
-      }
-      
-      // Create a new blank map
-      this.map = this.make.tilemap({
-        width: mapData.width,
-        height: mapData.height,
-        tileWidth: TILE_SIZE,
-        tileHeight: TILE_SIZE
-      });
-      
-      // Add a placeholder tileset
-      const tileset = this.map.addTilesetImage('placeholder', AssetKeys.TILESET_DUNGEON);
-      
-      if (!tileset) {
-        console.error('Failed to create map tileset');
-        return;
-      }
-      
-      // Create layers
-      const groundLayer = this.map.createBlankLayer('ground', tileset);
-      const obstaclesLayer = this.map.createBlankLayer('obstacles', tileset);
-      const overlayLayer = this.map.createBlankLayer('overlay', tileset);
-      
-      if (!groundLayer || !obstaclesLayer || !overlayLayer) {
-        console.error('Failed to create map layers');
-        return;
-      }
-      
-      this.layers[LayerType.GROUND] = groundLayer;
-      this.layers[LayerType.OBSTACLES] = obstaclesLayer;
-      this.layers[LayerType.OVERLAY] = overlayLayer;
-      
-      // Set transparency on all layers to make them very transparent
-      groundLayer.setAlpha(0.1);
-      obstaclesLayer.setAlpha(0.3);
-      overlayLayer.setAlpha(0.2);
-      
-      // Set collisions
-      this.layers[LayerType.OBSTACLES].setCollisionByProperty({ collides: true });
-      
-      // Process tile data
-      if (mapData.tiles) {
-        for (let y = 0; y < mapData.height; y++) {
-          for (let x = 0; x < mapData.width; x++) {
-            const tile = mapData.tiles[y] && mapData.tiles[y][x];
-            if (tile) {
-              // Ground layer - all tiles are ground
-              this.layers[LayerType.GROUND].putTileAt(1, x, y);
-              
-              // Add obstacles for non-walkable tiles
-              if (!tile.walkable) {
-                this.layers[LayerType.OBSTACLES].putTileAt(2, x, y);
-              }
-            }
-          }
-        }
-      }
-      
-      // Set world and camera bounds
+
+      // Set world and camera bounds to grid dimensions
       this.physics.world.setBounds(0, 0, mapWidth, mapHeight);
       this.cameras.main.setBounds(0, 0, mapWidth, mapHeight);
-      
+
       // Reset camera to default view
       this.resetCamera();
-      
-      console.log(`Map loaded with camera controls: ${mapData.name} (${mapData.width}x${mapData.height})`);
+
+      console.log(`Map grid displayed: ${mapData.name} (${mapData.width}x${mapData.height})`);
     } catch (error) {
-      console.error('Error loading map from data:', error);
+      console.error('Error loading map grid from data:', error);
     }
   }
 
@@ -774,6 +720,24 @@ class MainScene extends Phaser.Scene {
       this.resetCamera();
       
       console.log('Default map created with camera controls');
+      
+      // Add test actors for demonstration
+      const defaultStats = { health: 1, maxHealth: 1, mana: 0, maxMana: 0, strength: 0, dexterity: 0, intelligence: 0, constitution: 0, wisdom: 0, charisma: 0 };
+      const testActors: Actor[] = [
+        { id: 'test-nheme', name: 'Nheme', type: ActorType.NPC, position: { x: 2, y: 2 }, stats: defaultStats, skills: [], inventory: [], level: 1, experience: 0, nextLevelExperience: 100 },
+        { id: 'test-nil', name: 'Nil', type: ActorType.NPC, position: { x: 4, y: 2 }, stats: defaultStats, skills: [], inventory: [], level: 1, experience: 0, nextLevelExperience: 100 },
+        { id: 'test-rob', name: 'Rob', type: ActorType.ROB, position: { x: 6, y: 2 }, stats: defaultStats, skills: [], inventory: [], level: 1, experience: 0, nextLevelExperience: 100 },
+        { id: 'test-seraphine', name: 'Seraphine', type: ActorType.NPC, position: { x: 8, y: 2 }, stats: defaultStats, skills: [], inventory: [], level: 1, experience: 0, nextLevelExperience: 100 },
+        { id: 'test-torre', name: 'Torre', type: ActorType.NPC, position: { x: 10, y: 2 }, stats: defaultStats, skills: [], inventory: [], level: 1, experience: 0, nextLevelExperience: 100 }
+      ];
+      testActors.forEach(actor => {
+        try {
+          this.addActor(actor);
+          console.log(`✅ Test actor ${actor.name} added`);
+        } catch (error) {
+          console.error(`❌ Failed to add test actor ${actor.name}:`, error);
+        }
+      });
     } else {
       console.error('Failed to create default map layers');
     }
@@ -789,7 +753,7 @@ class MainScene extends Phaser.Scene {
     console.log('Actor data:', actor);
     
     // Determine which sprite to use based on actor type
-    let spriteKey = AssetKeys.SPRITE_PLAYER;
+    let spriteKey: string = AssetKeys.SPRITE_PLAYER;
     let objectType = ObjectType.PLAYER;
     
     switch (actor.type) {
@@ -798,7 +762,12 @@ class MainScene extends Phaser.Scene {
         objectType = ObjectType.PLAYER;
         break;
       case 'npc':
-        spriteKey = AssetKeys.SPRITE_NPC;
+        // Use actor.name key if loaded (e.g. 'Nil', 'Nheme'), otherwise fallback to default NPC sprite
+        if (this.textures.exists(actor.name)) {
+          spriteKey = actor.name;
+        } else {
+          spriteKey = AssetKeys.SPRITE_NPC;
+        }
         objectType = ObjectType.NPC;
         break;
       case 'enemy':
@@ -818,8 +787,6 @@ class MainScene extends Phaser.Scene {
         return null;
     }
     
-    console.log(`🎨 Using sprite key: ${spriteKey} for actor type: ${actor.type}`);
-    
     // Check if texture exists
     if (!this.textures.exists(spriteKey)) {
       console.error(`❌ TEXTURE NOT FOUND: ${spriteKey}`);
@@ -830,8 +797,8 @@ class MainScene extends Phaser.Scene {
     }
     
     // Calculate world position
-    const worldX = actor.position.x * TILE_SIZE;
-    const worldY = actor.position.y * TILE_SIZE;
+    const worldX = actor.position.x * TILE_SIZE + TILE_SIZE / 2;
+    const worldY = actor.position.y * TILE_SIZE + TILE_SIZE / 2;
     console.log(`🌍 World position: (${worldX}, ${worldY}) from tile (${actor.position.x}, ${actor.position.y})`);
     
     // Create the sprite
@@ -908,9 +875,6 @@ class MainScene extends Phaser.Scene {
       actor,
     };
     
-    // Create health bar
-    actorObject.healthBar = this.createHealthBar(actorObject);
-    
     // Create name text
     actorObject.nameText = this.add.text(
       sprite.x,
@@ -948,12 +912,21 @@ class MainScene extends Phaser.Scene {
         break;
     }
     
-    // If this is a player, set as the main player
-    if (objectType === ObjectType.PLAYER && !this.player) {
+    // If this is Rob, always set as the main player; else if a player and none set yet
+    if (objectType === ObjectType.ROB) {
       this.player = actorObject;
-      
+      // Make camera follow Rob with smooth movement
+      this.cameras.main.startFollow(sprite, true, this.PAN_SMOOTH_FACTOR, this.PAN_SMOOTH_FACTOR);
+    } else if (objectType === ObjectType.PLAYER && !this.player) {
+      this.player = actorObject;
       // Make camera follow the player with smooth movement
       this.cameras.main.startFollow(sprite, true, this.PAN_SMOOTH_FACTOR, this.PAN_SMOOTH_FACTOR);
+    }
+    
+    // Skip server-supplied Rob actor; only allow test-rob
+    if (objectType === ObjectType.ROB && actor.id !== 'test-rob') {
+      console.log(`Skipping server Rob actor: ${actor.id}`);
+      return null;
     }
     
     return actorObject;
@@ -973,20 +946,13 @@ class MainScene extends Phaser.Scene {
       
       // Move the sprite
       obj.sprite.setPosition(
-        position.x * TILE_SIZE,
-        position.y * TILE_SIZE
+        position.x * TILE_SIZE + TILE_SIZE / 2,
+        position.y * TILE_SIZE + TILE_SIZE / 2
       );
       
       // Update health bar and name text position
       if ('actor' in obj) {
         const actorObj = obj as ActorObject;
-        
-        if (actorObj.healthBar) {
-          actorObj.healthBar.setPosition(
-            obj.sprite.x - HEALTH_BAR_WIDTH / 2,
-            obj.sprite.y + HEALTH_BAR_OFFSET_Y
-          );
-        }
         
         if (actorObj.nameText) {
           actorObj.nameText.setPosition(
@@ -1015,10 +981,6 @@ class MainScene extends Phaser.Scene {
       if ('actor' in obj) {
         const actorObj = obj as ActorObject;
         
-        if (actorObj.healthBar) {
-          actorObj.healthBar.destroy();
-        }
-        
         if (actorObj.nameText) {
           actorObj.nameText.destroy();
         }
@@ -1030,118 +992,6 @@ class MainScene extends Phaser.Scene {
       // If this was the player, clear the player reference
       if (this.player && this.player.id === actorId) {
         this.player = null;
-      }
-    }
-  }
-
-  /**
-   * Create a health bar for an actor
-   * @param actorObj The actor object
-   * @returns The health bar graphics object
-   */
-  private createHealthBar(actorObj: ActorObject): Phaser.GameObjects.Graphics {
-    // Create the health bar graphics object
-    const healthBar = this.add.graphics();
-    healthBar.setDepth(1500); // Higher depth for health bars
-    
-    // Position the health bar
-    healthBar.setPosition(
-      actorObj.sprite!.x - HEALTH_BAR_WIDTH / 2,
-      actorObj.sprite!.y + HEALTH_BAR_OFFSET_Y
-    );
-    
-    // Draw the health bar
-    this.updateHealthBar(actorObj, healthBar);
-    
-    return healthBar;
-  }
-
-  /**
-   * Update a health bar
-   * @param actorObj The actor object
-   * @param healthBar Optional health bar graphics object
-   */
-  private updateHealthBar(actorObj: ActorObject, healthBar?: Phaser.GameObjects.Graphics): void {
-    // Use the provided health bar or get it from the actor object
-    const bar = healthBar || actorObj.healthBar;
-    
-    if (!bar) return;
-    
-    // Clear the health bar
-    bar.clear();
-    
-    // Calculate health percentage
-    const healthPercentage = actorObj.actor.stats.health / actorObj.actor.stats.maxHealth;
-    
-    // Draw background
-    bar.fillStyle(0x000000, 0.8);
-    bar.fillRect(0, 0, HEALTH_BAR_WIDTH, HEALTH_BAR_HEIGHT);
-    
-    // Draw health fill
-    if (healthPercentage > 0.6) {
-      bar.fillStyle(0x00ff00, 1); // Green
-    } else if (healthPercentage > 0.3) {
-      bar.fillStyle(0xffff00, 1); // Yellow
-    } else {
-      bar.fillStyle(0xff0000, 1); // Red
-    }
-    
-    bar.fillRect(1, 1, Math.max(0, (HEALTH_BAR_WIDTH - 2) * healthPercentage), HEALTH_BAR_HEIGHT - 2);
-    
-    // Position the health bar
-    if (actorObj.sprite) {
-      bar.setPosition(
-        actorObj.sprite.x - HEALTH_BAR_WIDTH / 2,
-        actorObj.sprite.y + HEALTH_BAR_OFFSET_Y
-      );
-    }
-  }
-
-  /**
-   * Update player movement based on keyboard input
-   */
-  private updatePlayerMovement(): void {
-    if (!this.player || !this.player.sprite) return;
-    
-    // Get the sprite body
-    const body = this.player.sprite.body as Phaser.Physics.Arcade.Body;
-    
-    // Reset velocity
-    body.setVelocity(0);
-    
-    // Movement speed
-    const speed = 160;
-    
-    // Horizontal movement
-    if (this.cursors.left.isDown) {
-      body.setVelocityX(-speed);
-      // No animation for static image
-    } else if (this.cursors.right.isDown) {
-      body.setVelocityX(speed);
-      // No animation for static image
-    }
-    
-    // Vertical movement
-    if (this.cursors.up.isDown) {
-      body.setVelocityY(-speed);
-      // No animation for static image
-    } else if (this.cursors.down.isDown) {
-      body.setVelocityY(speed);
-      // No animation for static image
-    }
-    
-    // Calculate the new tile position
-    const tileX = Math.floor(this.player.sprite.x / TILE_SIZE);
-    const tileY = Math.floor(this.player.sprite.y / TILE_SIZE);
-    
-    // If the position has changed, notify the callback
-    if (tileX !== this.player.position.x || tileY !== this.player.position.y) {
-      this.player.position.x = tileX;
-      this.player.position.y = tileY;
-      
-      // Notify the callback if it exists
-      if (this.onActorMove) {
-        this.onActorMove(this.player.id, { x: tileX, y: tileY });
       }
     }
   }
@@ -1259,6 +1109,44 @@ class MainScene extends Phaser.Scene {
   public getActor(actorId: string): ActorObject | null {
     const obj = this.gameObjects.get(actorId);
     return obj && 'actor' in obj ? obj as ActorObject : null;
+  }
+
+  /**
+   * Highlight a specific tile position with a translucent rectangle
+   */
+  private highlightTile(x: number, y: number): void {
+    const worldX = x * TILE_SIZE + TILE_SIZE / 2;
+    const worldY = y * TILE_SIZE + TILE_SIZE / 2;
+    const rect = this.add.rectangle(
+      worldX,
+      worldY,
+      TILE_SIZE,
+      TILE_SIZE,
+      0x28b463,
+      0.3
+    );
+    rect.setOrigin(0.5);
+    rect.setDepth(900);
+    this.highlightRects.push(rect);
+  }
+
+  /**
+   * Clear all highlighted path rectangles
+   */
+  private clearHighlights(): void {
+    this.highlightRects.forEach(rect => rect.destroy());
+    this.highlightRects = [];
+  }
+
+  /**
+   * Enable or disable actor movement via keyboard
+   */
+  public setMovementEnabled(enabled: boolean): void {
+    console.log('[MainScene] setMovementEnabled:', enabled);
+    this.movementEnabled = enabled;
+    if (!enabled) {
+      this.clearHighlights();
+    }
   }
 }
 

@@ -231,7 +231,7 @@ class WebSocketClient {
         });
         
         websocket.close();
-        return url;
+        return path;
       } catch (error) {
         console.warn(`Failed to connect to ${url}:`, error);
       }
@@ -290,13 +290,8 @@ class WebSocketClient {
         this.connectionPath = await this.testConnectivity();
       }
       
-      // Determine URL - provided URL takes precedence over auto-determined URL
+      // Determine URL - provided URL takes precedence; otherwise use env or fallback
       this.url = url || getWebSocketUrl(this.connectionPath);
-      
-      // If no explicit URL provided and no working path found, try port 8000 with /ws first
-      if (!url) {
-        this.url = 'ws://localhost:8000/ws';
-      }
       
       console.log('WebSocket connecting to:', this.url);
       

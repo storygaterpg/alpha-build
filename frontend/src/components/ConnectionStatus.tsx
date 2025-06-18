@@ -104,94 +104,95 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ className, compact 
   
   // Full status display
   return (
-    <Popover
-      content={
-        <div style={{ padding: '10px', maxWidth: '300px' }}>
-          <h4 style={{ margin: '0 0 10px 0' }}>Connection Details</h4>
-          
-          <div style={{ marginBottom: '5px' }}>
-            <strong>Status:</strong> {socketConnected ? 'Connected' : reconnecting ? 'Reconnecting...' : 'Disconnected'}
-          </div>
-          
-          {pingTime && socketConnected && (
+    <>
+      <Popover
+        content={
+          <div style={{ padding: '10px', maxWidth: '300px' }}>
+            <h4 style={{ margin: '0 0 10px 0' }}>Connection Details</h4>
+            
             <div style={{ marginBottom: '5px' }}>
-              <strong>Ping:</strong> {pingTime}ms ({quality})
+              <strong>Status:</strong> {socketConnected ? 'Connected' : reconnecting ? 'Reconnecting...' : 'Disconnected'}
             </div>
-          )}
-          
-          {socketConnected && lastPingTime && (
-            <div style={{ marginBottom: '5px' }}>
-              <strong>Last Ping:</strong> {new Date(lastPingTime).toLocaleTimeString()}
-            </div>
-          )}
-          
-          {disconnectReason && (
-            <div style={{ marginBottom: '5px' }}>
-              <strong>Disconnect Reason:</strong> {disconnectReason}
-            </div>
-          )}
-          
-          {socketError && socketError.message && (
-            <div style={{ marginBottom: '5px' }}>
-              <strong>Last Error:</strong> {socketError.message}
-              {socketError.code && <div>Code: {socketError.code}</div>}
-            </div>
-          )}
-          
-          <div style={{ fontSize: '11px', marginTop: '10px', opacity: 0.7 }}>
-            Click for more connection diagnostics
-          </div>
-        </div>
-      }
-      placement="bottom"
-    >
-      <div 
-        className={`connection-status ${className || ''}`}
-        style={{ 
-          display: 'flex',
-          alignItems: 'center',
-          gap: '8px',
-          padding: '6px 12px',
-          borderRadius: '16px',
-          backgroundColor: socketConnected ? 'rgba(76, 201, 240, 0.2)' : 
-                            reconnecting ? 'rgba(255, 190, 11, 0.2)' : 'rgba(230, 57, 70, 0.2)',
-          color: socketConnected ? 'var(--glass-success)' : 
-                  reconnecting ? 'var(--glass-warning)' : 'var(--glass-danger)',
-          cursor: 'pointer',
-          transition: 'all 0.2s ease'
-        }}
-      >
-        <div style={{ 
-          width: '10px', 
-          height: '10px', 
-          borderRadius: '50%', 
-          backgroundColor: socketConnected ? 'var(--glass-success)' : 
-                            reconnecting ? 'var(--glass-warning)' : 'var(--glass-danger)',
-          animation: reconnecting ? 'pulse 1.5s infinite' : 'none'
-        }} />
-        
-        {socketConnected ? (
-          <>
-            Connected
-            {pingTime && (
-              <span style={{ fontSize: '11px', opacity: 0.9 }}>
-                {pingTime}ms
-              </span>
+            
+            {pingTime && socketConnected && (
+              <div style={{ marginBottom: '5px' }}>
+                <strong>Ping:</strong> {pingTime}ms ({quality})
+              </div>
             )}
-          </>
-        ) : reconnecting ? (
-          <>
-            <Icon icon="refresh" intent={Intent.WARNING} />
-            Reconnecting...
-          </>
-        ) : (
-          <>
-            <Icon icon="offline" intent={Intent.DANGER} />
-            Disconnected
-          </>
-        )}
-      </div>
-      
+            
+            {socketConnected && lastPingTime && (
+              <div style={{ marginBottom: '5px' }}>
+                <strong>Last Ping:</strong> {new Date(lastPingTime).toLocaleTimeString()}
+              </div>
+            )}
+            
+            {disconnectReason && (
+              <div style={{ marginBottom: '5px' }}>
+                <strong>Disconnect Reason:</strong> {disconnectReason}
+              </div>
+            )}
+            
+            {socketError && socketError.message && (
+              <div style={{ marginBottom: '5px' }}>
+                <strong>Last Error:</strong> {socketError.message}
+                {socketError.code && <div>Code: {socketError.code}</div>}
+              </div>
+            )}
+            
+            <div style={{ fontSize: '11px', marginTop: '10px', opacity: 0.7 }}>
+              Click for more connection diagnostics
+            </div>
+          </div>
+        }
+        placement="bottom"
+      >
+        <div 
+          className={`connection-status ${className || ''}`}
+          style={{ 
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            padding: '6px 12px',
+            borderRadius: '16px',
+            backgroundColor: socketConnected ? 'rgba(76, 201, 240, 0.2)' : 
+                              reconnecting ? 'rgba(255, 190, 11, 0.2)' : 'rgba(230, 57, 70, 0.2)',
+            color: socketConnected ? 'var(--glass-success)' : 
+                    reconnecting ? 'var(--glass-warning)' : 'var(--glass-danger)',
+            cursor: 'pointer',
+            transition: 'all 0.2s ease'
+          }}
+        >
+          <div style={{ 
+            width: '10px', 
+            height: '10px', 
+            borderRadius: '50%', 
+            backgroundColor: socketConnected ? 'var(--glass-success)' : 
+                              reconnecting ? 'var(--glass-warning)' : 'var(--glass-danger)',
+            animation: reconnecting ? 'pulse 1.5s infinite' : 'none'
+          }} />
+          
+          {socketConnected ? (
+            <>
+              Connected
+              {pingTime && (
+                <span style={{ fontSize: '11px', opacity: 0.9 }}>
+                  {pingTime}ms
+                </span>
+              )}
+            </>
+          ) : reconnecting ? (
+            <>
+              <Icon icon="refresh" intent={Intent.WARNING} />
+              Reconnecting...
+            </>
+          ) : (
+            <>
+              <Icon icon="offline" intent={Intent.DANGER} />
+              Disconnected
+            </>
+          )}
+        </div>
+      </Popover>
       {/* Animation for the pulsing reconnect indicator */}
       <style>
         {`
@@ -211,7 +212,7 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ className, compact 
           }
         `}
       </style>
-    </Popover>
+    </>
   );
 };
 

@@ -1,10 +1,14 @@
-import React, { useRef, useEffect, useCallback, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { H2, Spinner } from '@blueprintjs/core';
 import { RootState } from '../store';
 import { Game as PhaserGame } from '../phaser/game';
 import MainScene from '../phaser/scenes/MainScene';
 import '../styles/phaser.css';
+import MapToolbar from './MapToolbar';
+import { requestMovementTiles, receiveMovementTiles, clearHighlightedTiles } from '../store/slices/mapSlice';
+import { ActorType } from '../store/types';
+import Phaser from 'phaser';
 
 interface MapPanelProps {
   onGameInitialized?: (game: PhaserGame) => void;
@@ -16,19 +20,29 @@ interface MapPanelProps {
  * Wraps the Phaser canvas in a styled container
  */
 const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
+  // console.log('[MapPanel] render or mount'); // debug removed
   const dispatch = useDispatch();
   const gameContainerRef = useRef<HTMLDivElement>(null);
   const phaserGameRef = useRef<PhaserGame | null>(null);
   const gameInitializedRef = useRef<boolean>(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+  const [moveMode, setMoveMode] = useState(false);
+  const [path, setPath] = useState<{x: number, y: number}[]>([]);
+  const [startPosition, setStartPosition] = useState<{x: number, y: number} | null>(null);
+  const [rawSteps, setRawSteps] = useState<number>(0);
+  const prevPosRef = useRef<{x: number, y: number} | null>(null);
+
   // Get map data from Redux
   const currentMapId = useSelector((state: RootState) => state.game.currentMapId);
   const maps = useSelector((state: RootState) => state.game.maps);
   const currentMap = currentMapId ? maps[currentMapId] : null;
   const actors = useSelector((state: RootState) => state.game.actors);
-  
+  const playerId = useSelector((state: RootState) => state.game.player?.id);
+
+  // Display step count by flooring rawSteps
+  const displayStepCount = Math.floor(rawSteps);
+
   // Store the callback in a ref to prevent dependency issues
   const callbackRef = useRef(onGameInitialized);
   
@@ -52,6 +66,25 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
         phaserGameRef.current = newGame;
         gameInitializedRef.current = true;
         setIsLoading(false);
+        
+        // Initialize movementEnabled on scene
+        const initScene = newGame.getScene('MainScene') as MainScene | undefined;
+        if (initScene && typeof initScene.setMovementEnabled === 'function') {
+          initScene.setMovementEnabled(moveMode);
+        }
+        
+        // Register actor movement callback immediately and on scene create
+        if (initScene && typeof initScene.setOnActorMove === 'function' && initScene.events) {
+          console.log('[MapPanel] initEffect registering onActorMove callback');
+          initScene.setOnActorMove(handleActorMove);
+          // Also ensure callback is registered once the scene has been created
+          initScene.events.once(Phaser.Scenes.Events.CREATE, () => {
+            console.log('[MapPanel] scene create event: registering onActorMove callback');
+            initScene.setOnActorMove(handleActorMove);
+          });
+        }
+        
+        // Scene will call handleActorMove when updating player movement
         
         // Call the initialization callback
         if (callbackRef.current) {
@@ -91,6 +124,25 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
     };
   }, []); // Empty dependency array ensures this only runs once
 
+  // Stable callback for actor movement: scene calls only when movementEnabled=true
+  const handleActorMove = useCallback((actorId: string, position: { x: number, y: number }) => {
+    if (actorId !== playerId) return;
+    // Compute step increment based on delta
+    const prevPos = prevPosRef.current;
+    if (prevPos) {
+      const dx = Math.abs(position.x - prevPos.x);
+      const dy = Math.abs(position.y - prevPos.y);
+      const inc = dx === 1 && dy === 1 ? 1.5 : 1;
+      setRawSteps(rs => rs + inc);
+    }
+    prevPosRef.current = { ...position };
+    setPath(prev => {
+      const newPath = [...prev, position];
+      dispatch(receiveMovementTiles({ tiles: newPath }));
+      return newPath;
+    });
+  }, [playerId, dispatch]);
+
   // Handle map data changes
   useEffect(() => {
     if (phaserGameRef.current && currentMap) {
@@ -121,6 +173,11 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
           
           // Add or update actors
           Object.values(actors).forEach(actor => {
+            // Skip the original Rob actor; keep only test-rob
+            if (actor.type === ActorType.ROB && actor.id !== 'test-rob') {
+              console.log(`⏩ MapPanel: Skipping original Rob actor: ${actor.id}`);
+              return;
+            }
             existingActors.add(actor.id);
             
             // Check if actor already exists in scene
@@ -207,76 +264,129 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Handlers for toolbar buttons
+  const handleMoveClick = () => {
+    const newMode = !moveMode;
+    console.log('[MapPanel] handleMoveClick, newMode=', newMode);
+    if (phaserGameRef.current) {
+      const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
+      mainScene.setMovementEnabled(newMode);
+    }
+    if (newMode) {
+      // Enter move mode: remember start position
+      if (playerId && phaserGameRef.current) {
+        const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
+        const playerObj = mainScene.getActor(playerId);
+        if (playerObj) {
+          console.log('[MapPanel] starting move at position', playerObj.position);
+          setStartPosition({ ...playerObj.position });
+          setPath([{ ...playerObj.position }]);
+          dispatch(requestMovementTiles({ actorId: playerId }));
+          dispatch(receiveMovementTiles({ tiles: [{ ...playerObj.position }] }));
+          // Reset raw step counter and prev position
+          setRawSteps(0);
+          prevPosRef.current = { ...playerObj.position };
+        }
+      }
+    } else {
+      console.log('[MapPanel] stopping move, clearing path');
+      setPath([]);
+      setStartPosition(null);
+      dispatch(clearHighlightedTiles());
+      setRawSteps(0);
+      prevPosRef.current = null;
+    }
+    setMoveMode(newMode);
+  };
+
+  const handleShortenPathClick = () => {
+    // TODO: Send path to server for shortest path, update path state
+    // For now, just stub
+    alert('Shorten Path: Not yet implemented');
+  };
+
+  const handleClearClick = () => {
+    console.log('[MapPanel] handleClearClick');
+    // Reset to start position
+    if (startPosition && phaserGameRef.current && playerId) {
+      const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
+      mainScene.updateActorPosition(playerId, startPosition);
+      setPath([startPosition]);
+      dispatch(clearHighlightedTiles());
+      dispatch(receiveMovementTiles({ tiles: [startPosition] }));
+      // Reset raw step counter and prev position
+      console.log('[MapPanel] clearing rawSteps, prevPos to', startPosition);
+      setRawSteps(0);
+      prevPosRef.current = { ...startPosition };
+    }
+    setMoveMode(false);
+    setStartPosition(null);
+  };
+
   return (
-    <>
-      <style>{`
-        .phaser-container canvas {
-          width: 100% !important;
-          height: 100% !important;
-          object-fit: contain;
-          display: block;
-        }
+    <div className="map-panel" style={{ 
+      height: '100%', 
+      width: '100%',
+      display: 'flex', 
+      flexDirection: 'column',
+      position: 'relative'
+    }}>
+      <div 
+        id="phaser-game" 
+        ref={gameContainerRef} 
+        className="phaser-container"
+        style={{ 
+          backgroundColor: 'rgba(18, 18, 31, 0.6)',
+          flex: 1,
+          width: '100%',
+          height: '100%',
+          borderRadius: '12px',
+          overflow: 'hidden',
+          border: '1px solid var(--glass-border)',
+          position: 'relative',
+          display: 'block'
+        }}
+      >
+        {isLoading && (
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
+            <Spinner size={50} />
+          </div>
+        )}
         
-        .phaser-container {
-          width: 100%;
-          height: 100%;
-        }
-      `}</style>
-      <div className="map-panel" style={{ 
-        height: '100%', 
-        width: '100%',
-        display: 'flex', 
-        flexDirection: 'column',
-        position: 'relative'
-      }}>
-        <div 
-          id="phaser-game" 
-          ref={gameContainerRef} 
-          className="phaser-container"
-          style={{ 
-            backgroundColor: 'rgba(18, 18, 31, 0.6)',
-            flex: 1,
-            width: '100%',
-            height: '100%',
-            borderRadius: '12px',
-            overflow: 'hidden',
-            border: '1px solid var(--glass-border)',
-            position: 'relative',
-            display: 'block' // Changed from flex to block for better canvas handling
-          }}
-        >
-          {isLoading && (
-            <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }}>
-              <Spinner size={50} />
-            </div>
-          )}
-          
-          {error && (
-            <div 
-              style={{ 
-                position: 'absolute', 
-                top: '50%', 
-                left: '50%', 
-                transform: 'translate(-50%, -50%)',
-                background: 'rgba(0,0,0,0.7)',
-                padding: '20px',
-                borderRadius: '8px',
-                maxWidth: '80%',
-                textAlign: 'center'
-              }}
+        {error && (
+          <div 
+            style={{ 
+              position: 'absolute', 
+              top: '50%', 
+              left: '50%', 
+              transform: 'translate(-50%, -50%)',
+              background: 'rgba(0,0,0,0.7)',
+              padding: '20px',
+              borderRadius: '8px',
+              maxWidth: '80%',
+              textAlign: 'center'
+            }}
+          >
+            <p style={{ color: 'var(--glass-danger)' }}>{error}</p>
+            <button 
+              className="glass-btn glass-btn-primary" 
+              onClick={() => window.location.reload()}
             >
-              <p style={{ color: 'var(--glass-danger)' }}>{error}</p>
-              <button 
-                className="glass-btn glass-btn-primary" 
-                onClick={() => window.location.reload()}
-              >
-                Reload
-              </button>
-            </div>
-          )}
-        </div>
+              Reload
+            </button>
+          </div>
+        )}
       </div>
-    </>
+      {/* Map Toolbar as sibling to avoid canvas overlay */}
+      <MapToolbar
+        moveActive={moveMode}
+        onMoveClick={handleMoveClick}
+        onShortenPathClick={handleShortenPathClick}
+        onClearClick={handleClearClick}
+        disabled={isLoading || !!error}
+        stepCount={displayStepCount}
+      />
+    </div>
   );
 };
 

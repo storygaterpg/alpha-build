@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import MainScene from './scenes/MainScene';
+import GridEngine from 'grid-engine';
 
 export interface GameConfig {
   parent: string;
@@ -30,6 +31,11 @@ export class Game {
         },
       },
       scene: [MainScene],
+      plugins: {
+        scene: [
+          { key: 'gridEngine', plugin: GridEngine, mapping: 'gridEngine' }
+        ]
+      },
       pixelArt: true,
       scale: {
         mode: Phaser.Scale.RESIZE,

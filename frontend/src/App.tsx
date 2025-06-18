@@ -156,20 +156,18 @@ function getWebSocketUrl(): string {
 const SocketManager: React.FC = () => {
   const dispatch = useDispatch();
   
-  // Connect to WebSocket using port 8000 explicitly
   useEffect(() => {
-    // Connect to port 8000 to match server
-    console.log('Connecting to WebSocket on port 8000...');
-    websocketClient.connect('ws://localhost:8000/ws')
+    // Connect via centralized WebSocket client
+    websocketClient.connect(undefined, '/ws')
       .then(success => {
         if (success) {
-          console.log('Successfully connected to WebSocket server on port 8000');
+          console.log('WebSocket client connected');
         } else {
-          console.error('Failed to connect to WebSocket server on port 8000');
+          console.error('WebSocket client failed to connect');
         }
       })
       .catch(error => {
-        console.error('Error connecting to WebSocket server:', error);
+        console.error('Error connecting WebSocket client:', error);
       });
       
     // Disconnect when component unmounts

@@ -21,8 +21,6 @@ class AssetPreloader {
     this.createPlaceholderCharacter(scene, AssetKeys.SPRITE_PLAYER, '#4287f5');
     this.createPlaceholderCharacter(scene, AssetKeys.SPRITE_NPC, '#28a745');
     this.createPlaceholderCharacter(scene, AssetKeys.SPRITE_ENEMY, '#dc3545');
-    this.createPlaceholderUI(scene, AssetKeys.UI_HEALTHBAR_BG, '#333333');
-    this.createPlaceholderUI(scene, AssetKeys.UI_HEALTHBAR_FILL, '#00ff00');
   }
 
   /**
