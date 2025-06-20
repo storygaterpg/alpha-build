@@ -11,6 +11,7 @@ import { Actor, Position, ActorType } from '../../store/types';
 import { performanceMonitor } from '../../utils/PerformanceMonitor';
 import AssetPreloader from '../AssetPreloader';
 import GridEngine, { Direction } from 'grid-engine';
+import { Subscription } from 'rxjs';
 
 class MainScene extends Phaser.Scene {
   // Map properties
@@ -55,6 +56,10 @@ class MainScene extends Phaser.Scene {
   private isDevMode: boolean = false;
   // Grid Engine plugin instance (added for TypeScript)
   private gridEngine!: any;
+  // Subscription to grid-engine positionChanged events
+  private posSub?: Subscription;
+  // Last known tile position for fallback fallback detection
+  private lastTilePos?: Position;
 
   constructor() {
     super({ key: 'MainScene' });
@@ -179,6 +184,28 @@ class MainScene extends Phaser.Scene {
         grid: { tileWidth: TILE_SIZE, tileHeight: TILE_SIZE },
         numberOfDirections: 8
       });
+      // Subscribe to tile-enter events for step counting, if available
+      try {
+        if (this.gridEngine && typeof this.gridEngine.positionChanged === 'function') {
+          this.posSub = this.gridEngine.positionChanged()
+            .subscribe(({ charId, enterTile }: { charId: string; enterTile: Position }) => {
+              // Highlight the tile entered
+              this.highlightTile(enterTile.x, enterTile.y);
+              // Forward event to React for step-counting and path state
+              if (this.onActorMove) {
+                this.onActorMove(charId, enterTile);
+              }
+            });
+          // Clean up on shutdown
+          this.events.once(Phaser.Scenes.Events.SHUTDOWN, () => {
+            this.posSub?.unsubscribe();
+          });
+        } else {
+          console.warn('GridEngine.positionChanged not available, skipping step subscription');
+        }
+      } catch (error) {
+        console.warn('Failed to subscribe to GridEngine positionChanged:', error);
+      }
     }
 
     // Click-to-move: click a tile to move there when in move-mode
@@ -483,6 +510,20 @@ class MainScene extends Phaser.Scene {
         console.error('Failed to update custom performance panel:', error);
       }
       performanceMonitor.end();
+    }
+
+    // Fallback: detect tile entry via polling
+    if (this.movementEnabled && this.player && typeof this.gridEngine.getPosition === 'function') {
+      const curPos = this.gridEngine.getPosition(this.player.id);
+      if (curPos && (!this.lastTilePos || curPos.x !== this.lastTilePos.x || curPos.y !== this.lastTilePos.y)) {
+        this.lastTilePos = curPos;
+        // Mark the new tile in the scene
+        this.highlightTile(curPos.x, curPos.y);
+        // Also notify React for step-counting and path state
+        if (this.onActorMove) {
+          this.onActorMove(this.player.id, curPos);
+        }
+      }
     }
   }
   
@@ -965,6 +1006,22 @@ class MainScene extends Phaser.Scene {
   }
 
   /**
+   * Teleport an actor to a new tile, updating GridEngine and sprite position
+   */
+  public teleportActor(actorId: string, position: Position): void {
+    // Try to update GridEngine internal position
+    if (this.gridEngine && typeof this.gridEngine.setPosition === 'function') {
+      try {
+        this.gridEngine.setPosition(actorId, position);
+      } catch (error) {
+        console.warn('Failed to set GridEngine position for actor', actorId, error);
+      }
+    }
+    // Update sprite position
+    this.updateActorPosition(actorId, position);
+  }
+
+  /**
    * Remove an actor from the scene
    * @param actorId The ID of the actor to remove
    */
@@ -994,6 +1051,41 @@ class MainScene extends Phaser.Scene {
         this.player = null;
       }
     }
+  }
+
+  /**
+   * Check if an actor exists in the scene
+   * @param actorId The ID of the actor to check
+   * @returns True if the actor exists, false otherwise
+   */
+  public hasActor(actorId: string): boolean {
+    return this.gameObjects.has(actorId);
+  }
+
+  /**
+   * Get all actor IDs currently in the scene
+   * @returns Array of actor IDs
+   */
+  public getActorIds(): string[] {
+    return Array.from(this.gameObjects.keys());
+  }
+
+  /**
+   * Get an actor object by ID
+   * @param actorId The ID of the actor
+   * @returns The actor object or null if not found
+   */
+  public getActor(actorId: string): ActorObject | null {
+    const obj = this.gameObjects.get(actorId);
+    return obj && 'actor' in obj ? (obj as ActorObject) : null;
+  }
+
+  /**
+   * Get the ID of the current player character
+   * @returns The current player's actor ID or undefined
+   */
+  public getPlayerId(): string | undefined {
+    return this.player?.id;
   }
 
   /**
@@ -1085,33 +1177,6 @@ class MainScene extends Phaser.Scene {
   }
 
   /**
-   * Check if an actor exists in the scene
-   * @param actorId The ID of the actor to check
-   * @returns True if the actor exists, false otherwise
-   */
-  public hasActor(actorId: string): boolean {
-    return this.gameObjects.has(actorId);
-  }
-
-  /**
-   * Get all actor IDs currently in the scene
-   * @returns Array of actor IDs
-   */
-  public getActorIds(): string[] {
-    return Array.from(this.gameObjects.keys());
-  }
-
-  /**
-   * Get an actor object by ID
-   * @param actorId The ID of the actor
-   * @returns The actor object or null if not found
-   */
-  public getActor(actorId: string): ActorObject | null {
-    const obj = this.gameObjects.get(actorId);
-    return obj && 'actor' in obj ? obj as ActorObject : null;
-  }
-
-  /**
    * Highlight a specific tile position with a translucent rectangle
    */
   private highlightTile(x: number, y: number): void {
@@ -1144,10 +1209,15 @@ class MainScene extends Phaser.Scene {
   public setMovementEnabled(enabled: boolean): void {
     console.log('[MainScene] setMovementEnabled:', enabled);
     this.movementEnabled = enabled;
-    if (!enabled) {
+    if (enabled) {
+      if (this.gridEngine && typeof this.gridEngine.getPosition === 'function' && this.player) {
+        this.lastTilePos = this.gridEngine.getPosition(this.player.id);
+      }
+    } else {
       this.clearHighlights();
+      this.lastTilePos = undefined;
     }
   }
 }
 
-export default MainScene; 
+export default MainScene;

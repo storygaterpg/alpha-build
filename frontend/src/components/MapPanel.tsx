@@ -7,6 +7,7 @@ import MainScene from '../phaser/scenes/MainScene';
 import '../styles/phaser.css';
 import MapToolbar from './MapToolbar';
 import { requestMovementTiles, receiveMovementTiles, clearHighlightedTiles } from '../store/slices/mapSlice';
+import { updateActor } from '../store/slices/actorsSlice';
 import { ActorType } from '../store/types';
 import Phaser from 'phaser';
 
@@ -31,6 +32,20 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
   const [path, setPath] = useState<{x: number, y: number}[]>([]);
   const [startPosition, setStartPosition] = useState<{x: number, y: number} | null>(null);
   const [rawSteps, setRawSteps] = useState<number>(0);
+  // Keep track of which actor is currently moving for clear reset
+  const [movingActorId, setMovingActorId] = useState<string | undefined>(undefined);
+
+  // Recalculate rawSteps whenever path changes
+  useEffect(() => {
+    let steps = 0;
+    for (let i = 1; i < path.length; i++) {
+      const dx = Math.abs(path[i].x - path[i - 1].x);
+      const dy = Math.abs(path[i].y - path[i - 1].y);
+      steps += dx === 1 && dy === 1 ? 1.5 : 1;
+    }
+    setRawSteps(steps);
+  }, [path]);
+
   const prevPosRef = useRef<{x: number, y: number} | null>(null);
 
   // Get map data from Redux
@@ -126,7 +141,8 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
 
   // Stable callback for actor movement: scene calls only when movementEnabled=true
   const handleActorMove = useCallback((actorId: string, position: { x: number, y: number }) => {
-    if (actorId !== playerId) return;
+    // In networked mode, only count moves for the actual player; in test mode, playerId may be null, so accept any
+    if (playerId != null && actorId !== playerId) return;
     // Compute step increment based on delta
     const prevPos = prevPosRef.current;
     if (prevPos) {
@@ -209,7 +225,7 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
           // Remove actors that no longer exist in the data
           if (mainScene.getActorIds) {
             const sceneActorIds = mainScene.getActorIds();
-            sceneActorIds.forEach(actorId => {
+            sceneActorIds.forEach((actorId: string) => {
               if (!existingActors.has(actorId)) {
                 console.log(`🗑️ Removing deleted actor: ${actorId}`);
                 if (typeof mainScene.removeActor === 'function') {
@@ -270,31 +286,39 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
     console.log('[MapPanel] handleMoveClick, newMode=', newMode);
     if (phaserGameRef.current) {
       const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
-      mainScene.setMovementEnabled(newMode);
-    }
-    if (newMode) {
-      // Enter move mode: remember start position
-      if (playerId && phaserGameRef.current) {
-        const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
-        const playerObj = mainScene.getActor(playerId);
-        if (playerObj) {
-          console.log('[MapPanel] starting move at position', playerObj.position);
-          setStartPosition({ ...playerObj.position });
-          setPath([{ ...playerObj.position }]);
-          dispatch(requestMovementTiles({ actorId: playerId }));
-          dispatch(receiveMovementTiles({ tiles: [{ ...playerObj.position }] }));
-          // Reset raw step counter and prev position
-          setRawSteps(0);
-          prevPosRef.current = { ...playerObj.position };
-        }
+      // (Re-)register movement callback to ensure steps fire
+      if (typeof mainScene.setOnActorMove === 'function') {
+        mainScene.setOnActorMove(handleActorMove);
       }
-    } else {
-      console.log('[MapPanel] stopping move, clearing path');
-      setPath([]);
-      setStartPosition(null);
-      dispatch(clearHighlightedTiles());
-      setRawSteps(0);
-      prevPosRef.current = null;
+      mainScene.setMovementEnabled(newMode);
+      if (newMode) {
+        // Enter move mode: remember start position
+        // Determine which actor to move: Redux playerId first, else scene player, else fallback
+        const scenePlayerId = typeof mainScene.getPlayerId === 'function' ? mainScene.getPlayerId() : undefined;
+        const fallbackIds = mainScene.getActorIds();
+        const targetId = playerId ?? scenePlayerId ?? (fallbackIds.length > 0 ? fallbackIds[0] : undefined);
+        if (targetId) {
+          setMovingActorId(targetId);
+          const playerObj = mainScene.getActor(targetId);
+          if (playerObj) {
+            console.log('[MapPanel] starting move at position', playerObj.position);
+            setStartPosition({ ...playerObj.position });
+            setPath([{ ...playerObj.position }]);
+            dispatch(requestMovementTiles({ actorId: targetId }));
+            dispatch(receiveMovementTiles({ tiles: [{ ...playerObj.position }] }));
+            // Reset raw step counter and prev position for first move
+            setRawSteps(0);
+            prevPosRef.current = { ...playerObj.position };
+          }
+        }
+      } else {
+        console.log('[MapPanel] stopping move, clearing path');
+        setPath([]);
+        setStartPosition(null);
+        dispatch(clearHighlightedTiles());
+        setRawSteps(0);
+        prevPosRef.current = null;
+      }
     }
     setMoveMode(newMode);
   };
@@ -307,18 +331,39 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
 
   const handleClearClick = () => {
     console.log('[MapPanel] handleClearClick');
-    // Reset to start position
-    if (startPosition && phaserGameRef.current && playerId) {
+    if (phaserGameRef.current) {
       const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
-      mainScene.updateActorPosition(playerId, startPosition);
-      setPath([startPosition]);
-      dispatch(clearHighlightedTiles());
-      dispatch(receiveMovementTiles({ tiles: [startPosition] }));
-      // Reset raw step counter and prev position
-      console.log('[MapPanel] clearing rawSteps, prevPos to', startPosition);
-      setRawSteps(0);
-      prevPosRef.current = { ...startPosition };
+      // Disable movement and clear scene highlights
+      mainScene.setMovementEnabled(false);
+      // Determine which actor to reset: Redux playerId, movingActorId, scene player, or fallback
+      const scenePlayerId = typeof mainScene.getPlayerId === 'function' ? mainScene.getPlayerId() : undefined;
+      const fallbackIds = mainScene.getActorIds();
+      const targetId = playerId ?? movingActorId ?? scenePlayerId ?? (fallbackIds.length > 0 ? fallbackIds[0] : undefined);
+      // Reset to start position if we have one
+      if (startPosition && targetId) {
+        // Teleport actor via scene API if available
+        if (phaserGameRef.current) {
+          const sceneAny = phaserGameRef.current.getScene('MainScene') as any;
+          if (typeof sceneAny.teleportActor === 'function') {
+            sceneAny.teleportActor(targetId, startPosition);
+          } else if (typeof sceneAny.updateActorPosition === 'function') {
+            sceneAny.updateActorPosition(targetId, startPosition);
+          }
+        }
+        // Reset React path and highlights
+        setPath([{ ...startPosition }]);
+        dispatch(clearHighlightedTiles());
+        dispatch(receiveMovementTiles({ tiles: [{ ...startPosition }] }));
+        // Update Redux actor position to reset state
+        dispatch(updateActor({ id: targetId, position: startPosition }));
+        // Reset raw step counter and prev position
+        console.log('[MapPanel] clearing rawSteps, prevPos to', startPosition);
+        setRawSteps(0);
+        prevPosRef.current = { ...startPosition };
+        setMovingActorId(undefined);
+      }
     }
+    // Exit move mode
     setMoveMode(false);
     setStartPosition(null);
   };
