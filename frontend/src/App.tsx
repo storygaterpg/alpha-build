@@ -186,7 +186,7 @@ const App: React.FC = () => {
       <SocketManager />
       <NotificationsDisplay />
       <div className="app-header">
-        <ConnectionStatus />
+        {/* ConnectionStatus moved to game page header */}
       </div>
       <Routes>
         <Route path="/" element={<Home />} />

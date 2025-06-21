@@ -210,13 +210,6 @@ const Game: React.FC = () => {
         
         <div className="game-header-right">
           <ConnectionStatus />
-          <button 
-            className="glass-btn" 
-            onClick={debugLayout}
-            style={{ marginLeft: '8px' }}
-          >
-            Debug
-          </button>
         </div>
       </div>
       

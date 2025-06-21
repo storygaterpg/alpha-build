@@ -172,43 +172,6 @@ const LayoutControls: React.FC = () => {
         </Popover>
       </ButtonGroup>
       
-      <Button
-        icon="bug"
-        className="glass-btn" 
-        onClick={() => {
-          console.log('Current layout state:', currentLayout);
-          safeShowToast({
-            message: currentLayout ? 'Layout exists!' : 'No layout found!',
-            intent: currentLayout ? Intent.SUCCESS : Intent.DANGER
-          });
-        }}
-        style={{ marginLeft: '8px' }}
-      >
-        Debug
-      </Button>
-      
-      <Button
-        icon="info-sign"
-        className="glass-btn" 
-        onClick={() => {
-          console.log('Debug info:');
-          console.log('- Available components: MapPanel, ChatPanel, ActionBar, TurnIndicator, etc.');
-          console.log('- Redux state:', {
-            currentLayout,
-            savedLayouts,
-            lastLayoutId
-          });
-          
-          safeShowToast({
-            message: 'Debug info logged to console',
-            intent: Intent.PRIMARY
-          });
-        }}
-        style={{ marginLeft: '8px' }}
-      >
-        Info
-      </Button>
-      
       <Dialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
