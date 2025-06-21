@@ -26,7 +26,7 @@ const MapToolbar: React.FC<MapToolbarProps> = ({
         disabled={disabled}
         aria-pressed={moveActive}
       >
-        Move
+        {moveActive ? 'Optimize path' : 'Move'}
       </button>
       {/* Shorten Path feature not implemented yet */}
       {/* <button className="toolbar-btn shorten-btn" disabled>Shorten Path</button> */}

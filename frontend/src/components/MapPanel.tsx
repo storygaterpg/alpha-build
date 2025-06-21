@@ -151,9 +151,10 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
       const inc = dx === 1 && dy === 1 ? 1.5 : 1;
       setRawSteps(rs => rs + inc);
     }
-    prevPosRef.current = { ...position };
+    prevPosRef.current = { x: position.x, y: position.y };
     setPath(prev => {
-      const newPath = [...prev, position];
+      const newPoint = { x: position.x, y: position.y };
+      const newPath = [...prev, newPoint];
       dispatch(receiveMovementTiles({ tiles: newPath }));
       return newPath;
     });
@@ -282,45 +283,54 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
 
   // Handlers for toolbar buttons
   const handleMoveClick = () => {
-    const newMode = !moveMode;
-    console.log('[MapPanel] handleMoveClick, newMode=', newMode);
-    if (phaserGameRef.current) {
-      const mainScene = phaserGameRef.current.getScene('MainScene') as MainScene;
-      // (Re-)register movement callback to ensure steps fire
-      if (typeof mainScene.setOnActorMove === 'function') {
-        mainScene.setOnActorMove(handleActorMove);
-      }
-      mainScene.setMovementEnabled(newMode);
-      if (newMode) {
-        // Enter move mode: remember start position
-        // Determine which actor to move: Redux playerId first, else scene player, else fallback
-        const scenePlayerId = typeof mainScene.getPlayerId === 'function' ? mainScene.getPlayerId() : undefined;
-        const fallbackIds = mainScene.getActorIds();
-        const targetId = playerId ?? scenePlayerId ?? (fallbackIds.length > 0 ? fallbackIds[0] : undefined);
-        if (targetId) {
-          setMovingActorId(targetId);
-          const playerObj = mainScene.getActor(targetId);
-          if (playerObj) {
-            console.log('[MapPanel] starting move at position', playerObj.position);
-            setStartPosition({ ...playerObj.position });
-            setPath([{ ...playerObj.position }]);
-            dispatch(requestMovementTiles({ actorId: targetId }));
-            dispatch(receiveMovementTiles({ tiles: [{ ...playerObj.position }] }));
-            // Reset raw step counter and prev position for first move
-            setRawSteps(0);
-            prevPosRef.current = { ...playerObj.position };
-          }
-        }
-      } else {
-        console.log('[MapPanel] stopping move, clearing path');
-        setPath([]);
-        setStartPosition(null);
-        dispatch(clearHighlightedTiles());
-        setRawSteps(0);
-        prevPosRef.current = null;
-      }
+    console.log('[MapPanel] handleMoveClick, moveMode=', moveMode);
+    if (!phaserGameRef.current) return;
+    const mainScene = phaserGameRef.current.getScene('MainScene') as any;
+    // (Re-)register movement callback
+    if (typeof mainScene.setOnActorMove === 'function') {
+      mainScene.setOnActorMove(handleActorMove);
     }
-    setMoveMode(newMode);
+    if (!moveMode) {
+      // Enter move mode
+      mainScene.setMovementEnabled(true);
+      // Determine actor to move
+      const scenePlayerId = typeof mainScene.getPlayerId === 'function' ? mainScene.getPlayerId() : undefined;
+      const fallbackIds: string[] = mainScene.getActorIds();
+      const targetId: string | undefined = playerId ?? scenePlayerId ?? (fallbackIds.length > 0 ? fallbackIds[0] : undefined);
+      if (targetId) {
+        setMovingActorId(targetId);
+        const playerObj = mainScene.getActor(targetId);
+        if (playerObj) {
+          console.log('[MapPanel] starting move at', playerObj.position);
+          setStartPosition({ ...playerObj.position });
+          setPath([{ ...playerObj.position }]);
+          dispatch(requestMovementTiles({ actorId: targetId }));
+          dispatch(receiveMovementTiles({ tiles: [{ ...playerObj.position }] }));
+          setRawSteps(0);
+          prevPosRef.current = { ...playerObj.position };
+        }
+      }
+      setMoveMode(true);
+    } else {
+      // Optimize path: compute shortest path between start and current end
+      if (!startPosition || path.length === 0) return;
+      const endPos = path[path.length - 1];
+      // Compute shortest path via scene method
+      let newPath: { x: number; y: number }[] = path;
+      if (typeof mainScene.findPath === 'function') {
+        newPath = mainScene.findPath(startPosition, endPos);
+      }
+      // Show highlights in scene if supported
+      if (typeof mainScene.showPath === 'function') {
+        mainScene.showPath(newPath);
+      }
+      // Update React state and Redux
+      const serialized = newPath.map(({ x, y }) => ({ x, y }));
+      setPath(serialized);
+      dispatch(clearHighlightedTiles());
+      dispatch(receiveMovementTiles({ tiles: serialized }));
+      // rawSteps recalculated by effect
+    }
   };
 
   const handleShortenPathClick = () => {

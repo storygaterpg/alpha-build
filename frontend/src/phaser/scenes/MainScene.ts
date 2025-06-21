@@ -1218,6 +1218,34 @@ class MainScene extends Phaser.Scene {
       this.lastTilePos = undefined;
     }
   }
+
+  /**
+   * Compute a simple straight-line path from start to end.
+   * @param start Starting tile position
+   * @param end Ending tile position
+   */
+  public findPath(start: Position, end: Position): Position[] {
+    const path: Position[] = [];
+    let x = start.x;
+    let y = start.y;
+    while (x !== end.x || y !== end.y) {
+      if (x < end.x) x++;
+      else if (x > end.x) x--;
+      if (y < end.y) y++;
+      else if (y > end.y) y--;
+      path.push({ x, y });
+    }
+    return path;
+  }
+
+  /**
+   * Highlight a series of tiles along the given path.
+   * @param path Array of tile positions to highlight
+   */
+  public showPath(path: Position[]): void {
+    this.clearHighlights();
+    path.forEach(pos => this.highlightTile(pos.x, pos.y));
+  }
 }
 
 export default MainScene;
