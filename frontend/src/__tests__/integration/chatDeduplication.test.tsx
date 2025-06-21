@@ -109,7 +109,9 @@ describe('Chat Deduplication Integration Tests', () => {
           }
           return state;
         },
-        socket: (state: SocketState = { connected: true }, action: any): SocketState => state
+        socket: (state: SocketState = { connected: true }, action: any): SocketState => state,
+        // Connection slice for ConnectionStatus component
+        connection: (state: { reconnecting: boolean; disconnectReason: string | null } = { reconnecting: false, disconnectReason: null }, action: any) => state
       },
       middleware: (getDefaultMiddleware: any) => getDefaultMiddleware()
     });
@@ -290,7 +292,8 @@ describe('Chat Deduplication Integration Tests', () => {
     const chatMessageCalls = dispatchSpy.mock.calls.filter(
       ([action]) => {
         const typedAction = action as any;
-        return typedAction.type === 'socket/send/chat_message' && 
+        // Should match the sendInCharacterChat action dispatched from ChatPanel
+        return typedAction.type === 'chat/sendInCharacter' && 
                typedAction.payload?.content === 'Test duplicate prevention';
       }
     );

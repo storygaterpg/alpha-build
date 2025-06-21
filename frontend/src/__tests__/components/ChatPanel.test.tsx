@@ -57,10 +57,15 @@ describe('ChatPanel Component', () => {
             timestamp: Date.now(),
             type: 'in-character'
           }
-        ]
+        ],
+        isTyping: {}
       },
       socket: {
         connected: true
+      },
+      connection: {
+        reconnecting: false,
+        disconnectReason: null
       }
     });
     
@@ -93,10 +98,15 @@ describe('ChatPanel Component', () => {
         player: { id: 'player-123' }
       },
       chat: {
-        messages: []
+        messages: [],
+        isTyping: {}
       },
       socket: {
         connected: true
+      },
+      connection: {
+        reconnecting: false,
+        disconnectReason: null
       }
     });
     
@@ -165,10 +175,12 @@ describe('ChatPanel Component', () => {
         <ChatPanel />
       </Provider>
     );
+    // Clear initial clearUnread dispatch call
+    store.dispatch.mockClear();
     
     // Try to send an empty message
-    const sendButton = screen.getByRole('button', { name: '' });
-    fireEvent.click(sendButton);
+    const input = screen.getByPlaceholderText('Speak as your character...');
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
     
     // Check if validation error is displayed - use waitFor for async updates
     await waitFor(() => {
@@ -188,10 +200,15 @@ describe('ChatPanel Component', () => {
         player: { id: 'player-123' }
       },
       chat: {
-        messages: []
+        messages: [],
+        isTyping: {}
       },
       socket: {
         connected: false
+      },
+      connection: {
+        reconnecting: false,
+        disconnectReason: null
       }
     });
     
@@ -205,9 +222,8 @@ describe('ChatPanel Component', () => {
     const input = screen.getByPlaceholderText('Connecting...');
     fireEvent.change(input, { target: { value: 'This will fail' } });
     
-    // Try to send
-    const sendButton = screen.getByRole('button', { name: '' });
-    fireEvent.click(sendButton);
+    // Try to send via Enter key
+    fireEvent.keyDown(input, { key: 'Enter', code: 'Enter' });
     
     // Check if validation error is displayed - use waitFor for async updates
     await waitFor(() => {
@@ -258,7 +274,7 @@ describe('ChatPanel Component', () => {
     const sendButton = screen.getByRole('button', { name: '' });
     fireEvent.click(sendButton);
     
-    // Check if action was dispatched
+    // Check that the sendInCharacterChat action was dispatched
     expect(store.dispatch).toHaveBeenCalledWith(
       sendInCharacterChat('Duplicate message', 'player-123')
     );
@@ -272,7 +288,10 @@ describe('ChatPanel Component', () => {
     
     // Check if validation error is displayed
     expect(screen.getByText(/Duplicate message/)).toBeInTheDocument();
-    expect(store.dispatch).not.toHaveBeenCalled();
+    // Should not dispatch sendInCharacterChat again
+    expect(store.dispatch).not.toHaveBeenCalledWith(
+      sendInCharacterChat('Duplicate message', 'player-123')
+    );
     
     // Restore original env
     process.env.NODE_ENV = originalEnv;
@@ -376,10 +395,15 @@ describe('ChatPanel Component', () => {
             timestamp: timestamp + 2000,
             type: 'in-character'
           }
-        ]
+        ],
+        isTyping: {}
       },
       socket: {
         connected: true
+      },
+      connection: {
+        reconnecting: false,
+        disconnectReason: null
       }
     });
     

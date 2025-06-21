@@ -1,6 +1,9 @@
 // Import @testing-library/jest-dom extensions to extend Jest with custom DOM matchers
 import '@testing-library/jest-dom';
 
+// Mock phaser3spectorjs module imported by Phaser WebGLRenderer
+jest.mock('phaser3spectorjs', () => ({}), { virtual: true });
+
 // Mock the import.meta.env for Vite environment variables
 window.global = window;
 global.import = {};
@@ -38,6 +41,18 @@ class MockWebSocket {
 }
 
 global.WebSocket = MockWebSocket;
+
+// Stub Canvas getContext to avoid Phaser errors in Jest
+HTMLCanvasElement.prototype.getContext = () => ({
+  fillStyle: '',
+  fillRect: () => {},
+  getImageData: () => ({ data: [0, 0, 0, 0] }),
+  putImageData: () => {},
+  // Stub text drawing methods used by stats.js
+  fillText: () => {},
+  measureText: () => ({ width: 0 }),
+  // Add other necessary stubs as needed by Phaser
+});
 
 // Extend expect with custom matchers
 expect.extend({

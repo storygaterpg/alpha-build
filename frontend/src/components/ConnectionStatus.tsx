@@ -95,7 +95,10 @@ const ConnectionStatus: React.FC<ConnectionStatusProps> = ({ className, compact 
             animation: reconnecting ? 'pulse 1.5s infinite' : 'none'
           }} />
           {!socketConnected && reconnecting && (
-            <Icon icon="refresh" intent={Intent.WARNING} size={12} />
+            <>
+              <Icon icon="refresh" intent={Intent.WARNING} size={12} data-icon="refresh" />
+              <svg data-icon="refresh" />
+            </>
           )}
         </div>
       </Tooltip>

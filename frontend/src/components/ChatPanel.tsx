@@ -58,10 +58,21 @@ const ChatPanel: React.FC = () => {
     // Reset the ID map
     messageIdMap.current = {};
     
-    // First add all Redux messages to the map and unique list
+    // First add all Redux messages to the map and unique list, deduplicating by ID and content/time
+    const contentMap: Record<string, number> = {};
+    const TIME_THRESHOLD = 3000; // 3 seconds for deduplication window
     const uniqueList = messages.filter(msg => {
+      const timestamp = msg.timestamp || 0;
+      const contentKey = `${msg.sender}:${msg.content}`;
+      // Skip if no ID or ID already seen
       if (!msg.id || messageIdMap.current[msg.id]) return false;
+      // Skip content-based duplicates within time window
+      if (contentMap[contentKey] && Math.abs(contentMap[contentKey] - timestamp) < TIME_THRESHOLD) {
+        return false;
+      }
+      // Mark ID and content key as seen
       messageIdMap.current[msg.id] = true;
+      contentMap[contentKey] = timestamp;
       return true;
     });
     

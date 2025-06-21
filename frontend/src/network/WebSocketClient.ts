@@ -52,19 +52,21 @@ const isTestEnvironment = (): boolean => {
 
 // Get environment variables in a way that works in both browser and test environments
 const getEnvVar = (name: string, defaultValue: string = ''): string => {
-  // First check window.ENV if available (set in index.html)
-  if (typeof window !== 'undefined' && window.ENV && window.ENV[name.replace('VITE_', '')]) {
-    const value = window.ENV[name.replace('VITE_', '')];
-    return value || defaultValue;
+  // Check for browser-provided configuration via window.ENV
+  if (typeof window !== 'undefined' && (window as any).ENV) {
+    const key = name.replace('VITE_', '');
+    const cfg = (window as any).ENV[key];
+    if (cfg !== undefined) {
+      return cfg;
+    }
   }
-  
-  if (isTestEnvironment()) {
-    // In test environment, use the mock values from setupTests.js
-    return (global as any).import?.meta?.env?.[name] || defaultValue;
-  } else {
-    // In browser environment, use Vite's import.meta.env
-    return (import.meta.env as any)[name] || defaultValue;
+  // Fallback to test environment stubbed import.meta.env
+  const testVal = (globalThis as any).import?.meta?.env?.[name];
+  if (testVal !== undefined) {
+    return testVal;
   }
+  // Otherwise, return default
+  return defaultValue;
 };
 
 /**

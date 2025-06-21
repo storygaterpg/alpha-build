@@ -168,6 +168,8 @@ const getConnectionDiagnostics = () => {
 
 // Socket middleware creator that accepts message handlers
 export const createSocketMiddleware = (messageHandlers: MessageHandlers): Middleware => {
+  // Clear global message cache to avoid cross-test pollution
+  Object.keys(messageCache).forEach(key => delete messageCache[key]);
   // @ts-ignore - Ignoring TypeScript errors for Redux middleware compatibility
   return (store: MiddlewareAPI<Dispatch, RootState>) => {
     // Track reconnection attempts

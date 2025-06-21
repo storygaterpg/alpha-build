@@ -17,6 +17,11 @@ describe('Chat Slice', () => {
     isTyping: {}
   };
   
+  beforeEach(() => {
+    // Reset duplicate detection caches
+    chatReducer(undefined, clearMessages());
+  });
+  
   test('should handle initial state', () => {
     expect(chatReducer(undefined, { type: 'unknown' })).toEqual({
       messages: [],
