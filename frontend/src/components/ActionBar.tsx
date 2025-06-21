@@ -13,7 +13,7 @@ const ActionBar: React.FC = () => {
         <H2 className="panel-header">Actions</H2>
       </div>
       
-      <div className="action-buttons" style={{ padding: '16px' }}>
+      <div className="action-buttons" style={{ padding: '5px' }}>
         <ButtonGroup fill style={{ marginBottom: '12px' }}>
           <Button 
             icon="arrow-right" 
@@ -75,7 +75,7 @@ const ActionBar: React.FC = () => {
       
       <div style={{ flex: 1 }} />
       
-      <div style={{ padding: '0 16px 16px' }}>
+      <div style={{ padding: '0 5px 5px' }}>
         <ButtonGroup fill>
           <Button 
             icon="time" 

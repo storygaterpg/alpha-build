@@ -118,7 +118,7 @@
   height: 100%;
   overflow: hidden;
   border-radius: var(--border-radius-md);
-  padding: var(--spacing-md);
+  padding: 10px !important;
 }
 
 /* Panel headers */
@@ -199,4 +199,17 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+/* Chat message list: remove all padding/margin and add bottom margin for breathing room */
+.scrollable-content.message-list {
+  padding: 0 !important;
+  margin: 0 !important;
+  margin-bottom: 5px !important;
+}
+
+/* Remove default padding/margin for chat input container */
+.chat-input-container {
+  padding: 0 !important;
+  margin: 0 !important;
 } 

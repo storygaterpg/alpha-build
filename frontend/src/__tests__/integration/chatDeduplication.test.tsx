@@ -200,53 +200,6 @@ describe('Chat Deduplication Integration Tests', () => {
     expect(screen.getByText('This is a different message')).toBeInTheDocument();
   });
   
-  test('debug toggle affects verbose logging', async () => {
-    // Mock console.log
-    const originalConsoleLog = console.log;
-    const mockConsoleLog = jest.fn();
-    console.log = mockConsoleLog;
-    
-    try {
-      // Render with debug off
-      render(
-        <Provider store={store}>
-          <ChatPanel />
-        </Provider>
-      );
-      
-      // Find and click debug toggle
-      const debugToggle = screen.getByText('🔇 Debug');
-      fireEvent.click(debugToggle);
-      
-      // Should have set localStorage
-      expect(localStorage.setItem).toHaveBeenCalledWith('verbose_logging', 'true');
-      
-      // Re-render component to apply debug setting
-      await act(async () => {
-        store.dispatch(messageReceived({
-          id: 'debug-msg',
-          sender: 'System',
-          content: 'Debug test message',
-          timestamp: Date.now(),
-          type: 'system' as const
-        }));
-      });
-      
-      // Should have logged verbose debug info
-      expect(mockConsoleLog).toHaveBeenCalled();
-      
-      // Should be able to toggle debug off
-      const debugToggleOn = screen.getByText('🔊 Debug');
-      fireEvent.click(debugToggleOn);
-      
-      // Should have updated localStorage
-      expect(localStorage.setItem).toHaveBeenCalledWith('verbose_logging', 'false');
-    } finally {
-      // Restore original console.log
-      console.log = originalConsoleLog;
-    }
-  });
-  
   test('prevents sending duplicate chat messages in quick succession', async () => {
     // Create a store with a spy on dispatch
     const dispatchSpy = jest.spyOn(store, 'dispatch');

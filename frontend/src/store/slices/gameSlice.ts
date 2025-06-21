@@ -41,7 +41,15 @@ const initialState: GameState = {
   },
   logs: {
     entries: [],
-    unread: 0
+    unread: 0,
+    filters: {
+      info: true,
+      combat: true,
+      loot: true,
+      quest: true,
+      achievement: true,
+      error: true
+    }
   },
   turnState: {
     currentActorId: null,
@@ -285,6 +293,16 @@ export const gameSlice = createSlice({
       state.logs.unread = 0
     },
     
+    // Filter management
+    toggleLogFilter: (state, action: PayloadAction<LogEntry['type']>) => {
+      const type = action.payload;
+      state.logs.filters[type] = !state.logs.filters[type];
+    },
+    
+    setLogFilters: (state, action: PayloadAction<Record<LogEntry['type'], boolean>>) => {
+      state.logs.filters = action.payload;
+    },
+    
     // Turn management
     setGamePhase: (state, action: PayloadAction<GamePhase>) => {
       state.turnState.phase = action.payload
@@ -387,6 +405,8 @@ export const {
   clearChatUnread,
   addLogEntry,
   clearLogUnread,
+  toggleLogFilter,
+  setLogFilters,
   setGamePhase,
   startCombat,
   nextTurn,

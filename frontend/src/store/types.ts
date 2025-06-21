@@ -131,6 +131,7 @@ export interface GameState {
   logs: {
     entries: LogEntry[];
     unread: number;
+    filters: Record<LogEntry['type'], boolean>;
   };
   turnState: TurnState;
   sheetModal: ModalState;

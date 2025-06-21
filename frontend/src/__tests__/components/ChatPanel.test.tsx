@@ -152,9 +152,9 @@ describe('ChatPanel Component', () => {
       </Provider>
     );
     
-    // Switch to out-of-character mode
-    const oocButton = screen.getByText('Out of Character');
-    fireEvent.click(oocButton);
+    // Switch to out-of-character mode via toggle button
+    const toggleButton = screen.getByTitle('Switch to Out of Character');
+    fireEvent.click(toggleButton);
     
     // Type a message
     const input = screen.getByPlaceholderText('Send an out-of-character message...');
@@ -315,53 +315,6 @@ describe('ChatPanel Component', () => {
     
     // The value should now include a space
     expect(input).toHaveValue('Hello ');
-  });
-  
-  test('renders debug toggle in development mode', () => {
-    // Set NODE_ENV to development
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'development';
-    
-    render(
-      <Provider store={store}>
-        <ChatPanel />
-      </Provider>
-    );
-    
-    // Check for debug toggle button (initially showing debug off)
-    const debugToggle = screen.getByText('🔇 Debug');
-    expect(debugToggle).toBeInTheDocument();
-    
-    // Click toggle
-    fireEvent.click(debugToggle);
-    
-    // Should have updated localStorage
-    expect(localStorage.setItem).toHaveBeenCalledWith('verbose_logging', 'true');
-    
-    // Check if button text updated
-    expect(screen.getByText('🔊 Debug')).toBeInTheDocument();
-    
-    // Restore original env
-    process.env.NODE_ENV = originalEnv;
-  });
-  
-  test('does not render debug toggle in production mode', () => {
-    // Set NODE_ENV to production
-    const originalEnv = process.env.NODE_ENV;
-    process.env.NODE_ENV = 'production';
-    
-    render(
-      <Provider store={store}>
-        <ChatPanel />
-      </Provider>
-    );
-    
-    // Debug toggle should not be present
-    expect(screen.queryByText('🔇 Debug')).not.toBeInTheDocument();
-    expect(screen.queryByText('🔊 Debug')).not.toBeInTheDocument();
-    
-    // Restore original env
-    process.env.NODE_ENV = originalEnv;
   });
   
   test('deduplicates messages with identical content', () => {

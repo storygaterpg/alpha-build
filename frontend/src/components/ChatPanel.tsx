@@ -4,7 +4,6 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { sendInCharacterChat, sendOutOfCharacterChat, clearUnread, userTyping } from '../store/slices/chatSlice';
 import { AppToaster } from '../App';
-import DebugToggle from './DebugToggle';
 import TypingIndicator from './TypingIndicator';
 import ConnectionStatus from './ConnectionStatus';
 
@@ -337,22 +336,19 @@ const ChatPanel: React.FC = () => {
 
   return (
     <div className="chat-panel" style={{ 
-      height: '100%', 
+      height: '100%',
       display: 'flex', 
       flexDirection: 'column',
       position: 'relative',
       zIndex: 2,
       pointerEvents: 'auto'
     }}>
-      {/* Add debug toggle in dev mode */}
-      <DebugToggle />
-      
       <div 
         className="scrollable-content message-list" 
         ref={messageListRef}
         style={{ 
-          padding: '16px', 
-          margin: '16px',
+          padding: '5px', 
+          margin: '10px',
           height: 'calc(100% - 100px)',
           overflowY: 'auto',
           display: 'flex',
@@ -420,23 +416,13 @@ const ChatPanel: React.FC = () => {
                     OUT-OF-CHARACTER
                   </div>
                 )}
-                <div className="bubble-sender" style={{ fontWeight: 'bold', marginBottom: '4px' }}>
+                <div className="bubble-sender" style={{ fontWeight: 'normal', fontStyle: 'italic', fontSize: '12px', marginBottom: '4px' }}>
                   {msg.sender || 'Unknown'}
                 </div>
                 <div className="bubble-content" style={{ wordBreak: 'break-word' }}>
                   {/* Handle both content and text field names (for backward compatibility) */}
                   {msg.content || (msg as any).text || ''}
                 </div>
-                {msg.timestamp && (
-                  <div className="bubble-timestamp" style={{ 
-                    fontSize: '10px', 
-                    textAlign: 'right', 
-                    marginTop: '4px',
-                    opacity: 0.7 
-                  }}>
-                    {new Date(msg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                  </div>
-                )}
               </div>
             );
           })
@@ -445,41 +431,22 @@ const ChatPanel: React.FC = () => {
       </div>
       
       {/* Typing indicator */}
-      <TypingIndicator className="typing-indicator-container" style={{ margin: '0 16px', minHeight: '20px' }} />
+      <TypingIndicator className="typing-indicator-container" style={{ margin: '0 10px', minHeight: '20px' }} />
       
       {validationError && (
         <Callout
           intent={Intent.DANGER}
           title="Message Error"
-          style={{ margin: '0 16px 16px' }}
+          style={{ margin: '0 10px 10px' }}
         >
           {validationError}
         </Callout>
       )}
       
-      <div className="chat-mode-selector" style={{ margin: '0 16px 8px' }}>
-        <ButtonGroup fill={true}>
-          <Button
-            text="In Character"
-            active={messageMode === 'in-character'}
-            intent={messageMode === 'in-character' ? Intent.PRIMARY : Intent.NONE}
-            onClick={() => setMessageMode('in-character')}
-            icon="person"
-            style={{ borderRadius: '4px 0 0 4px' }}
-          />
-          <Button
-            text="Out of Character"
-            active={messageMode === 'out-of-character'}
-            intent={messageMode === 'out-of-character' ? Intent.PRIMARY : Intent.NONE}
-            onClick={() => setMessageMode('out-of-character')}
-            icon="comment"
-            style={{ borderRadius: '0 4px 4px 0' }}
-          />
-        </ButtonGroup>
-      </div>
-      
       <div className="chat-input-container" style={{ 
-        margin: '0 16px 16px',
+        display: 'flex',
+        alignItems: 'center',
+        margin: '0 10px 10px',
         position: 'relative',
         zIndex: 5,
         pointerEvents: 'auto'
@@ -528,9 +495,13 @@ const ChatPanel: React.FC = () => {
           large={true}
           intent={messageMode === 'in-character' ? Intent.PRIMARY : Intent.NONE}
           className="chat-input"
+          // seamless merge: no left border, rounded on right; avoid shorthand/longhand conflict
           style={{
             backgroundColor: 'rgba(29, 31, 58, 0.3)',
-            border: `1px solid ${messageMode === 'in-character' ? 'var(--glass-primary)' : 'var(--glass-border)'}`,
+            borderTop: `1px solid ${messageMode === 'in-character' ? 'var(--glass-primary)' : 'var(--glass-border)'}`,
+            borderRight: `1px solid ${messageMode === 'in-character' ? 'var(--glass-primary)' : 'var(--glass-border)'}`,
+            borderBottom: `1px solid ${messageMode === 'in-character' ? 'var(--glass-primary)' : 'var(--glass-border)'}`,
+            borderLeft: 'none',
             borderRadius: '20px',
             color: 'var(--glass-text-primary)',
             whiteSpace: 'pre-wrap',
@@ -571,6 +542,31 @@ const ChatPanel: React.FC = () => {
                 className="send-button"
               />
             </div>
+          }
+          leftElement={
+            <Button
+              minimal={true}
+              onClick={() => setMessageMode(prev => prev === 'in-character' ? 'out-of-character' : 'in-character')}
+              text={messageMode === 'in-character' ? 'in rol' : 'off rol'}
+              title={messageMode === 'in-character' ? 'Switch to Out of Character' : 'Switch to In Character'}
+              className="bp5-button bp5-minimal chat-mode-toggle"
+              style={{
+                pointerEvents: 'auto',
+                padding: '4px 8px',
+                backgroundColor: messageMode === 'in-character' ? 'rgba(67, 97, 238, 0.3)' : 'rgba(134, 142, 150, 0.3)',
+                // Ensure the toggle pill has fully rounded ends regardless of width
+                borderRadius: '9999px',
+                fontSize: '12px',
+                fontStyle: 'italic',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+                cursor: 'pointer'
+              }}
+            />
           }
           disabled={!socketConnected}
           autoFocus

@@ -403,7 +403,7 @@ const VideoGrid: React.FC = () => {
       )}
       
       <div className="scrollable-content" style={{
-        padding: isFullscreen ? '0' : '16px',
+        padding: isFullscreen ? '0' : '5px',
         height: '100%',
         overflow: 'hidden'
       }}>
