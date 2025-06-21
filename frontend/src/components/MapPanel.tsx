@@ -55,7 +55,7 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
   const actors = useSelector((state: RootState) => state.game.actors);
   const playerId = useSelector((state: RootState) => state.game.player?.id);
 
-  // Display step count by flooring rawSteps
+  // Display step count by flooring rawSteps (number of moves)
   const displayStepCount = Math.floor(rawSteps);
 
   // Store the callback in a ref to prevent dependency issues
@@ -315,17 +315,19 @@ const MapPanel: React.FC<MapPanelProps> = ({ onGameInitialized }) => {
       // Optimize path: compute shortest path between start and current end
       if (!startPosition || path.length === 0) return;
       const endPos = path[path.length - 1];
-      // Compute shortest path via scene method
-      let newPath: { x: number; y: number }[] = path;
-      if (typeof mainScene.findPath === 'function') {
-        newPath = mainScene.findPath(startPosition, endPos);
-      }
+      // Compute shortest path via scene method (intermediate positions)
+      const segment: { x: number; y: number }[] =
+        typeof mainScene.findPath === 'function'
+          ? mainScene.findPath(startPosition, endPos)
+          : [];
+      // Prepend start position to form full path
+      const fullPath = [{ ...startPosition }, ...segment];
       // Show highlights in scene if supported
       if (typeof mainScene.showPath === 'function') {
-        mainScene.showPath(newPath);
+        mainScene.showPath(fullPath);
       }
       // Update React state and Redux
-      const serialized = newPath.map(({ x, y }) => ({ x, y }));
+      const serialized = fullPath.map(({ x, y }) => ({ x, y }));
       setPath(serialized);
       dispatch(clearHighlightedTiles());
       dispatch(receiveMovementTiles({ tiles: serialized }));
