@@ -27,6 +27,8 @@ import CharacterSheet from '../components/CharacterSheet';
 import VideoGrid from '../components/VideoGrid';
 import LayoutControls from '../components/LayoutControls';
 import ConnectionStatus from '../components/ConnectionStatus';
+import CharacterSheetWindow from '../components/CharacterSheetWindow';
+import SpellsWindow from '../components/SpellsWindow';
 
 // Extended Item type to include equipped property
 interface ExtendedItem extends Item {
@@ -59,6 +61,8 @@ const Game: React.FC = () => {
   // Phaser game instance
   const [phaserGame, setPhaserGame] = useState<PhaserGame | null>(null);
   const [gameError, setGameError] = useState<string | null>(null);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [spellsOpen, setSpellsOpen] = useState(false);
   
   // Define a simple default layout to avoid any issues with stored layouts
   const defaultLayout: MosaicNode<ViewId> = {
@@ -200,6 +204,7 @@ const Game: React.FC = () => {
     }}>
       {/* Header with layout controls */}
       <div style={{ 
+        position: 'relative',
         marginBottom: '16px', 
         display: 'flex', 
         justifyContent: 'space-between',
@@ -207,11 +212,17 @@ const Game: React.FC = () => {
         flexShrink: 0 /* Prevent header from shrinking */
       }}>
         <LayoutControls />
+        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', gap: '10px' }}>
+          <button className="glass-btn" onClick={() => setSheetOpen(true)}>Character Sheet</button>
+          <button className="glass-btn" onClick={() => setSpellsOpen(true)}>Spells</button>
+        </div>
         
         <div className="game-header-right">
           <ConnectionStatus />
         </div>
       </div>
+      {sheetOpen && <CharacterSheetWindow onClose={() => setSheetOpen(false)} />}
+      {spellsOpen && <SpellsWindow onClose={() => setSpellsOpen(false)} />}
       
       {/* Mosaic Layout - With fixed resize options */}
       <div style={{ 

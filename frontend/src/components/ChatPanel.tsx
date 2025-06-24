@@ -49,6 +49,19 @@ const ChatPanel: React.FC = () => {
   const messageListRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   
+  // Listen for external prefill requests (e.g., spell casting)
+  useEffect(() => {
+    const handlePrefill = (e: any) => {
+      if (e.detail && typeof e.detail === 'string') {
+        setInputValue(e.detail);
+        // focus the input
+        setTimeout(() => inputRef.current?.focus(), 0);
+      }
+    };
+    window.addEventListener('prefillChat', handlePrefill as EventListener);
+    return () => window.removeEventListener('prefillChat', handlePrefill as EventListener);
+  }, []);
+  
   // Create a map of message IDs to prevent duplicates
   const messageIdMap = useRef<Record<string, boolean>>({});
   
@@ -482,22 +495,51 @@ const ChatPanel: React.FC = () => {
           />
         )}
         
+        {/* Toggle message mode button */}
+        <Button
+          minimal={true}
+          onClick={() => setMessageMode(prev => prev === 'in-character' ? 'out-of-character' : 'in-character')}
+          text={messageMode === 'in-character' ? 'in rol' : 'off rol'}
+          title={messageMode === 'in-character'
+            ? 'Switch to Out of Character to speak to the Storyteller.'
+            : 'Switch to In Character to continue with the adventure.'}
+          className="chat-mode-toggle"
+          style={{
+            position: 'absolute',
+            left: '8px',
+            top: '50%',
+            transform: 'translateY(-50%)',
+            pointerEvents: 'auto',
+            padding: '4px 8px',
+            backgroundColor: messageMode === 'in-character' ? 'rgba(67, 97, 238, 0.3)' : 'rgba(134, 142, 150, 0.3)',
+            borderRadius: '9999px',
+            fontSize: '12px',
+            fontStyle: 'italic',
+            color: 'white',
+            transition: 'all 0.2s ease',
+            boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
+            cursor: 'pointer',
+            zIndex: 2
+          }}
+        />
         <InputGroup
           placeholder={socketConnected ? 
             messageMode === 'in-character' ? "Speak as your character..." : "Send an out-of-character message..." 
             : "Connecting..."}
           value={inputValue}
           onChange={handleInputChange}
-          onKeyDown={handleKeyDown}
+          onKeyDown={e => { e.stopPropagation(); handleKeyDown(e); }}
+          onFocus={() => window.dispatchEvent(new Event('ui-focus'))}
+          onBlur={() => window.dispatchEvent(new Event('ui-blur'))}
           inputRef={inputRef}
           spellCheck={true}
           fill={true}
           large={true}
           intent={messageMode === 'in-character' ? Intent.PRIMARY : Intent.NONE}
           className="chat-input"
-          // seamless merge: no left border, rounded on right; avoid shorthand/longhand conflict
           style={{
             backgroundColor: 'rgba(29, 31, 58, 0.3)',
+            paddingLeft: '72px', // space for toggle button
             borderTop: `1px solid ${messageMode === 'in-character' ? 'var(--glass-primary)' : 'var(--glass-border)'}`,
             borderRight: `1px solid ${messageMode === 'in-character' ? 'var(--glass-primary)' : 'var(--glass-border)'}`,
             borderBottom: `1px solid ${messageMode === 'in-character' ? 'var(--glass-primary)' : 'var(--glass-border)'}`,
@@ -543,31 +585,6 @@ const ChatPanel: React.FC = () => {
               />
             </div>
           }
-          leftElement={
-            <Button
-              minimal={true}
-              onClick={() => setMessageMode(prev => prev === 'in-character' ? 'out-of-character' : 'in-character')}
-              text={messageMode === 'in-character' ? 'in rol' : 'off rol'}
-              title={messageMode === 'in-character' ? 'Switch to Out of Character' : 'Switch to In Character'}
-              className="bp5-button bp5-minimal chat-mode-toggle"
-              style={{
-                pointerEvents: 'auto',
-                padding: '4px 8px',
-                backgroundColor: messageMode === 'in-character' ? 'rgba(67, 97, 238, 0.3)' : 'rgba(134, 142, 150, 0.3)',
-                // Ensure the toggle pill has fully rounded ends regardless of width
-                borderRadius: '9999px',
-                fontSize: '12px',
-                fontStyle: 'italic',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'white',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
-                cursor: 'pointer'
-              }}
-            />
-          }
           disabled={!socketConnected}
           autoFocus
         />
@@ -611,6 +628,7 @@ const ChatPanel: React.FC = () => {
             white-space: pre-wrap !important;
             word-break: break-word !important;
             overflow-wrap: break-word !important;
+            padding-left: 60px !important;
           }
           
           /* Reset any default Blueprint event stopPropagation for space key */

@@ -54,7 +54,7 @@ describe('LogView component', () => {
     const filterButton = screen.getByLabelText('Log filters');
     fireEvent.click(filterButton);
     // uncheck COMBAT
-    const combatCheckbox = screen.getByLabelText('COMBAT');
+    const combatCheckbox = screen.getByLabelText('Combat');
     fireEvent.click(combatCheckbox);
 
     // combat entry should be gone
@@ -89,7 +89,7 @@ describe('LogView component', () => {
     // open dropdown and toggle INFO off
     const filterButton = screen.getByLabelText('Log filters');
     fireEvent.click(filterButton);
-    const infoCheckbox = screen.getByLabelText('INFO');
+    const infoCheckbox = screen.getByLabelText('Info');
     fireEvent.click(infoCheckbox);
 
     // verify localStorage updated

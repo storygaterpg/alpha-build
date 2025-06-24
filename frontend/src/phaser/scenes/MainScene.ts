@@ -149,6 +149,9 @@ class MainScene extends Phaser.Scene {
         panUp: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.W),
         panDown: this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.S)
       };
+      // Suspend game keyboard controls when UI inputs are focused
+      window.addEventListener('ui-focus', () => { this.input!.keyboard!.enabled = false; });
+      window.addEventListener('ui-blur', () => { this.input!.keyboard!.enabled = true; });
     } else {
       console.error('Input or keyboard is not available');
     }
@@ -461,6 +464,18 @@ class MainScene extends Phaser.Scene {
     this.enforceCameraBounds();
   }
 
+  /**
+   * Checks if a native HTML input or contenteditable element is focused
+   * to disable map keyboard controls when typing in chat or other inputs
+   */
+  private isInputFocused(): boolean {
+    const active = document.activeElement;
+    if (!active) return false;
+    const tag = active.tagName;
+    // Disable map keys when typing in inputs or contenteditable
+    return tag === 'INPUT' || tag === 'TEXTAREA' || (active as HTMLElement).isContentEditable;
+  }
+
   update() {
     console.log('[MainScene] update loop, movementEnabled:', this.movementEnabled, 'isDragging:', this.isDragging);
     
@@ -469,11 +484,11 @@ class MainScene extends Phaser.Scene {
       performanceMonitor.begin();
     }
     
-    // Handle keyboard zoom controls
-    this.handleKeyboardZoom();
-    
-    // Handle keyboard pan controls
-    this.handleKeyboardPan();
+    // Handle map zoom/pan only if not typing in a native input
+    if (!this.isInputFocused()) {
+      this.handleKeyboardZoom();
+      this.handleKeyboardPan();
+    }
     
     // Arrow-key movement when in move-mode
     if (this.movementEnabled && this.player) {

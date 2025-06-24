@@ -59,7 +59,7 @@ const LogView: React.FC = () => {
         <summary
           aria-label="Log filters"
           title="Filters"
-          style={{ cursor: 'pointer', background: 'rgba(0,0,0,0.3)', color: 'white', padding: '6px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+          style={{ cursor: 'pointer', background: 'var(--glass-overlay)', color: 'var(--glass-text-primary)', padding: '6px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', border: '1px solid var(--glass-border)' }}
         >
           {/* Inline funnel icon */}
           <svg
@@ -74,14 +74,15 @@ const LogView: React.FC = () => {
             <path d="M3 5h18v2l-7 8v5l-4-2v-3l-7-8V5z" />
           </svg>
         </summary>
-        <div style={{ background: 'white', padding: '5px', borderRadius: '4px', marginTop: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
+        <div style={{ background: 'var(--glass-overlay)', padding: '8px', borderRadius: '4px', marginTop: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', border: '1px solid var(--glass-border)' }}>
           {Object.entries(filters).map(([type, enabled]) => (
-            <label key={type} style={{ display: 'block', color: getLogColor(type) }}>
+            <label key={type} style={{ display: 'block', color: getLogColor(type), fontWeight: 'bold' }}>
               <input
                 type="checkbox"
                 checked={enabled}
                 onChange={() => dispatch(toggleLogFilter(type as LogEntry['type']))}
-              />{' '}{type.toUpperCase()}
+                style={{ marginRight: '4px' }}
+              />{type.charAt(0).toUpperCase() + type.slice(1)}
             </label>
           ))}
         </div>
