@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Intent, ButtonGroup, Button } from '@blueprintjs/core';
+import { Intent, ButtonGroup, Button, Popover, Menu, MenuItem, Icon } from '@blueprintjs/core';
 import { Mosaic, MosaicWindow, MosaicNode } from 'react-mosaic-component';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -18,6 +18,7 @@ import { websocketClient } from '../network';
 import { Game as PhaserGame } from '../phaser/game';
 import { Position, Actor, Item } from '../store/types';
 import { AppToaster } from '../App';
+import { useNavigate } from 'react-router-dom';
 
 // Import widget components
 import MapPanel from '../components/MapPanel';
@@ -53,6 +54,7 @@ const safeShowToast = (props: any) => {
  */
 const Game: React.FC = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const player = useSelector((state: RootState) => state.game.player);
   const actors = useSelector((state: RootState) => state.game.actors);
   const currentLayout = useSelector((state: RootState) => state.settings.currentLayout);
@@ -211,14 +213,30 @@ const Game: React.FC = () => {
         alignItems: 'center',
         flexShrink: 0 /* Prevent header from shrinking */
       }}>
+        {/* Hamburger menu & connection status */}
+        <div style={{ position: 'absolute', top: '8px', left: '8px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 20 }}>
+          <Popover
+            content={
+              <Menu>
+                <MenuItem text="Profile" onClick={() => navigate('/profile')} />
+                <MenuItem text="Games" onClick={() => navigate('/dashboard')} />
+                <MenuItem text="Friends" onClick={() => navigate('/friends')} />
+                <MenuItem text="Settings" onClick={() => navigate('/settings')} />
+              </Menu>
+            }
+            position="bottom-left"
+            minimal
+          >
+            <button className="glass-btn" style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <Icon icon="menu" />
+            </button>
+          </Popover>
+          <ConnectionStatus />
+        </div>
         <LayoutControls />
         <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', gap: '10px' }}>
           <button className="glass-btn" onClick={() => setSheetOpen(true)}>Character Sheet</button>
           <button className="glass-btn" onClick={() => setSpellsOpen(true)}>Spells</button>
-        </div>
-        
-        <div className="game-header-right">
-          <ConnectionStatus />
         </div>
       </div>
       {sheetOpen && <CharacterSheetWindow onClose={() => setSheetOpen(false)} />}

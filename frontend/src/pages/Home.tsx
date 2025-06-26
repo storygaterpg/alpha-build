@@ -1,4 +1,5 @@
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
+import { exampleImages } from '@utils/imageManifest'
 import { useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
 import { Button, Card, H1, H3, FormGroup, InputGroup, Intent, ButtonGroup } from '@blueprintjs/core'
@@ -9,6 +10,53 @@ const Home: React.FC = () => {
   const [nameError, setNameError] = useState('')
   const navigate = useNavigate()
   const dispatch = useDispatch()
+
+  // Setup for auto-scrolling the collage
+  const collageRef = useRef<HTMLDivElement>(null)
+  const [isAutoScrolling, setIsAutoScrolling] = useState(true)
+  const isAutoScrollingRef = useRef(true)
+  // Sync ref with state
+  useEffect(() => { isAutoScrollingRef.current = isAutoScrolling }, [isAutoScrolling])
+  
+  // Auto-scroll interval and scroll listener
+  useEffect(() => {
+    const container = collageRef.current
+    if (!container) return
+    // auto-scroll every 100ms when enabled
+    const intervalId = window.setInterval(() => {
+      if (isAutoScrollingRef.current) {
+        container.scrollBy({ top: 1, behavior: 'smooth' })
+        if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
+          container.scrollTo({ top: 0, behavior: 'auto' })
+        }
+      }
+    }, 50)
+    // pause on actual user input, resume after 5s
+    let resumeTimeoutId: number | undefined
+    const onUserScroll = () => {
+      if (isAutoScrollingRef.current) setIsAutoScrolling(false)
+      if (resumeTimeoutId) clearTimeout(resumeTimeoutId)
+      resumeTimeoutId = window.setTimeout(() => setIsAutoScrolling(true), 500)
+    }
+    container.addEventListener('wheel', onUserScroll, { passive: true })
+    container.addEventListener('touchmove', onUserScroll, { passive: true })
+    return () => {
+      clearInterval(intervalId)
+      container.removeEventListener('wheel', onUserScroll)
+      container.removeEventListener('touchmove', onUserScroll)
+      if (resumeTimeoutId) clearTimeout(resumeTimeoutId)
+    }
+  }, [])
+
+  // Shuffle images once on load
+  const [shuffledImages] = useState(() => {
+    const arr = [...exampleImages]
+    for (let i = arr.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1))
+      ;[arr[i], arr[j]] = [arr[j], arr[i]]
+    }
+    return arr
+  })
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value)
@@ -30,20 +78,67 @@ const Home: React.FC = () => {
 
   return (
     <div className="home-container" style={{
+      position: 'relative',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      background: 'var(--glass-background)',
-      backgroundImage: `
-        radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.3) 0%, transparent 40%),
-        radial-gradient(circle at 90% 80%, rgba(247, 37, 133, 0.3) 0%, transparent 40%),
-        radial-gradient(circle at 50% 50%, rgba(76, 201, 240, 0.1) 0%, transparent 90%)
-      `,
-      backgroundAttachment: 'fixed',
       perspective: '1000px'
     }}>
+      {/* Collage background grid */}
+      <div ref={collageRef} style={{
+        position: 'absolute', top: 0, left: 0,
+        width: '100%', height: '100%',
+        overflowY: 'auto',
+        zIndex: 0,
+        display: 'flex',
+        gap: '2px' // horizontal gap between columns
+      }}>
+        {/* Column 1: even-index images */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {shuffledImages.filter((_, idx) => idx % 2 === 0).map((src, idx) => (
+            <img
+              key={idx}
+              src={src}
+              alt={`collage-${idx}`}
+              style={{ width: '100%', height: 'auto', objectFit: 'contain', display: 'block' }}
+            />
+          ))}
+        </div>
+        {/* Column 2: odd-index images, offset upward */}
+        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, marginTop: '-500px' }}>
+          {shuffledImages.filter((_, idx) => idx % 2 === 1).map((src, idx) => (
+            <img
+              key={idx}
+              src={src}
+              alt={`collage-${idx}`}
+              style={{ width: '100%', height: 'auto', objectFit: 'contain', display: 'block' }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <Button
+        className="glass-btn glass-btn-primary"
+        style={{
+          zIndex: 1,
+          position: 'absolute',
+          top: '20px',
+          left: '20px',
+          height: '40px',
+          width: '120px',
+          fontSize: '1rem',
+          fontWeight: 600,
+          borderRadius: '8px',
+          boxShadow: '0 0 10px rgba(247, 37, 133, 0.5)',
+        }}
+        onClick={() => navigate('/login')}
+        icon="log-in"
+      >
+        Log In
+      </Button>
       <div className="glass-panel" style={{
+        zIndex: 1,
         width: '90%',
         maxWidth: '600px',
         padding: '40px',
@@ -57,7 +152,7 @@ const Home: React.FC = () => {
           textShadow: '0 0 10px rgba(67, 97, 238, 0.5)',
           fontSize: '2.5rem'
         }}>
-          StoryGate RPG
+          StoryGate
         </H1>
         
         <H3 style={{ 
@@ -129,31 +224,17 @@ const Home: React.FC = () => {
           >
             Start Adventure
           </Button>
-          
-          <Button 
-            className="glass-btn"
-            style={{
-              height: '40px',
-              width: '150px',
-              fontSize: '1rem',
-              fontWeight: 500,
-              opacity: 0.8
-            }}
-            onClick={() => navigate('/settings')}
-            icon="cog"
-            minimal
-          >
-            Settings
-          </Button>
         </div>
         
-        <div style={{ 
+        <div style={{
           marginTop: '32px',
           color: 'var(--glass-text-secondary)',
           fontSize: '0.9rem',
-          opacity: 0.7
+          opacity: 0.7,
+          fontStyle: 'italic'
         }}>
-          A professional glassmorphic RPG experience
+          Imagine a game where the story changes based on your decisions.<br />
+          An interactive adventure that adapts to you and your friends in real-time.
         </div>
       </div>
     </div>

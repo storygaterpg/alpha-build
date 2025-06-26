@@ -157,3 +157,5 @@ wrapt==1.16.0
 xxhash==3.5.0
 yarl==1.20.0
 zipp==3.21.0
+python-jose[cryptography]
+passlib[bcrypt]

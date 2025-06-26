@@ -2,10 +2,43 @@ import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath } from 'url'
 import { resolve } from 'path'
+import fs from 'fs'
+import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  plugins: [react()],
+  plugins: [
+    react(),
+    {
+      name: 'generate-example-images-manifest',
+      configureServer() {
+        // regenerate on dev server start
+        const __filename = fileURLToPath(import.meta.url)
+        const __dirname = path.dirname(__filename)
+        const dir = path.resolve(__dirname, 'public/images/example_images')
+        const dest = path.resolve(__dirname, 'src/utils/imageManifest.ts')
+        try {
+          const files = fs.readdirSync(dir)
+          const images = files.map(f => `/images/example_images/${f}`)
+          const content = `export const exampleImages = ${JSON.stringify(images)}`
+          fs.writeFileSync(dest, content)
+        } catch {}
+      },
+      buildStart() {
+        // regenerate before build
+        const __filename = fileURLToPath(import.meta.url)
+        const __dirname = path.dirname(__filename)
+        const dir = path.resolve(__dirname, 'public/images/example_images')
+        const dest = path.resolve(__dirname, 'src/utils/imageManifest.ts')
+        try {
+          const files = fs.readdirSync(dir)
+          const images = files.map(f => `/images/example_images/${f}`)
+          const content = `export const exampleImages = ${JSON.stringify(images)}`
+          fs.writeFileSync(dest, content)
+        } catch {}
+      }
+    },
+  ],
   resolve: {
     alias: {
       '@': '/src',
@@ -21,6 +54,16 @@ export default defineConfig({
   server: {
     port: 5173,
     open: true,
+    proxy: {
+      '/login': 'http://localhost:8000',
+      '/logout': 'http://localhost:8000',
+      '/me': 'http://localhost:8000',
+      '/api': 'http://localhost:8000',
+      '/ws': {
+        target: 'ws://localhost:8000',
+        ws: true
+      }
+    }
   },
   build: {
     outDir: 'dist',

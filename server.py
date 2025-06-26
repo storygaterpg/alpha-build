@@ -11,8 +11,11 @@ import sys
 import os
 import time
 from typing import Dict, List, Any, Optional, Union
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, HTTPException, Response, Cookie
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from passlib.context import CryptContext
+from jose import jwt, JWTError
 import uvicorn
 import logging
 
@@ -27,6 +30,24 @@ logging.basicConfig(
 logger = logging.getLogger("server")
 
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # allow all origins for development
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# JWT auth config (dev accepts any credentials)
+SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGE_THIS_TO_A_SECURE_RANDOM_VALUE")
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 60
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+def create_access_token(data: dict) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    to_encode.update({"exp": expire})
+    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # Define a MockAIService class that will be used if the real AIService isn't available
 class MockAIService:
@@ -197,6 +218,12 @@ except ImportError as e:
 # Manage connections and player characters
 connections: List[WebSocket] = []
 players: Dict[str, Any] = {}  # Will hold Character objects or mock data
+
+# Use environment variable for secret key; fallback to placeholder
+SECRET_KEY = os.environ.get("SECRET_KEY", "CHANGE_THIS_TO_A_SECURE_RANDOM_VALUE")
+# Determine cookie security based on environment ('production' => secure cookies)
+ENV = os.environ.get("ENV", "development")
+SECURE_COOKIES = ENV == "production"
 
 async def send_event(ws: WebSocket, event: str, payload: Any):
     """Send an event to a single client."""
@@ -505,6 +532,36 @@ async def generic_exception_handler(request: Request, exc: Exception):
         status_code=500,
         content={"message": f"Internal server error: {str(exc)}"}
     )
+
+@app.post("/login")
+async def login(payload: dict, response: Response):
+    # accept any credentials
+    email = payload.get("email", "")
+    token = create_access_token({"sub": email})
+    response.set_cookie(
+        key="access_token",
+        value=token,
+        httponly=True,
+        secure=False,
+        samesite="lax",
+        max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+    return {"message": "Logged in"}
+
+@app.post("/logout")
+async def logout(response: Response):
+    response.delete_cookie("access_token")
+    return {"message": "Logged out"}
+
+@app.get("/me")
+async def me(access_token: str = Cookie(None)):
+    if not access_token:
+        raise HTTPException(401, "Not authenticated")
+    try:
+        payload = jwt.decode(access_token, SECRET_KEY, algorithms=[ALGORITHM])
+        return {"email": payload.get("sub")}
+    except JWTError:
+        raise HTTPException(401, "Invalid token")
 
 if __name__ == '__main__':
     mode = "MOCK MODE" if USING_MOCK_DATA else "FULL ENGINE MODE"

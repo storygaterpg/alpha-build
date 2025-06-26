@@ -6,13 +6,14 @@ import '@blueprintjs/icons/lib/css/blueprint-icons.css';
 import 'react-mosaic-component/react-mosaic-component.css';
 import { useDispatch } from 'react-redux';
 import { connect, ConnectedProps } from 'react-redux';
-import { BrowserRouter as Router } from 'react-router-dom';
 import websocketClient from './network/WebSocketClient';
 
 // Import pages
 import Home from './pages/Home';
+import Login from '@pages/Login';
 import Game from './pages/Game';
 import SettingsPage from './pages/SettingsPage';
+import Dashboard from '@pages/Dashboard';
 import './styles/glassmorphic.css';
 import './styles/mosaic.css';
 
@@ -22,6 +23,7 @@ import { socketConnect, socketDisconnect } from './store/slices/socketSlice';
 // Import our components
 import ConnectionStatus from './components/ConnectionStatus';
 import NotificationsDisplay from './components/NotificationsDisplay';
+import AuthGuard from '@components/AuthGuard';
 
 // Create global AppToaster instance
 export const AppToaster = Toaster.create({
@@ -190,7 +192,16 @@ const App: React.FC = () => {
       </div>
       <Routes>
         <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/game" element={<Game />} />
+        <Route
+          path="/dashboard"
+          element={
+            <AuthGuard>
+              <Dashboard />
+            </AuthGuard>
+          }
+        />
         <Route path="/settings" element={<SettingsPage />} />
       </Routes>
     </div>
