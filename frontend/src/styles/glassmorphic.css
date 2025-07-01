@@ -1,4 +1,4 @@
-/* 
+ /* 
  * Glassmorphic Design Theme for StoryGate RPG
  * Modern, clean design with glass-like effects
  */
@@ -759,4 +759,79 @@ body {
   font-weight: 500;
   color: #e3eaff;
   margin-bottom: 8px;
+}
+
+/* Global Glassmorphic Overrides for Blueprint Popovers and Menus */
+.bp5-popover .bp5-popover-content,
+.bp5-overlay .bp5-popover-content {
+  background: var(--glass-surface) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+  border: var(--glass-border-width) solid var(--glass-border) !important;
+  border-radius: var(--glass-border-radius) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+.bp5-popover .bp5-popover-arrow,
+.bp5-overlay .bp5-arrow {
+  fill: var(--glass-surface) !important;
+  stroke: var(--glass-border) !important;
+}
+.bp5-menu {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.bp5-menu-item {
+  background-color: transparent !important;
+  color: var(--glass-text-primary) !important;
+}
+.bp5-menu-item .bp5-icon {
+  color: white !important;
+}
+.bp5-menu-item:hover {
+  background-color: rgba(255,255,255,0.1) !important;
+}
+.bp5-menu-divider,
+.bp5-divider {
+  border-top: 1px solid var(--glass-border) !important;
+}
+.bp5-menu-item.bp5-active {
+  background-color: rgba(100, 200, 255, 0.2) !important;
+  color: #aeeaff !important;
+}
+.bp5-menu-item.bp5-active .bp5-icon {
+  color: #aeeaff !important;
+}
+
+/* Log filter dropdown styling under .log-panel */
+.log-panel details {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 100;
+}
+
+.log-panel details summary {
+  cursor: pointer;
+  background: var(--glass-surface);
+  color: var(--glass-text-primary);
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+.log-panel details > div {
+  background: var(--glass-surface);
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
 } 

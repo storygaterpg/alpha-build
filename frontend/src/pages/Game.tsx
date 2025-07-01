@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { Intent, ButtonGroup, Button, Popover, Menu, MenuItem, Icon } from '@blueprintjs/core';
+import { Intent, ButtonGroup, Button, Popover, Menu, MenuItem, Icon, Dialog, Classes, Divider, FormGroup, InputGroup } from '@blueprintjs/core';
+import '@styles/GameToolbar.css';
 import { Mosaic, MosaicWindow, MosaicNode } from 'react-mosaic-component';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -10,6 +11,9 @@ import {
   resetLayout, 
   PRESET_LAYOUTS, 
   applyPresetLayout, 
+  saveLayout, 
+  loadLayout, 
+  deleteLayout, 
   LayoutPresetId, 
   ViewId,
   updateLayout
@@ -19,6 +23,7 @@ import { Game as PhaserGame } from '../phaser/game';
 import { Position, Actor, Item } from '../store/types';
 import { AppToaster } from '../App';
 import { useNavigate } from 'react-router-dom';
+import { v4 as uuidv4 } from 'uuid';
 
 // Import widget components
 import MapPanel from '../components/MapPanel';
@@ -26,7 +31,6 @@ import ChatPanel from '../components/ChatPanel';
 import LogView from '../components/LogView';
 import CharacterSheet from '../components/CharacterSheet';
 import VideoGrid from '../components/VideoGrid';
-import LayoutControls from '../components/LayoutControls';
 import ConnectionStatus from '../components/ConnectionStatus';
 import CharacterSheetWindow from '../components/CharacterSheetWindow';
 import SpellsWindow from '../components/SpellsWindow';
@@ -55,6 +59,10 @@ const safeShowToast = (props: any) => {
 const Game: React.FC = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const savedLayouts = useSelector((state: RootState) => state.settings.savedLayouts);
+  // save layout dialog state
+  const [isSaveDialogOpen, setIsSaveDialogOpen] = useState(false);
+  const [layoutName, setLayoutName] = useState('');
   const player = useSelector((state: RootState) => state.game.player);
   const actors = useSelector((state: RootState) => state.game.actors);
   const currentLayout = useSelector((state: RootState) => state.settings.currentLayout);
@@ -213,34 +221,103 @@ const Game: React.FC = () => {
         alignItems: 'center',
         flexShrink: 0 /* Prevent header from shrinking */
       }}>
-        {/* Hamburger menu & connection status */}
-        <div style={{ position: 'absolute', top: '8px', left: '8px', display: 'flex', alignItems: 'center', gap: '8px', zIndex: 20 }}>
-          <Popover
-            content={
-              <Menu>
-                <MenuItem text="Profile" onClick={() => navigate('/profile')} />
-                <MenuItem text="Games" onClick={() => navigate('/dashboard')} />
-                <MenuItem text="Friends" onClick={() => navigate('/friends')} />
-                <MenuItem text="Settings" onClick={() => navigate('/settings')} />
-              </Menu>
-            }
-            position="bottom-left"
-            minimal
-          >
-            <button className="glass-btn" style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <Icon icon="menu" />
-            </button>
-          </Popover>
-          <ConnectionStatus />
-        </div>
-        <LayoutControls />
-        <div style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', zIndex: 10, display: 'flex', gap: '10px' }}>
-          <button className="glass-btn" onClick={() => setSheetOpen(true)}>Character Sheet</button>
-          <button className="glass-btn" onClick={() => setSpellsOpen(true)}>Spells</button>
+        {/* Toolbar */}
+        <div className="toolbar">
+          <div className="toolbar-item hamburger">
+            <Popover
+              content={
+                <Menu>
+                  <MenuItem text="Profile" onClick={() => navigate('/profile')} />
+                  <MenuItem text="Games" onClick={() => navigate('/dashboard')} />
+                  <MenuItem text="Friends" onClick={() => navigate('/friends')} />
+                  <MenuItem text="Settings" onClick={() => navigate('/settings')} />
+                </Menu>
+              }
+              position="bottom-left"
+              popoverClassName="toolbar-dropdown"
+              minimal
+            >
+              <button className="glass-btn" style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon icon="menu" />
+              </button>
+            </Popover>
+          </div>
+          <div className="toolbar-item">
+            <ConnectionStatus />
+          </div>
+          <div className="toolbar-item">
+            <button className="glass-btn" onClick={() => setSheetOpen(true)}>Character Sheet</button>
+          </div>
+          <div className="toolbar-item">
+            <button className="glass-btn" onClick={() => setSpellsOpen(true)}>Spells</button>
+          </div>
+          {/* View selector dropdown */}
+          <div className="toolbar-item">
+            <Popover
+              content={
+                <Menu>
+                  <MenuItem text="Reset" icon="reset" onClick={() => dispatch(resetLayout())} />
+                  <Divider />
+                  <MenuItem text="Save Current Layout..." icon="floppy-disk" onClick={() => setIsSaveDialogOpen(true)} />
+                  <Divider />
+                  <MenuItem text="Combat View" icon="shield" active={lastLayoutId === 'combat'} onClick={() => dispatch(applyPresetLayout('combat'))} />
+                  <MenuItem text="Story View" icon="book" active={lastLayoutId === 'story'} onClick={() => dispatch(applyPresetLayout('story'))} />
+                  <MenuItem text="Roleplay View" icon="people" active={lastLayoutId === 'roleplay'} onClick={() => dispatch(applyPresetLayout('roleplay'))} />
+                  {savedLayouts.length > 0 && (
+                    <>
+                      <Divider />
+                      <MenuItem text="Saved Layouts" disabled />
+                      {savedLayouts.map(layout => (
+                        <MenuItem
+                          key={layout.id}
+                          text={layout.name}
+                          icon="floppy-disk"
+                          active={lastLayoutId === layout.id}
+                          onClick={() => dispatch(loadLayout(layout.id))}
+                          labelElement={
+                            <Button icon="trash" minimal small onClick={e => { e.stopPropagation(); dispatch(deleteLayout(layout.id)); }} />
+                          }
+                        />
+                      ))}
+                    </>
+                  )}
+                </Menu>
+              }
+              position="bottom-left"
+              popoverClassName="toolbar-dropdown"
+              minimal
+            >
+              <button className="glass-btn" style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Icon icon="layout-grid" />
+              </button>
+            </Popover>
+          </div>
         </div>
       </div>
       {sheetOpen && <CharacterSheetWindow onClose={() => setSheetOpen(false)} />}
       {spellsOpen && <SpellsWindow onClose={() => setSpellsOpen(false)} />}
+      {/* Save Layout dialog */}
+      {isSaveDialogOpen && (
+        <Dialog isOpen={isSaveDialogOpen} onClose={() => setIsSaveDialogOpen(false)} title="Save Layout" className={Classes.DARK}>
+          <div className={Classes.DIALOG_BODY}>
+            <FormGroup label="Layout Name" labelFor="layout-name" helperText="Enter a name for your custom layout">
+              <InputGroup id="layout-name" placeholder="My Layout" value={layoutName} onChange={e => setLayoutName(e.target.value)} autoFocus />
+            </FormGroup>
+          </div>
+          <div className={Classes.DIALOG_FOOTER}>
+            <div className={Classes.DIALOG_FOOTER_ACTIONS}>
+              <Button onClick={() => setIsSaveDialogOpen(false)}>Cancel</Button>
+              <Button intent={Intent.PRIMARY} onClick={() => {
+                  if (layoutName.trim()) {
+                    dispatch(saveLayout({ id: uuidv4(), name: layoutName.trim() }));
+                    setLayoutName('');
+                    setIsSaveDialogOpen(false);
+                  }
+                }}>Save</Button>
+            </div>
+          </div>
+        </Dialog>
+      )}
       
       {/* Mosaic Layout - With fixed resize options */}
       <div style={{ 

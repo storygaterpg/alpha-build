@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { RootState } from '../store';
 import { clearLogUnread, toggleLogFilter, setLogFilters } from '../store/slices/gameSlice';
 import { LogEntry } from '../store/types';
+import { Popover, Menu, MenuItem, Icon } from '@blueprintjs/core';
 
 /**
  * LogView component
@@ -54,39 +55,32 @@ const LogView: React.FC = () => {
       display: 'flex',
       flexDirection: 'column'
     }}>
-      {/* Floating filter button */}
-      <details style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 100 }}>
-        <summary
-          aria-label="Log filters"
-          title="Filters"
-          style={{ cursor: 'pointer', background: 'var(--glass-overlay)', color: 'var(--glass-text-primary)', padding: '6px', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', border: '1px solid var(--glass-border)' }}
+      {/* Floating filter dropdown */}
+      <div style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 100 }}>
+        <Popover
+          minimal
+          position="bottom-right"
+          popoverClassName="toolbar-dropdown"
+          content={
+            <Menu>
+              {Object.entries(filters).map(([type, enabled]) => (
+                <MenuItem
+                  key={type}
+                  text={type.charAt(0).toUpperCase() + type.slice(1)}
+                  icon={enabled ? 'tick' : 'blank'}
+                  active={enabled}
+                  shouldDismissPopover={false}
+                  onClick={() => dispatch(toggleLogFilter(type as LogEntry['type']))}
+                />
+              ))}
+            </Menu>
+          }
         >
-          {/* Inline funnel icon */}
-          <svg
-            aria-hidden="true"
-            width={16}
-            height={16}
-            viewBox="0 0 24 24"
-            fill="currentColor"
-            xmlns="http://www.w3.org/2000/svg"
-            style={{ display: 'block' }}
-          >
-            <path d="M3 5h18v2l-7 8v5l-4-2v-3l-7-8V5z" />
-          </svg>
-        </summary>
-        <div style={{ background: 'var(--glass-overlay)', padding: '8px', borderRadius: '4px', marginTop: '10px', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', backdropFilter: 'blur(var(--glass-blur))', WebkitBackdropFilter: 'blur(var(--glass-blur))', border: '1px solid var(--glass-border)' }}>
-          {Object.entries(filters).map(([type, enabled]) => (
-            <label key={type} style={{ display: 'block', color: getLogColor(type), fontWeight: 'bold' }}>
-              <input
-                type="checkbox"
-                checked={enabled}
-                onChange={() => dispatch(toggleLogFilter(type as LogEntry['type']))}
-                style={{ marginRight: '4px' }}
-              />{type.charAt(0).toUpperCase() + type.slice(1)}
-            </label>
-          ))}
-        </div>
-      </details>
+          <button className="glass-btn" style={{ width: '40px', height: '40px', borderRadius: '50%', padding: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Icon icon="filter" />
+          </button>
+        </Popover>
+      </div>
       {/* Log messages */}
       <div className="scrollable-content log-messages" style={{ 
         padding: '5px', 

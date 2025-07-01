@@ -1,0 +1,98 @@
+/* Glassmorphic sliding toolbar */
+.toolbar {
+  position: absolute;
+  top: -20;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  z-index: 20;
+  height: 48px;
+  padding: 4px 8px;
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-bottom: var(--glass-border-width) solid var(--glass-border);
+  border-radius: 0 0 var(--glass-border-radius) var(--glass-border-radius);
+  overflow: visible;
+}
+
+.toolbar-item {
+  transform: translateY(-100%);
+  transition: transform 0.3s ease;
+  will-change: transform;
+}
+
+.toolbar:hover .toolbar-item {
+  transform: translateY(0);
+}
+
+.toolbar-item.hamburger {
+  transform: translateY(0); /* always visible */
+}
+
+/* Glassmorphic dropdown content wrapper */
+.toolbar-dropdown {
+  background: var(--glass-surface) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+  border: var(--glass-border-width) solid var(--glass-border) !important;
+  border-radius: var(--glass-border-radius) !important;
+  padding: 4px 0 !important;
+  overflow: hidden;
+}
+
+/* Ensure menu items match glass style */
+.toolbar-dropdown .bp3-menu-item {
+  color: var(--glass-text-primary) !important;
+}
+
+.toolbar-dropdown .bp3-menu-item:hover {
+  background: rgba(255,255,255,0.1) !important;
+}
+
+.toolbar-dropdown .bp3-divider {
+  border-top: 1px solid var(--glass-border) !important;
+}
+
+/* Override Blueprint Popover Content for transparency */
+.toolbar-dropdown .bp5-popover-content {
+  background-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Override Blueprint Menu for transparency under glass dropdown */
+.toolbar-dropdown .bp5-menu {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+
+.toolbar-dropdown .bp5-menu-item {
+  background-color: transparent !important;
+  color: var(--glass-text-primary) !important;
+}
+
+.toolbar-dropdown .bp5-menu-item:hover {
+  background-color: rgba(255,255,255,0.1) !important;
+}
+
+.toolbar-dropdown .bp5-divider,
+.toolbar-dropdown .bp5-menu-divider {
+  border-top: 1px solid var(--glass-border) !important;
+}
+
+/* Make dropdown icons white */
+.toolbar-dropdown .bp5-menu-item .bp5-icon {
+  color: white !important;
+}
+
+/* Highlight active menu item with bright blue tone */
+.toolbar-dropdown .bp5-menu-item.bp5-active {
+  background-color: rgba(100, 200, 255, 0.2) !important;
+}
+
+.toolbar-dropdown .bp5-menu-item.bp5-active,
+.toolbar-dropdown .bp5-menu-item.bp5-active .bp5-icon {
+  color: #aeeaff !important;
+} 
