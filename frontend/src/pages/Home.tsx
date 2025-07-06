@@ -11,43 +11,13 @@ const Home: React.FC = () => {
   const navigate = useNavigate()
   const dispatch = useDispatch()
 
-  // Setup for auto-scrolling the collage
-  const collageRef = useRef<HTMLDivElement>(null)
+  // Setup for infinite-transform background scroll
+  const wrapperRef = useRef<HTMLDivElement>(null)
   const [isAutoScrolling, setIsAutoScrolling] = useState(true)
   const isAutoScrollingRef = useRef(true)
   // Sync ref with state
   useEffect(() => { isAutoScrollingRef.current = isAutoScrolling }, [isAutoScrolling])
   
-  // Auto-scroll interval and scroll listener
-  useEffect(() => {
-    const container = collageRef.current
-    if (!container) return
-    // auto-scroll every 100ms when enabled
-    const intervalId = window.setInterval(() => {
-      if (isAutoScrollingRef.current) {
-        container.scrollBy({ top: 1, behavior: 'smooth' })
-        if (container.scrollTop + container.clientHeight >= container.scrollHeight) {
-          container.scrollTo({ top: 0, behavior: 'auto' })
-        }
-      }
-    }, 50)
-    // pause on actual user input, resume after 5s
-    let resumeTimeoutId: number | undefined
-    const onUserScroll = () => {
-      if (isAutoScrollingRef.current) setIsAutoScrolling(false)
-      if (resumeTimeoutId) clearTimeout(resumeTimeoutId)
-      resumeTimeoutId = window.setTimeout(() => setIsAutoScrolling(true), 500)
-    }
-    container.addEventListener('wheel', onUserScroll, { passive: true })
-    container.addEventListener('touchmove', onUserScroll, { passive: true })
-    return () => {
-      clearInterval(intervalId)
-      container.removeEventListener('wheel', onUserScroll)
-      container.removeEventListener('touchmove', onUserScroll)
-      if (resumeTimeoutId) clearTimeout(resumeTimeoutId)
-    }
-  }, [])
-
   // Shuffle images once on load
   const [shuffledImages] = useState(() => {
     const arr = [...exampleImages]
@@ -57,6 +27,77 @@ const Home: React.FC = () => {
     }
     return arr
   })
+
+  // Infinite-transform scroll animation (uses shuffledImages)
+  useEffect(() => {
+    const wrapper = wrapperRef.current
+    if (!wrapper) return
+    // Measure height of one group
+    const group = wrapper.children[0] as HTMLElement
+    let groupHeight = group.clientHeight
+    let offset = 0
+    let lastTime = performance.now()
+    const speed = 0.02 // px per ms (1px per 50ms)
+
+    const tick = (time: number) => {
+      const delta = time - lastTime
+      lastTime = time
+      if (isAutoScrollingRef.current && groupHeight > 0) {
+        offset = (offset + speed * delta) % groupHeight
+        wrapper.style.transform = `translateY(-${offset}px)`
+      }
+      requestAnimationFrame(tick)
+    }
+
+    // Recompute height on resize
+    const onResize = () => {
+      groupHeight = (wrapper.children[0] as HTMLElement).clientHeight
+    }
+    window.addEventListener('resize', onResize)
+    wrapper.style.willChange = 'transform'
+
+    // Pause/resume and manual scroll on user interaction
+    let resumeId: number
+    let lastTouchY: number | null = null
+    const onWheel = (e: WheelEvent) => {
+      if (isAutoScrollingRef.current) setIsAutoScrolling(false)
+      // manual infinite scroll by wheel delta (wrap via modulo)
+      offset = ((offset + e.deltaY) % groupHeight + groupHeight) % groupHeight
+      wrapper.style.transform = `translateY(-${offset}px)`
+      clearTimeout(resumeId)
+      resumeId = window.setTimeout(() => setIsAutoScrolling(true), 500)
+    }
+    const onTouchStart = (e: TouchEvent) => {
+      lastTouchY = e.touches[0].clientY
+      if (isAutoScrollingRef.current) setIsAutoScrolling(false)
+      clearTimeout(resumeId)
+    }
+    const onTouchMove = (e: TouchEvent) => {
+      if (lastTouchY !== null) {
+        const currentY = e.touches[0].clientY
+        const deltaY = lastTouchY - currentY
+        lastTouchY = currentY
+        // manual infinite scroll by touch delta (wrap via modulo)
+        offset = ((offset + deltaY) % groupHeight + groupHeight) % groupHeight
+        wrapper.style.transform = `translateY(-${offset}px)`
+        clearTimeout(resumeId)
+        resumeId = window.setTimeout(() => setIsAutoScrolling(true), 500)
+      }
+    }
+    wrapper.addEventListener('wheel', onWheel, { passive: true })
+    wrapper.addEventListener('touchstart', onTouchStart, { passive: true })
+    wrapper.addEventListener('touchmove', onTouchMove, { passive: true })
+
+    // Start animation
+    requestAnimationFrame((t) => { lastTime = t; tick(t) })
+    return () => {
+      window.removeEventListener('resize', onResize)
+      wrapper.removeEventListener('wheel', onWheel)
+      wrapper.removeEventListener('touchstart', onTouchStart)
+      wrapper.removeEventListener('touchmove', onTouchMove)
+      clearTimeout(resumeId)
+    }
+  }, [shuffledImages])
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setName(e.target.value)
@@ -83,39 +124,42 @@ const Home: React.FC = () => {
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      perspective: '1000px'
+      perspective: '1000px',
+      overflow: 'hidden'
     }}>
-      {/* Collage background grid */}
-      <div ref={collageRef} style={{
+      {/* Infinite-transform background scroll */}
+      <div ref={wrapperRef} style={{
         position: 'absolute', top: 0, left: 0,
-        width: '100%', height: '100%',
-        overflowY: 'auto',
-        zIndex: 0,
-        display: 'flex',
-        gap: '2px' // horizontal gap between columns
+        width: '100%', overflow: 'hidden',
+        display: 'flex', flexDirection: 'column',
+        zIndex: 0, willChange: 'transform'
       }}>
-        {/* Column 1: even-index images */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
-          {shuffledImages.filter((_, idx) => idx % 2 === 0).map((src, idx) => (
-            <img
-              key={idx}
-              src={src}
-              alt={`collage-${idx}`}
-              style={{ width: '100%', height: 'auto', objectFit: 'contain', display: 'block' }}
-            />
-          ))}
-        </div>
-        {/* Column 2: odd-index images, offset upward */}
-        <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, marginTop: '-500px' }}>
-          {shuffledImages.filter((_, idx) => idx % 2 === 1).map((src, idx) => (
-            <img
-              key={idx}
-              src={src}
-              alt={`collage-${idx}`}
-              style={{ width: '100%', height: 'auto', objectFit: 'contain', display: 'block' }}
-            />
-          ))}
-        </div>
+        {[0, 1].map((_, groupIdx) => (
+          <div key={groupIdx} style={{ display: 'flex', gap: '2px' }}>
+            {/* Column 1: even-index images */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0 }}>
+              {shuffledImages.filter((_, i) => i % 2 === 0).map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt={`collage-${i}`}
+                  style={{ width: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              ))}
+            </div>
+            {/* Column 2: odd-index images, offset upward */}
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 0, marginTop: '-500px' }}>
+              {shuffledImages.filter((_, i) => i % 2 === 1).map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt={`collage-${i}`}
+                  style={{ width: '100%', objectFit: 'contain', display: 'block' }}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
       </div>
 
       <Button
