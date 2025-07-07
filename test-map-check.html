@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Map Check</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+        }
+        img {
+            max-width: 100%;
+            border: 2px solid #666;
+            margin: 20px 0;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+        }
+        h1 {
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Test Map Image Check</h1>
+        
+        <h2>Frontend Public Path (/assets/maps/test-map.png)</h2>
+        <img src="frontend/public/assets/maps/test-map.png" alt="Test Map (frontend/public path)">
+        
+        <h2>Regular Public Path (/assets/maps/test-map.png)</h2>
+        <img src="/assets/maps/test-map.png" alt="Test Map (absolute path)">
+        
+        <h2>Relative Path (assets/maps/test-map.png)</h2>
+        <img src="assets/maps/test-map.png" alt="Test Map (relative path)">
+    </div>
+</body>
+</html> 

@@ -1,0 +1,837 @@
+ /* 
+ * Glassmorphic Design Theme for StoryGate RPG
+ * Modern, clean design with glass-like effects
+ */
+
+/* Reset outlines for non-interactive elements while preserving them for form controls */
+*:not(input):not(textarea):not(select):not(button):focus,
+*:not(input):not(textarea):not(select):not(button):focus-visible,
+*:not(input):not(textarea):not(select):not(button):focus-within {
+  outline: none !important;
+  box-shadow: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* Preserve focus states for interactive elements but style them appropriately */
+input:focus, textarea:focus, select:focus, button:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 2px var(--glass-primary) !important;
+}
+
+/* Additional selectors to target any possible dotted outlines */
+.mosaic-root,
+.mosaic-root:focus,
+.mosaic-root div,
+.mosaic-root div:focus,
+.mosaic-blueprint-theme,
+.mosaic-blueprint-theme:focus,
+.mosaic-blueprint-theme *,
+.mosaic-blueprint-theme *:focus,
+[class*="bp3-"],
+[class*="bp4-"],
+[class*="mosaic"] {
+  outline: none !important;
+  outline-width: 0 !important;
+  border-style: none !important;
+  outline-style: none !important;
+  box-shadow: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* Exception for form elements in Blueprint components */
+[class*="bp3-"] input, [class*="bp3-"] textarea, [class*="bp3-"] select,
+[class*="bp4-"] input, [class*="bp4-"] textarea, [class*="bp4-"] select {
+  pointer-events: auto !important;
+}
+
+:root {
+  /* Glassmorphic color palette */
+  --glass-primary: #4361ee;
+  --glass-primary-light: #5e7cf7;
+  --glass-primary-dark: #2d45c9;
+  
+  --glass-secondary: #f72585;
+  --glass-secondary-light: #ff4f9e;
+  --glass-secondary-dark: #c4126a;
+  
+  --glass-success: #4cc9f0;
+  --glass-warning: #f8961e;
+  --glass-danger: #e63946;
+  --glass-info: #7209b7;
+  
+  /* Neutral colors */
+  --glass-background: #12121f;
+  --glass-surface: rgba(29, 31, 58, 0.5);
+  --glass-overlay: rgba(32, 34, 65, 0.7);
+  
+  /* Text colors */
+  --glass-text-primary: rgba(255, 255, 255, 0.95);
+  --glass-text-secondary: rgba(255, 255, 255, 0.75);
+  --glass-text-disabled: rgba(255, 255, 255, 0.45);
+  
+  /* Border and accent */
+  --glass-border: rgba(255, 255, 255, 0.1);
+  --glass-accent: rgba(255, 255, 255, 0.05);
+  
+  /* Glassmorphic effect variables */
+  --glass-blur: 10px;
+  --glass-border-radius: 12px;
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.36);
+  --glass-border-width: 1px;
+  
+  /* Animation variables */
+  --glass-transition-fast: 150ms;
+  --glass-transition-normal: 250ms;
+  --glass-glow-effect: 0 0 15px rgba(67, 97, 238, 0.6);
+}
+
+/* Apply glassmorphic theme to the entire app */
+body {
+  background-color: var(--glass-background);
+  background-image: 
+    radial-gradient(circle at 10% 20%, rgba(67, 97, 238, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 90% 80%, rgba(247, 37, 133, 0.15) 0%, transparent 30%),
+    radial-gradient(circle at 50% 50%, rgba(76, 201, 240, 0.05) 0%, transparent 80%);
+  background-attachment: fixed;
+  color: var(--glass-text-primary);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* Glass container base styles */
+.glass-panel {
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--glass-border-radius);
+  border: var(--glass-border-width) solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  transition: all var(--glass-transition-normal) ease;
+  overflow: hidden;
+}
+
+/* Glass panel hover effect */
+.glass-panel:hover {
+  box-shadow: var(--glass-shadow), var(--glass-glow-effect);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Panel header styling */
+.glass-header {
+  padding: 16px;
+  border-bottom: var(--glass-border-width) solid var(--glass-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--glass-overlay);
+}
+
+.glass-header h2, .glass-header h3 {
+  margin: 0;
+  font-weight: 600;
+  color: var(--glass-text-primary);
+  font-size: 1.25rem;
+}
+
+/* Buttons */
+.glass-btn {
+  background: rgba(67, 97, 238, 0.2);
+  color: var(--glass-text-primary);
+  border: 1px solid rgba(67, 97, 238, 0.4);
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all var(--glass-transition-fast) ease;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.glass-btn:hover {
+  background: rgba(67, 97, 238, 0.4);
+  border-color: rgba(67, 97, 238, 0.6);
+  box-shadow: 0 0 10px rgba(67, 97, 238, 0.3);
+}
+
+.glass-btn-primary {
+  background: rgba(67, 97, 238, 0.7);
+  border-color: var(--glass-primary);
+}
+
+.glass-btn-primary:hover {
+  background: rgba(67, 97, 238, 0.9);
+}
+
+.glass-btn-secondary {
+  background: rgba(247, 37, 133, 0.2);
+  border-color: rgba(247, 37, 133, 0.4);
+}
+
+.glass-btn-secondary:hover {
+  background: rgba(247, 37, 133, 0.4);
+  border-color: rgba(247, 37, 133, 0.6);
+  box-shadow: 0 0 10px rgba(247, 37, 133, 0.3);
+}
+
+.glass-btn-danger {
+  background: rgba(230, 57, 70, 0.2);
+  border-color: rgba(230, 57, 70, 0.4);
+}
+
+.glass-btn-danger:hover {
+  background: rgba(230, 57, 70, 0.4);
+  border-color: rgba(230, 57, 70, 0.6);
+  box-shadow: 0 0 10px rgba(230, 57, 70, 0.3);
+}
+
+/* Inputs */
+.glass-input {
+  background: rgba(29, 31, 58, 0.3);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  color: var(--glass-text-primary);
+  padding: 8px 16px;
+  width: 100%;
+  transition: all var(--glass-transition-fast) ease;
+}
+
+.glass-input:focus {
+  outline: none;
+  border-color: var(--glass-primary);
+  box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+  background: rgba(29, 31, 58, 0.5);
+}
+
+/* Glassmorphic scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(67, 97, 238, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(67, 97, 238, 0.5);
+}
+
+/* Apply glassmorphic styles to game panels */
+.map-panel,
+.chat-panel,
+.log-panel,
+.action-bar,
+.turn-indicator,
+.character-sheet,
+.video-grid {
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border-radius: var(--glass-border-radius);
+  border: var(--glass-border-width) solid var(--glass-border);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+}
+
+/* Panel headers */
+.panel-header {
+  color: var(--glass-text-primary);
+  font-weight: 600;
+  border-bottom: 1px solid var(--glass-border);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+/* Scrollable content areas with glassmorphic styling */
+.scrollable-content {
+  background: rgba(29, 31, 58, 0.2);
+  border-radius: 8px;
+  border: 1px solid var(--glass-border);
+}
+
+/* Chat message styling */
+.chat-message {
+  background: rgba(29, 31, 58, 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
+  border-left: 3px solid rgba(67, 97, 238, 0.5);
+}
+
+.chat-message.system {
+  border-left-color: rgba(76, 201, 240, 0.5);
+}
+
+.chat-message.self {
+  border-left-color: rgba(247, 37, 133, 0.5);
+  background: rgba(247, 37, 133, 0.1);
+}
+
+/* Glow effects for interactive elements */
+.interactive-element:hover {
+  box-shadow: var(--glass-glow-effect);
+}
+
+/* Blueprint.js integration overrides */
+.bp4-button {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  background-color: rgba(67, 97, 238, 0.2);
+  box-shadow: none;
+  color: var(--glass-text-primary);
+  border: 1px solid rgba(67, 97, 238, 0.3);
+}
+
+.bp4-button:hover {
+  background-color: rgba(67, 97, 238, 0.4);
+  box-shadow: 0 0 10px rgba(67, 97, 238, 0.2);
+}
+
+.bp4-input {
+  background: rgba(29, 31, 58, 0.3);
+  box-shadow: none;
+  color: var(--glass-text-primary);
+  border: 1px solid var(--glass-border);
+}
+
+.bp4-input:focus {
+  box-shadow: 0 0 0 1px var(--glass-primary), 0 0 0 3px rgba(67, 97, 238, 0.3);
+}
+
+/* Mosaic layout glassmorphic overrides */
+.glass-mosaic .mosaic-window {
+  border-radius: var(--glass-border-radius);
+  box-shadow: var(--glass-shadow);
+  overflow: hidden;
+  border: var(--glass-border-width) solid var(--glass-border);
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  outline: none !important;
+}
+
+/* Headerless mosaic window styles */
+.headerless-mosaic-window .mosaic-window-toolbar {
+  display: none !important;
+  height: 0 !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.headerless-mosaic-window .mosaic-window-body {
+  height: 100% !important;
+  top: 0 !important;
+}
+
+.headerless-mosaic-window .empty-toolbar {
+  display: none;
+}
+
+/* Target blue outlines specifically */
+.glass-mosaic *:focus,
+.glass-mosaic *:focus-visible,
+.glass-mosaic .mosaic-window,
+.glass-mosaic .mosaic-window:focus,
+.glass-mosaic .mosaic-window *:focus,
+.glass-mosaic .mosaic-window-body:focus,
+.glass-mosaic .mosaic-split:focus,
+.no-outline-window,
+.no-outline-window:focus,
+.no-outline-window *,
+.no-outline-window *:focus,
+.no-outlines,
+.no-outlines *,
+.no-outlines *:focus {
+  outline: none !important;
+  -webkit-focus-ring-color: transparent !important;
+  box-shadow: none !important;
+}
+
+.glass-mosaic .mosaic-window-toolbar {
+  background: var(--glass-overlay);
+  border-bottom: var(--glass-border-width) solid var(--glass-border);
+  padding: 8px 12px;
+}
+
+.glass-mosaic .mosaic-window-body {
+  background: transparent;
+  padding: 0;
+}
+
+/* Enhanced split bars for better resizing */
+.glass-mosaic .mosaic-split {
+  background: rgba(255, 255, 255, 0.15);
+  z-index: 10;
+  transition: background 0.2s ease;
+  outline: none !important;
+}
+
+.glass-mosaic .mosaic-split:hover {
+  background: rgba(67, 97, 238, 0.6);
+  cursor: col-resize;
+}
+
+.glass-mosaic .mosaic-split.mosaic-split-column {
+  height: 6px !important;
+  cursor: row-resize;
+  outline: none !important;
+}
+
+.glass-mosaic .mosaic-split.mosaic-split-row {
+  width: 6px !important;
+  cursor: col-resize;
+  outline: none !important;
+}
+
+/* Mosaic window title */
+.glass-mosaic .mosaic-window-title {
+  color: var(--glass-text-primary);
+  font-weight: 500;
+}
+
+/* Mini header styling for draggable mosaic windows */
+.mosaic-window-mini-header .mosaic-window-toolbar {
+  display: flex !important;
+  height: 10px !important;
+  min-height: 10px !important;
+  padding: 0 !important;
+  background-color: transparent !important;
+  border: none !important;
+  cursor: move;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  top: auto !important;
+  z-index: 10;
+}
+
+.mini-toolbar {
+  width: 100%;
+  height: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mini-toolbar .drag-handle {
+  width: 30px;
+  height: 4px;
+  background-color: var(--glass-border);
+  border-radius: 2px;
+  opacity: 0.5;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.mosaic-window-mini-header:hover .drag-handle {
+  opacity: 1;
+  background-color: var(--glass-primary);
+}
+
+.mosaic-window-mini-header .mosaic-window-body {
+  height: calc(100% - 10px) !important;
+  top: 0 !important;
+  bottom: 10px !important;
+}
+
+/* Mosaic drop target */
+.glass-mosaic .mosaic-drop-target {
+  background: rgba(67, 97, 238, 0.2);
+  border: 2px dashed var(--glass-primary);
+}
+
+/* Zero state view */
+.glass-mosaic .zero-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--glass-text-secondary);
+  font-size: 1.2rem;
+  background: rgba(29, 31, 58, 0.3);
+  border-radius: var(--glass-border-radius);
+}
+
+/* Card styled elements */
+.glass-card {
+  background: rgba(29, 31, 58, 0.4);
+  border-radius: 8px;
+  padding: 16px;
+  border: 1px solid var(--glass-border);
+  margin-bottom: 16px;
+  transition: all var(--glass-transition-fast) ease;
+}
+
+.glass-card:hover {
+  background: rgba(29, 31, 58, 0.6);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Tag styling */
+.glass-tag {
+  background: rgba(67, 97, 238, 0.2);
+  color: var(--glass-text-primary);
+  border-radius: 16px;
+  padding: 2px 8px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  margin-right: 6px;
+  border: 1px solid rgba(67, 97, 238, 0.3);
+}
+
+.glass-tag.success {
+  background: rgba(76, 201, 240, 0.2);
+  border-color: rgba(76, 201, 240, 0.3);
+}
+
+.glass-tag.warning {
+  background: rgba(248, 150, 30, 0.2);
+  border-color: rgba(248, 150, 30, 0.3);
+}
+
+.glass-tag.danger {
+  background: rgba(230, 57, 70, 0.2);
+  border-color: rgba(230, 57, 70, 0.3);
+}
+
+/* Decorative glowing orb effect */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.15;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.glow-orb.primary {
+  background: var(--glass-primary);
+}
+
+.glow-orb.secondary {
+  background: var(--glass-secondary);
+}
+
+.glow-orb.accent {
+  background: var(--glass-info);
+}
+
+/* Orb container for proper positioning */
+.orb-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 0 rgba(248, 150, 30, 0.4);
+  }
+  70% {
+    opacity: 1;
+    box-shadow: 0 0 0 10px rgba(248, 150, 30, 0);
+  }
+  100% {
+    opacity: 0.8;
+    box-shadow: 0 0 0 0 rgba(248, 150, 30, 0);
+  }
+}
+
+/* Toast notifications */
+.glassmorphic-toaster {
+  margin-top: 20px;
+}
+
+.glass-toast {
+  background: rgba(29, 31, 58, 0.7) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+  border-radius: var(--glass-border-radius) !important;
+  border: var(--glass-border-width) solid var(--glass-border) !important;
+  box-shadow: var(--glass-shadow) !important;
+  color: var(--glass-text-primary) !important;
+  padding: 16px !important;
+}
+
+.glass-toast .bp4-button {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--glass-text-primary) !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.glass-toast .bp4-button:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Grid layout for game page */
+.game-grid {
+  display: grid;
+  grid-template-columns: 3fr 1fr;
+  grid-template-rows: auto 1fr 1fr 1fr;
+  gap: 16px;
+  height: calc(100vh - 32px); /* Account for padding */
+  width: 100%;
+}
+
+.game-grid-panel {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--glass-border-radius);
+  border: var(--glass-border-width) solid var(--glass-border);
+  background: var(--glass-surface);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  box-shadow: var(--glass-shadow);
+  transition: all var(--glass-transition-normal) ease;
+}
+
+.game-grid-panel:hover {
+  box-shadow: var(--glass-shadow), var(--glass-glow-effect);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Connection Status */
+.app-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 10px;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.connection-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 10px;
+  border-radius: 16px;
+  background: rgba(30, 30, 30, 0.7);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(80, 80, 80, 0.5);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+}
+
+.connection-status-icon {
+  animation: pulse 2s infinite;
+}
+
+.connection-status-icon.reconnecting {
+  animation: spin 1.2s linear infinite;
+}
+
+.connection-status-text {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.connection-status-tooltip .bp4-popover-content {
+  padding: 8px 12px;
+  max-width: 250px;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.6;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Map Toolbar Styles */
+.map-toolbar-glass {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  min-width: 120px;
+  min-height: 120px;
+  max-width: 160px;
+  max-height: 170px;
+  width: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 12px;
+  z-index: 100;
+  background: rgba(18, 24, 40, 0.25);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+  padding: 23px 12px;
+  backdrop-filter: blur(3px);
+  -webkit-backdrop-filter: blur(3px);
+  border: 1.5px solid rgba(67, 97, 238, 0.18);
+  pointer-events: auto;
+}
+
+.toolbar-btn {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: inherit;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 8px;
+  padding: 10px 22px;
+  margin: 0;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+  background: rgba(36, 54, 90, 0.55);
+  color: #e3eaff;
+  box-shadow: 0 2px 8px rgba(67, 97, 238, 0.08);
+  outline: none;
+}
+
+.toolbar-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.move-btn {
+  background: rgba(36, 54, 90, 0.55);
+  color: #b3d1ff;
+  border: 1.5px solid rgba(67, 97, 238, 0.25);
+}
+.move-btn.active {
+  background: rgba(40, 180, 99, 0.7);
+  color: #eaffea;
+  border: 1.5px solid #27ae60;
+  box-shadow: 0 0 12px 2px rgba(40, 180, 99, 0.18);
+}
+
+.shorten-btn {
+  background: rgba(36, 54, 90, 0.45);
+  color: #b3d1ff;
+  font-size: 0.95rem;
+  border: 1.5px solid rgba(67, 97, 238, 0.18);
+}
+
+.clear-btn {
+  background: rgba(220, 53, 69, 0.35);
+  color: #fff0f0;
+  border: 1.5px solid rgba(220, 53, 69, 0.25);
+}
+.toolbar-btn.clear-btn:hover {
+  background: rgba(220, 53, 69, 0.55);
+  color: #fff;
+}
+
+/* Step count label above toolbar buttons */
+.toolbar-step-count {
+  width: 100%;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #e3eaff;
+  margin-bottom: 8px;
+}
+
+/* Global Glassmorphic Overrides for Blueprint Popovers and Menus */
+.bp5-popover .bp5-popover-content,
+.bp5-overlay .bp5-popover-content {
+  background: var(--glass-surface) !important;
+  backdrop-filter: blur(var(--glass-blur)) !important;
+  -webkit-backdrop-filter: blur(var(--glass-blur)) !important;
+  border: var(--glass-border-width) solid var(--glass-border) !important;
+  border-radius: var(--glass-border-radius) !important;
+  box-shadow: var(--glass-shadow) !important;
+}
+.bp5-popover .bp5-popover-arrow,
+.bp5-overlay .bp5-arrow {
+  fill: var(--glass-surface) !important;
+  stroke: var(--glass-border) !important;
+}
+.bp5-menu {
+  background-color: transparent !important;
+  box-shadow: none !important;
+  border: none !important;
+}
+.bp5-menu-item {
+  background-color: transparent !important;
+  color: var(--glass-text-primary) !important;
+}
+.bp5-menu-item .bp5-icon {
+  color: white !important;
+}
+.bp5-menu-item:hover {
+  background-color: rgba(255,255,255,0.1) !important;
+}
+.bp5-menu-divider,
+.bp5-divider {
+  border-top: 1px solid var(--glass-border) !important;
+}
+.bp5-menu-item.bp5-active {
+  background-color: rgba(100, 200, 255, 0.2) !important;
+  color: #aeeaff !important;
+}
+.bp5-menu-item.bp5-active .bp5-icon {
+  color: #aeeaff !important;
+}
+
+/* Log filter dropdown styling under .log-panel */
+.log-panel details {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 100;
+}
+
+.log-panel details summary {
+  cursor: pointer;
+  background: var(--glass-surface);
+  color: var(--glass-text-primary);
+  padding: 6px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+}
+
+.log-panel details > div {
+  background: var(--glass-surface);
+  padding: 8px;
+  border-radius: 4px;
+  margin-top: 10px;
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
+} 

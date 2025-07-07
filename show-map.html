@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryGateRPG Map Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #121212;
+            color: #fff;
+        }
+        .map-container {
+            border: 2px solid #666;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .character {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+        .player {
+            left: 320px;
+            top: 320px;
+        }
+        .npc {
+            left: 512px;
+            top: 512px;
+        }
+        h1, h2 {
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>StoryGateRPG Map Viewer</h1>
+    
+    <div class="map-container">
+        <object data="/frontend/public/assets/images/backgrounds/fantasy_map.svg" type="image/svg+xml" width="1024" height="768">
+            Your browser does not support SVG
+        </object>
+        
+        <img class="character player" src="/frontend/public/assets/sprites/characters/player.svg" alt="Player Character">
+        <img class="character npc" src="/frontend/public/assets/sprites/characters/npc.svg" alt="NPC Character">
+    </div>
+    
+    <h2>Alternative Direct View</h2>
+    <div class="map-container">
+        <img src="frontend/public/assets/images/backgrounds/fantasy_map.svg" alt="Fantasy Map" width="1024" height="768">
+    </div>
+    
+    <h2>Map Components</h2>
+    <p>Background Image: <a href="frontend/public/assets/images/backgrounds/fantasy_map.svg" target="_blank">fantasy_map.svg</a></p>
+    <p>Grid Tile: <a href="frontend/public/assets/images/backgrounds/grid_tile.svg" target="_blank">grid_tile.svg</a></p>
+    <p>Player Character: <a href="frontend/public/assets/sprites/characters/player.svg" target="_blank">player.svg</a></p>
+    <p>NPC Character: <a href="frontend/public/assets/sprites/characters/npc.svg" target="_blank">npc.svg</a></p>
+</body>
+</html> 

@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>StoryGate RPG</title>
+  <style>
+    /* Global style overrides to fix header and outline issues in React Mosaic */
+    .mosaic-window:focus,
+    .mosaic-window-toolbar:focus,
+    .mosaic:focus,
+    .mosaic-window-body:focus,
+    .mosaic-split:focus,
+    .mosaic *:focus,
+    .mosaic-window *:focus,
+    .mosaic-window-body *:focus {
+      outline: none !important;
+      box-shadow: none !important;
+    }
+
+    /* Prevent scrollbar layout shift */
+    html {
+      scrollbar-gutter: stable;
+    }
+
+    /* Override react-remove-scroll margin when using scrollbar-gutter */
+    @supports (scrollbar-gutter: stable) {
+      body {
+        margin: 0 !important;
+      }
+    }
+
+    /* Fix for headerless windows */
+    .mosaic-window-toolbar {
+      display: none !important;
+      height: 0 !important;
+      min-height: 0 !important;
+    }
+
+    /* Exception for mini header windows */
+    .mosaic-window-mini-header .mosaic-window-toolbar {
+      display: flex !important;
+      height: 10px !important;
+      min-height: 10px !important;
+      cursor: move;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      top: auto !important;
+      z-index: 10;
+    }
+
+    .mosaic-window-body {
+      top: 0 !important;
+      height: 100% !important;
+    }
+
+    /* Adjustment for mini header windows */
+    .mosaic-window-mini-header .mosaic-window-body {
+      top: 0 !important;
+      height: calc(100% - 10px) !important;
+      bottom: 10px !important;
+    }
+
+    /* Remove window outline */
+    .mosaic-window {
+      box-shadow: none !important;
+      outline: none !important;
+    }
+
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <div id="root"></div>
+</body>
+</html> 

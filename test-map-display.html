@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Map Display</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: white;
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .map-container {
+            position: relative;
+            border: 2px solid #444;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .map-background {
+            display: block;
+            max-width: 100%;
+        }
+        .grid-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('frontend/public/assets/images/backgrounds/grid_tile.svg');
+            background-repeat: repeat;
+            opacity: 0.3;
+        }
+        .character {
+            position: absolute;
+            width: 32px;
+            height: 32px;
+            transform: translate(-50%, -50%);
+        }
+        .player {
+            background-image: url('frontend/public/assets/sprites/characters/player.svg');
+            background-size: cover;
+            top: 50%;
+            left: 50%;
+        }
+        .npc {
+            background-image: url('frontend/public/assets/sprites/characters/npc.svg');
+            background-size: cover;
+            top: 30%;
+            left: 70%;
+        }
+        pre {
+            background: #222;
+            padding: 15px;
+            border-radius: 4px;
+            overflow: auto;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Map Display</h1>
+    
+    <div class="map-container">
+        <img src="frontend/public/assets/maps/test-map.png" alt="Fantasy Map" class="map-background">
+        <div class="grid-overlay"></div>
+        <div class="character player"></div>
+        <div class="character npc"></div>
+    </div>
+    
+    <h2>Map Details</h2>
+    <pre>{
+  "id": "test_map",
+  "name": "Test Map",
+  "width": 15,
+  "height": 15,
+  "backgroundImage": "/assets/maps/test-map.png",
+  "gridSize": 64
+}</pre>
+
+    <p>This page directly displays the test-map.png with a grid overlay and character sprites.</p>
+</body>
+</html> 

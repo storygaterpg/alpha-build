@@ -1,0 +1,33 @@
+/* Phaser Canvas Responsive Styles */
+
+.phaser-container {
+  width: 100% !important;
+  height: 100% !important;
+  position: relative;
+  overflow: hidden;
+}
+
+.phaser-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: contain;
+  display: block !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  image-rendering: pixelated;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: crisp-edges;
+}
+
+/* Ensure the canvas parent div is also responsive */
+.phaser-container > div {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Fix for Phaser scale manager */
+.phaser-container canvas[data-engine="phaser"] {
+  max-width: 100% !important;
+  max-height: 100% !important;
+} 

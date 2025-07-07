@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryGateRPG Embedded Map</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1024px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #121212;
+            color: #fff;
+        }
+        .map-container {
+            border: 2px solid #666;
+            border-radius: 8px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        h1, h2 {
+            color: #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>StoryGateRPG Embedded Map</h1>
+    
+    <div class="map-container">
+        <!-- Directly embedded SVG map -->
+        <svg width="1024" height="768" viewBox="0 0 1024 768" xmlns="http://www.w3.org/2000/svg">
+            <!-- Map background -->
+            <rect width="1024" height="768" fill="#e8d4a9" />
+            
+            <!-- Terrain features -->
+            <g id="forests">
+              <circle cx="200" cy="300" r="100" fill="#5d8c5d" />
+              <circle cx="270" cy="250" r="80" fill="#5d8c5d" />
+              <circle cx="180" cy="200" r="90" fill="#5d8c5d" />
+              <circle cx="800" cy="500" r="120" fill="#5d8c5d" />
+              <circle cx="720" cy="450" r="80" fill="#5d8c5d" />
+              <circle cx="850" cy="400" r="90" fill="#5d8c5d" />
+            </g>
+            
+            <!-- Mountains -->
+            <g id="mountains">
+              <path d="M400,200 L450,100 L500,200 Z" fill="#8a8a8a" />
+              <path d="M480,220 L530,120 L580,220 Z" fill="#8a8a8a" />
+              <path d="M560,210 L610,110 L660,210 Z" fill="#8a8a8a" />
+              <path d="M350,220 L400,120 L450,220 Z" fill="#8a8a8a" />
+            </g>
+            
+            <!-- Water -->
+            <g id="water">
+              <path d="M100,500 C150,450 250,550 300,500 C350,450 400,550 450,500 C500,450 550,550 600,500 C650,450 700,550 750,500 C800,450 850,550 900,500 L900,700 L100,700 Z" fill="#6495ed" />
+            </g>
+            
+            <!-- Grid overlay (for gameplay positioning) -->
+            <g id="grid" stroke="#0003" stroke-width="1">
+              <!-- Horizontal grid lines -->
+              <line x1="0" y1="0" x2="1024" y2="0" />
+              <line x1="0" y1="64" x2="1024" y2="64" />
+              <line x1="0" y1="128" x2="1024" y2="128" />
+              <line x1="0" y1="192" x2="1024" y2="192" />
+              <line x1="0" y1="256" x2="1024" y2="256" />
+              <line x1="0" y1="320" x2="1024" y2="320" />
+              <line x1="0" y1="384" x2="1024" y2="384" />
+              <line x1="0" y1="448" x2="1024" y2="448" />
+              <line x1="0" y1="512" x2="1024" y2="512" />
+              <line x1="0" y1="576" x2="1024" y2="576" />
+              <line x1="0" y1="640" x2="1024" y2="640" />
+              <line x1="0" y1="704" x2="1024" y2="704" />
+              <line x1="0" y1="768" x2="1024" y2="768" />
+              
+              <!-- Vertical grid lines -->
+              <line x1="0" y1="0" x2="0" y2="768" />
+              <line x1="64" y1="0" x2="64" y2="768" />
+              <line x1="128" y1="0" x2="128" y2="768" />
+              <line x1="192" y1="0" x2="192" y2="768" />
+              <line x1="256" y1="0" x2="256" y2="768" />
+              <line x1="320" y1="0" x2="320" y2="768" />
+              <line x1="384" y1="0" x2="384" y2="768" />
+              <line x1="448" y1="0" x2="448" y2="768" />
+              <line x1="512" y1="0" x2="512" y2="768" />
+              <line x1="576" y1="0" x2="576" y2="768" />
+              <line x1="640" y1="0" x2="640" y2="768" />
+              <line x1="704" y1="0" x2="704" y2="768" />
+              <line x1="768" y1="0" x2="768" y2="768" />
+              <line x1="832" y1="0" x2="832" y2="768" />
+              <line x1="896" y1="0" x2="896" y2="768" />
+              <line x1="960" y1="0" x2="960" y2="768" />
+              <line x1="1024" y1="0" x2="1024" y2="768" />
+            </g>
+            
+            <!-- Map locations/markers -->
+            <g id="locations">
+              <circle cx="250" cy="150" r="10" fill="#8b4513" />
+              <text x="270" y="155" fill="#000" font-size="16">Forest Village</text>
+              
+              <circle cx="500" cy="250" r="10" fill="#8b4513" />
+              <text x="520" y="255" fill="#000" font-size="16">Mountain Pass</text>
+              
+              <circle cx="350" cy="450" r="10" fill="#8b4513" />
+              <text x="370" y="455" fill="#000" font-size="16">Lake Town</text>
+              
+              <circle cx="750" cy="350" r="10" fill="#8b4513" />
+              <text x="770" y="355" fill="#000" font-size="16">Eastern Woods</text>
+            </g>
+        </svg>
+    </div>
+    
+    <h2>Characters</h2>
+    <div style="display: flex; gap: 20px;">
+        <div>
+            <h3>Player</h3>
+            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="10" r="6" fill="#4287f5" stroke="#000" stroke-width="1" />
+              <path d="M10,16 L22,16 L22,26 L10,26 Z" fill="#4287f5" stroke="#000" stroke-width="1" />
+              <rect x="14" y="26" width="4" height="4" fill="#8b4513" />
+              <path d="M11,8 L14,5 L18,5 L21,8" stroke="#fff" stroke-width="1" fill="none" />
+            </svg>
+        </div>
+        
+        <div>
+            <h3>NPC</h3>
+            <svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="16" cy="10" r="6" fill="#28a745" stroke="#000" stroke-width="1" />
+              <path d="M10,16 L22,16 L20,26 L12,26 Z" fill="#28a745" stroke="#000" stroke-width="1" />
+              <rect x="14" y="26" width="4" height="4" fill="#8b4513" />
+              <circle cx="14" cy="9" r="1" fill="#000" />
+              <circle cx="18" cy="9" r="1" fill="#000" />
+              <path d="M14,12 L18,12" stroke="#000" stroke-width="1" fill="none" />
+            </svg>
+        </div>
+    </div>
+    
+    <h2>Full Scene with Characters</h2>
+    <div class="map-container">
+        <svg width="1024" height="768" viewBox="0 0 1024 768" xmlns="http://www.w3.org/2000/svg">
+            <!-- Background map (as above) -->
+            <rect width="1024" height="768" fill="#e8d4a9" />
+            
+            <!-- Terrain features -->
+            <g id="forests2">
+              <circle cx="200" cy="300" r="100" fill="#5d8c5d" />
+              <circle cx="270" cy="250" r="80" fill="#5d8c5d" />
+              <circle cx="180" cy="200" r="90" fill="#5d8c5d" />
+              <circle cx="800" cy="500" r="120" fill="#5d8c5d" />
+              <circle cx="720" cy="450" r="80" fill="#5d8c5d" />
+              <circle cx="850" cy="400" r="90" fill="#5d8c5d" />
+            </g>
+            
+            <!-- Mountains -->
+            <g id="mountains2">
+              <path d="M400,200 L450,100 L500,200 Z" fill="#8a8a8a" />
+              <path d="M480,220 L530,120 L580,220 Z" fill="#8a8a8a" />
+              <path d="M560,210 L610,110 L660,210 Z" fill="#8a8a8a" />
+              <path d="M350,220 L400,120 L450,220 Z" fill="#8a8a8a" />
+            </g>
+            
+            <!-- Water -->
+            <g id="water2">
+              <path d="M100,500 C150,450 250,550 300,500 C350,450 400,550 450,500 C500,450 550,550 600,500 C650,450 700,550 750,500 C800,450 850,550 900,500 L900,700 L100,700 Z" fill="#6495ed" />
+            </g>
+            
+            <!-- Grid overlay (simplified for this example) -->
+            <g id="grid2" stroke="#0003" stroke-width="1">
+              <!-- Draw some grid lines for reference -->
+              <line x1="0" y1="0" x2="1024" y2="0" />
+              <line x1="0" y1="64" x2="1024" y2="64" />
+              <line x1="0" y1="0" x2="0" y2="768" />
+              <line x1="64" y1="0" x2="64" y2="768" />
+              <!-- Add more lines as needed -->
+            </g>
+            
+            <!-- Characters (added to the map) -->
+            <!-- Player at position (5, 5) -->
+            <g transform="translate(320, 320)">
+              <circle cx="0" cy="-10" r="6" fill="#4287f5" stroke="#000" stroke-width="1" />
+              <path d="M-6,-4 L6,-4 L6,6 L-6,6 Z" fill="#4287f5" stroke="#000" stroke-width="1" />
+              <rect x="-2" y="6" width="4" height="4" fill="#8b4513" />
+              <path d="M-5,-12 L-2,-15 L2,-15 L5,-12" stroke="#fff" stroke-width="1" fill="none" />
+            </g>
+            
+            <!-- NPC at position (8, 8) -->
+            <g transform="translate(512, 512)">
+              <circle cx="0" cy="-10" r="6" fill="#28a745" stroke="#000" stroke-width="1" />
+              <path d="M-6,-4 L6,-4 L4,6 L-4,6 Z" fill="#28a745" stroke="#000" stroke-width="1" />
+              <rect x="-2" y="6" width="4" height="4" fill="#8b4513" />
+              <circle cx="-2" cy="-11" r="1" fill="#000" />
+              <circle cx="2" cy="-11" r="1" fill="#000" />
+              <path d="M-2,-8 L2,-8" stroke="#000" stroke-width="1" fill="none" />
+            </g>
+            
+            <!-- Map locations/markers -->
+            <g id="locations2">
+              <circle cx="250" cy="150" r="10" fill="#8b4513" />
+              <text x="270" y="155" fill="#000" font-size="16">Forest Village</text>
+              
+              <circle cx="500" cy="250" r="10" fill="#8b4513" />
+              <text x="520" y="255" fill="#000" font-size="16">Mountain Pass</text>
+              
+              <circle cx="350" cy="450" r="10" fill="#8b4513" />
+              <text x="370" y="455" fill="#000" font-size="16">Lake Town</text>
+              
+              <circle cx="750" cy="350" r="10" fill="#8b4513" />
+              <text x="770" y="355" fill="#000" font-size="16">Eastern Woods</text>
+            </g>
+        </svg>
+    </div>
+</body>
+</html> 

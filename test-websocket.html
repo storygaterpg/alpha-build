@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryGateRPG WebSocket Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .connected {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .disconnected {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        #messages {
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 300px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <h1>StoryGateRPG WebSocket Test</h1>
+    
+    <div id="connectionStatus" class="status disconnected">Not Connected</div>
+    
+    <button id="connectBtn">Connect to WebSocket</button>
+    <button id="disconnectBtn" disabled>Disconnect</button>
+    
+    <h2>Server Info</h2>
+    <div id="serverInfo">Not available</div>
+    
+    <h2>Request Map</h2>
+    <button id="requestMapBtn" disabled>Request Map Data</button>
+    
+    <h2>Request Actors</h2>
+    <button id="requestActorsBtn" disabled>Request Actors Data</button>
+    
+    <h2>Messages</h2>
+    <div id="messages"></div>
+    
+    <script>
+        let socket = null;
+        const wsUrl = 'ws://localhost:8000/ws';
+        
+        function updateStatus(connected) {
+            const statusEl = document.getElementById('connectionStatus');
+            const connectBtn = document.getElementById('connectBtn');
+            const disconnectBtn = document.getElementById('disconnectBtn');
+            const requestMapBtn = document.getElementById('requestMapBtn');
+            const requestActorsBtn = document.getElementById('requestActorsBtn');
+            
+            if (connected) {
+                statusEl.className = 'status connected';
+                statusEl.textContent = 'Connected to WebSocket';
+                connectBtn.disabled = true;
+                disconnectBtn.disabled = false;
+                requestMapBtn.disabled = false;
+                requestActorsBtn.disabled = false;
+            } else {
+                statusEl.className = 'status disconnected';
+                statusEl.textContent = 'Disconnected';
+                connectBtn.disabled = false;
+                disconnectBtn.disabled = true;
+                requestMapBtn.disabled = true;
+                requestActorsBtn.disabled = true;
+            }
+        }
+        
+        function addMessage(message, isOutgoing = false) {
+            const messagesEl = document.getElementById('messages');
+            const msgEl = document.createElement('div');
+            msgEl.style.marginBottom = '10px';
+            
+            const directionEl = document.createElement('div');
+            directionEl.style.fontWeight = 'bold';
+            directionEl.style.color = isOutgoing ? '#721c24' : '#155724';
+            directionEl.textContent = isOutgoing ? '→ Sent:' : '← Received:';
+            msgEl.appendChild(directionEl);
+            
+            const contentEl = document.createElement('pre');
+            try {
+                const parsed = JSON.parse(message);
+                contentEl.textContent = JSON.stringify(parsed, null, 2);
+            } catch {
+                contentEl.textContent = message;
+            }
+            msgEl.appendChild(contentEl);
+            
+            messagesEl.appendChild(msgEl);
+            messagesEl.scrollTop = messagesEl.scrollHeight;
+        }
+        
+        function connectWebSocket() {
+            if (socket && socket.readyState === WebSocket.OPEN) return;
+            
+            try {
+                socket = new WebSocket(wsUrl);
+                
+                socket.onopen = () => {
+                    updateStatus(true);
+                    addMessage('WebSocket connection established');
+                    
+                    // Request server info
+                    fetch('http://localhost:8000/')
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('serverInfo').textContent = JSON.stringify(data, null, 2);
+                        })
+                        .catch(error => {
+                            document.getElementById('serverInfo').textContent = 'Error fetching server info: ' + error.message;
+                        });
+                };
+                
+                socket.onmessage = (event) => {
+                    addMessage(event.data);
+                    
+                    try {
+                        const data = JSON.parse(event.data);
+                        
+                        // Handle specific message types if needed
+                        if (data.event === 'mapData') {
+                            console.log('Map data received:', data.payload);
+                        } else if (data.event === 'actors') {
+                            console.log('Actors data received:', data.payload);
+                        }
+                    } catch (error) {
+                        console.error('Error parsing message:', error);
+                    }
+                };
+                
+                socket.onclose = (event) => {
+                    updateStatus(false);
+                    addMessage(`WebSocket connection closed: ${event.code} ${event.reason}`);
+                };
+                
+                socket.onerror = (error) => {
+                    updateStatus(false);
+                    addMessage('WebSocket error: ' + JSON.stringify(error));
+                };
+            } catch (error) {
+                addMessage('Error creating WebSocket: ' + error.message);
+            }
+        }
+        
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.close();
+                socket = null;
+            }
+        }
+        
+        function sendMessage(event, payload = {}) {
+            if (!socket || socket.readyState !== WebSocket.OPEN) {
+                addMessage('Cannot send message: WebSocket not connected');
+                return;
+            }
+            
+            const message = JSON.stringify({ event, payload });
+            socket.send(message);
+            addMessage(message, true);
+        }
+        
+        document.getElementById('connectBtn').addEventListener('click', connectWebSocket);
+        document.getElementById('disconnectBtn').addEventListener('click', disconnectWebSocket);
+        document.getElementById('requestMapBtn').addEventListener('click', () => sendMessage('requestMap'));
+        document.getElementById('requestActorsBtn').addEventListener('click', () => sendMessage('requestActors'));
+    </script>
+</body>
+</html> 

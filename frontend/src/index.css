@@ -1,0 +1,97 @@
+/* Global reset for outlines and focus indicators */
+* {
+  outline: none !important;
+}
+
+*:focus,
+*:focus-visible,
+*:active,
+*:focus-within,
+*:visited,
+button:focus,
+div:focus,
+[tabindex]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Target specific browser focus indicators */
+::-moz-focus-inner {
+  border: 0 !important;
+}
+
+/* Disable webkit focus ring */
+:focus {
+  outline-color: transparent !important;
+  outline-style: none !important;
+  -webkit-focus-ring-color: transparent !important;
+}
+
+/* Target React Mosaic specifically */
+.mosaic,
+.mosaic-root,
+.mosaic-tile,
+.mosaic-window,
+.mosaic-window-toolbar,
+.mosaic-window-body,
+.mosaic-window-title,
+.mosaic-window-controls,
+.mosaic-split,
+.mosaic-split-line,
+.mosaic-drop-target,
+[class*="mosaic"] {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Focus states for mosaic elements */
+.mosaic:focus,
+.mosaic *:focus,
+.mosaic-window:focus,
+.mosaic-window *:focus,
+.mosaic-split:focus,
+[class*="mosaic"]:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Target Blueprint-specific outline issues */
+.mosaic-blueprint-theme,
+.mosaic-blueprint-theme:focus,
+.mosaic-blueprint-theme *,
+.mosaic-blueprint-theme *:focus,
+.mosaic-blueprint-theme *:focus-visible,
+.mosaic-blueprint-theme:focus-visible,
+.bp3-focus,
+.bp3-focus-disabled,
+.bp4-focus,
+.bp4-focus-disabled,
+[class*="bp3"],
+[class*="bp4"],
+.mosaic-blueprint-theme [tabindex],
+.mosaic-blueprint-theme [tabindex]:focus {
+  outline: 0 !important;
+  outline-width: 0 !important;
+  outline-color: transparent !important;
+  outline-style: none !important;
+  -webkit-focus-ring-color: transparent !important;
+  box-shadow: none !important;
+}
+
+/* Target dotted outlines specifically */
+.mosaic-window-body div,
+.mosaic-window-body div:focus,
+.mosaic div,
+.mosaic div:focus,
+.mosaic-root,
+.mosaic-root:focus,
+.mosaic-root div,
+.mosaic-root div:focus {
+  border-style: none !important;
+  outline-style: none !important;
+  outline: none !important;
+  outline-width: 0 !important;
+  box-shadow: none !important;
+}
+
+/* ... existing code ... */ 

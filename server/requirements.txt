@@ -1,0 +1,6 @@
+fastapi==0.110.3
+uvicorn==0.29.0
+passlib[bcrypt]
+python-jose[cryptography]
+dspy==2.6.24
+numpy==2.2.6
