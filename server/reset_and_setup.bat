@@ -11,8 +11,17 @@ if not exist "venv\" (
     call venv\Scripts\activate.bat
     
     :: Install required packages
-    echo Installing required packages...
-    pip install -r requirements.txt
+    echo Checking for uv package manager...
+    where uv > nul 2>&1
+    if errorlevel 1 (
+        echo uv not found in virtualenv, installing uv via pip...
+        pip install uv
+    )
+    echo Installing required packages with uv...
+    uv pip install %PIP_OPTS% -r requirements.txt || (
+        echo uv install failed, falling back to pip install...
+        pip install %PIP_OPTS% -r requirements.txt
+    )
     
     :: Create a marker file with requirements.txt timestamp to indicate dependencies are installed
     copy requirements.txt venv\requirements_installed.txt > nul
@@ -22,7 +31,17 @@ if not exist "venv\" (
     if not exist "venv\dependencies_installed.marker" (
         echo Marker file not found. Installing dependencies...
         call venv\Scripts\activate.bat
-        pip install -r requirements.txt
+        echo Checking for uv package manager...
+        where uv > nul 2>&1
+        if errorlevel 1 (
+            echo uv not found in virtualenv, installing uv via pip...
+            pip install uv
+        )
+        echo Installing required packages with uv...
+        uv pip install %PIP_OPTS% -r requirements.txt || (
+            echo uv install failed, falling back to pip install...
+            pip install %PIP_OPTS% -r requirements.txt
+        )
         copy requirements.txt venv\requirements_installed.txt > nul
         echo %DATE% %TIME% > venv\dependencies_installed.marker
     ) else (
@@ -31,7 +50,17 @@ if not exist "venv\" (
         if errorlevel 1 (
             echo Requirements file has changed. Updating dependencies...
             call venv\Scripts\activate.bat
-            pip install -r requirements.txt
+            echo Checking for uv package manager...
+            where uv > nul 2>&1
+            if errorlevel 1 (
+                echo uv not found in virtualenv, installing uv via pip...
+                pip install uv
+            )
+            echo Installing required packages with uv...
+            uv pip install %PIP_OPTS% -r requirements.txt || (
+                echo uv install failed, falling back to pip install...
+                pip install %PIP_OPTS% -r requirements.txt
+            )
             copy requirements.txt venv\requirements_installed.txt > nul
             echo %DATE% %TIME% > venv\dependencies_installed.marker
         ) else (

@@ -4,9 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build",
-    "build:pwa": "tsc && vite build && workbox generateSW workbox-config.js",
+    "dev": "npm run generate:image-manifest && vite",
+    "build": "npm run generate:image-manifest && tsc && vite build",
+    "build:pwa": "npm run generate:image-manifest && tsc && vite build && workbox generateSW workbox-config.js",
+    "generate:image-manifest": "node scripts/generate-image-manifest.js",
     "preview": "vite preview",
     "icons": "node scripts/generate-icons.js",
     "pwa-check": "workbox-cli wizard",
