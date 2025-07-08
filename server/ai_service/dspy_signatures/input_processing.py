@@ -74,9 +74,7 @@ class IntentCheck(dspy.Signature):
     )
     violations: List[IntentIssue] = dspy.OutputField(
         desc=(
-            "List of any detected violations; each with "
-            "'category', 'severity', and 'description'; "
-            "empty list if none"
+            "List of any detected violations; each with 'category', 'severity', and 'description'; empty list if none."
         )
     )
     sanitized_intent: str = dspy.OutputField(
